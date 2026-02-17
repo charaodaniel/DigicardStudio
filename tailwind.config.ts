@@ -10,6 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        display: ['Inter', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
         headline: ['Space Grotesk', 'sans-serif'],
         code: ['monospace'],

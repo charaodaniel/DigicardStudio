@@ -17,31 +17,43 @@ type DigitalCardPreviewProps = {
   cardData: CardData;
 };
 
-export default function DigitalCardPreview({ cardData }: DigitalCardPreviewProps) {
-  switch (cardData.template) {
-    case 'professionals':
-      return <ProfessionalsPreview cardData={cardData} />;
-    case 'linkedin':
-      return <LinkedinPreview cardData={cardData} />;
-    case 'instagram':
-      return <InstagramPreview cardData={cardData} />;
-    case 'whatsapp':
+export default function DigitalCardPreview({
+  cardData,
+}: DigitalCardPreviewProps) {
+  const PreviewComponent = () => {
+    switch (cardData.template) {
+      case 'professionals':
+        return <ProfessionalsPreview cardData={cardData} />;
+      case 'linkedin':
+        return <LinkedinPreview cardData={cardData} />;
+      case 'instagram':
+        return <InstagramPreview cardData={cardData} />;
+      case 'whatsapp':
         return <WhatsappPreview cardData={cardData} />;
-    case 'designer-studio':
+      case 'designer-studio':
         return <DesignerStudioPreview cardData={cardData} />;
-    case 'executive':
+      case 'executive':
         return <ExecutivePreview cardData={cardData} />;
-    case 'facebook':
+      case 'facebook':
         return <FacebookPreview cardData={cardData} />;
-    case 'spotify':
+      case 'spotify':
         return <SpotifyPreview cardData={cardData} />;
-    case 'youtube':
+      case 'youtube':
         return <YoutubePreview cardData={cardData} />;
-    case 'tiktok':
+      case 'tiktok':
         return <TiktokPreview cardData={cardData} />;
-    case 'digicard-web':
+      case 'digicard-web':
         return <DigicardWebPreview cardData={cardData} />;
-    default:
-      return <DefaultPreview cardData={cardData} />;
-  }
+      default:
+        return <DefaultPreview cardData={cardData} />;
+    }
+  };
+  return (
+    <div
+      style={{ fontFamily: `'${cardData.fontFamily}', sans-serif` }}
+      className="h-full w-full"
+    >
+      <PreviewComponent />
+    </div>
+  );
 }

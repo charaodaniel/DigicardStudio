@@ -7,10 +7,16 @@
       "imageHint": "profile avatar"
     },
     {
-      "id": "profile-1",
-      "description": "Professional business profile photo",
-      "imageUrl": "https://images.unsplash.com/flagged/photo-1595514191830-3e96a518989b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwcm9mZXNzaW9uYWwlMjBwaG90b3xlbnwwfHx8fDE3NzEzNTExNzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "professional photo"
+      "id": "profile-joao-silva",
+      "description": "Profile picture of João Silva",
+      "imageUrl": "https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtYWxlJTIwcHJvZmlsZXxlbnwwfHx8fDE3NzE0Mjg2MTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "male profile"
+    },
+    {
+      "id": "qr-code-1",
+      "description": "Sample QR Code",
+      "imageUrl": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://firebasestudio.com",
+      "imageHint": "qr code"
     },
     {
       "id": "template-default",
