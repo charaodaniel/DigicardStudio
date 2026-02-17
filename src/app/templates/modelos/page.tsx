@@ -6,16 +6,16 @@ import { cn } from '@/lib/utils';
 
 const templates = [
   { name: 'Profissionais', slug: 'professionals', image: 'https://picsum.photos/seed/prof/400/300', available: true },
-  { name: 'LinkedIn', slug: 'linkedin', image: 'https://picsum.photos/seed/link/400/300', available: false },
-  { name: 'Instagram', slug: 'instagram', image: 'https://picsum.photos/seed/insta/400/300', available: false },
-  { name: 'WhatsApp', slug: 'whatsapp', image: 'https://picsum.photos/seed/wapp/400/300', available: false },
-  { name: 'Designer Studio', slug: 'designer-studio', image: 'https://picsum.photos/seed/design/400/300', available: false },
-  { name: 'Executivo', slug: 'executive', image: 'https://picsum.photos/seed/exec/400/300', available: false },
-  { name: 'Facebook', slug: 'facebook', image: 'https://picsum.photos/seed/fb/400/300', available: false },
-  { name: 'Spotify', slug: 'spotify', image: 'https://picsum.photos/seed/spot/400/300', available: false },
-  { name: 'YouTube', slug: 'youtube', image: 'https://picsum.photos/seed/yt/400/300', available: false },
-  { name: 'TikTok', slug: 'tiktok', image: 'https://picsum.photos/seed/tt/400/300', available: false },
-  { name: 'DigiCard Web', slug: 'digicard-web', image: 'https://picsum.photos/seed/digi/400/300', available: false },
+  { name: 'LinkedIn', slug: 'linkedin', image: 'https://picsum.photos/seed/link/400/300', available: true },
+  { name: 'Instagram', slug: 'instagram', image: 'https://picsum.photos/seed/insta/400/300', available: true },
+  { name: 'WhatsApp', slug: 'whatsapp', image: 'https://picsum.photos/seed/wapp/400/300', available: true },
+  { name: 'Designer Studio', slug: 'designer-studio', image: 'https://picsum.photos/seed/design/400/300', available: true },
+  { name: 'Executivo', slug: 'executive', image: 'https://picsum.photos/seed/exec/400/300', available: true },
+  { name: 'Facebook', slug: 'facebook', image: 'https://picsum.photos/seed/fb/400/300', available: true },
+  { name: 'Spotify', slug: 'spotify', image: 'https://picsum.photos/seed/spot/400/300', available: true },
+  { name: 'YouTube', slug: 'youtube', image: 'https://picsum.photos/seed/yt/400/300', available: true },
+  { name: 'TikTok', slug: 'tiktok', image: 'https://picsum.photos/seed/tt/400/300', available: true },
+  { name: 'DigiCard Web', slug: 'digicard-web', image: 'https://picsum.photos/seed/digi/400/300', available: true },
 ];
 
 export default function ModelosPage() {
