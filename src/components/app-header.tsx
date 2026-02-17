@@ -24,12 +24,12 @@ export default function AppHeader() {
       </div>
       <div className="flex items-center gap-6">
         <nav className="mr-2 hidden items-center gap-6 border-r border-slate-200 pr-6 md:flex">
-          <a
+          <Link
             className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-            href="#"
+            href="/meus-cartoes"
           >
-            Meus Projetos
-          </a>
+            Meus Cartões
+          </Link>
           <Link
             className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
             href="/templates/modelos"

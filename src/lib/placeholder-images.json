@@ -83,6 +83,30 @@
       "description": "DigiCard Web Template Preview",
       "imageUrl": "https://images.unsplash.com/photo-1645103464876-71761c1386e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkaWdpdGFsJTIwY2FyZHxlbnwwfHx8fDE3NzEzNTI4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "digital card"
+    },
+    {
+      "id": "meus-cartoes-avatar-1",
+      "description": "User profile picture of a male professional",
+      "imageUrl": "https://picsum.photos/seed/mc-avatar1/128/128",
+      "imageHint": "professional avatar"
+    },
+    {
+      "id": "meus-cartoes-card-bg-1",
+      "description": "Abstract vibrant indigo and purple gradient background",
+      "imageUrl": "https://images.unsplash.com/photo-1672009190560-12e7bade8d09?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMGdyYWRpZW50fGVufDB8fHx8MTc3MTMzNzE5Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract gradient"
+    },
+    {
+      "id": "meus-cartoes-card-bg-2",
+      "description": "Minimalist dark slate texture background",
+      "imageUrl": "https://images.unsplash.com/photo-1529753253655-470be9a42781?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkYXJrJTIwdGV4dHVyZXxlbnwwfHx8fDE3NzEyNjI2MDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dark texture"
+    },
+    {
+      "id": "meus-cartoes-card-bg-3",
+      "description": "Abstract clean wave pattern in blue tones",
+      "imageUrl": "https://images.unsplash.com/photo-1710678832358-c1f3e85939c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxibHVlJTIwd2F2ZXN8ZW58MHx8fHwxNzcxMzUzMDc2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blue waves"
     }
   ]
 }
