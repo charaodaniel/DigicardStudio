@@ -7,6 +7,7 @@ export type SocialLink = {
 };
 
 export type CardData = {
+  template: string;
   fullName: string;
   jobTitle: string;
   bio: string;

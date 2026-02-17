@@ -13,22 +13,76 @@
       "imageHint": "professional photo"
     },
     {
-      "id": "template-social",
-      "description": "Instagram Social Card Template",
-      "imageUrl": "https://images.unsplash.com/photo-1516251193007-45ef944ab0c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c29jaWFsJTIwbWVkaWF8ZW58MHx8fHwxNzcxMzQ4MTI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "social media"
+      "id": "template-default",
+      "description": "Default template preview",
+      "imageUrl": "https://picsum.photos/seed/default/400/300",
+      "imageHint": "default template"
+    },
+    {
+      "id": "template-professionals",
+      "description": "Professionals Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1659303387110-8d1be69a8d55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwcm9mZXNzaW9uYWwlMjBhcmNoaXRlY3R8ZW58MHx8fHwxNzcxMzUyODU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional architect"
+    },
+    {
+      "id": "template-linkedin",
+      "description": "LinkedIn Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1615494937430-65d34f6e5aa8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsaW5rZWRpbiUyMHByb2ZpbGV8ZW58MHx8fHwxNzcxMjkwNjE4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "linkedin profile"
+    },
+    {
+      "id": "template-instagram",
+      "description": "Instagram Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1624024000238-b31760e3cf02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxpbnN0YWdyYW0lMjBwcm9maWxlfGVufDB8fHx8MTc3MTM1Mjg1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "instagram profile"
+    },
+    {
+      "id": "template-whatsapp",
+      "description": "WhatsApp Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1497215842964-222b430dc094?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx3aGF0c2FwcCUyMGJ1c2luZXNzfGVufDB8fHx8MTc3MTM1Mjg1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "whatsapp business"
+    },
+    {
+      "id": "template-designer-studio",
+      "description": "Designer Studio Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1564917380596-cef4a39f39c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkZXNpZ25lciUyMHBvcnRmb2xpb3xlbnwwfHx8fDE3NzEzNTI4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "designer portfolio"
+    },
+    {
+      "id": "template-executive",
+      "description": "Executive Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1769893464274-ef3af10359f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZXhlY3V0aXZlJTIwY2FyZHxlbnwwfHx8fDE3NzEzNTI4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "executive card"
+    },
+    {
+      "id": "template-facebook",
+      "description": "Facebook Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1511367461989-f85a21fda167?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYWNlYm9vayUyMHByb2ZpbGV8ZW58MHx8fHwxNzcxMzUyODU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "facebook profile"
     },
     {
       "id": "template-spotify",
-      "description": "Spotify Wave Template",
-      "imageUrl": "https://images.unsplash.com/photo-1598520107176-c28e43cdc09c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtdXNpYyUyMGNyZWF0aXZlfGVufDB8fHx8MTc3MTM1MTE3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "music creative"
+      "description": "Spotify Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1570455746033-abb92a0da479?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzcG90aWZ5JTIwYXJ0aXN0fGVufDB8fHx8MTc3MTM1Mjg1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "spotify artist"
+    },
+    {
+      "id": "template-youtube",
+      "description": "YouTube Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1673767297196-ce9739933932?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx5b3V0dWJlJTIwY3JlYXRvcnxlbnwwfHx8fDE3NzEzNTI4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "youtube creator"
     },
     {
       "id": "template-tiktok",
-      "description": "TikTok Influencer Neon Template",
-      "imageUrl": "https://images.unsplash.com/photo-1648237409808-aa4649c07ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxuZW9uJTIwaW5mbHVlbmNlcnxlbnwwfHx8fDE3NzEzNTExNzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "neon influencer"
+      "description": "TikTok Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1759932021109-ffbec9251f9b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx0aWt0b2slMjBwcm9maWxlfGVufDB8fHx8MTc3MTM1Mjg1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tiktok profile"
+    },
+    {
+      "id": "template-digicard-web",
+      "description": "DigiCard Web Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1645103464876-71761c1386e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkaWdpdGFsJTIwY2FyZHxlbnwwfHx8fDE3NzEzNTI4NTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "digital card"
     }
   ]
 }

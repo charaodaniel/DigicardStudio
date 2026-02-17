@@ -4,6 +4,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const profileImage = PlaceHolderImages.find(img => img.id === 'profile-1');
 
 export const initialCardData: CardData = {
+  template: 'default',
   fullName: "Ricardo Oliveira",
   jobTitle: "Diretor de Tecnologia",
   bio: "Focado em soluções inovadoras para o mercado financeiro e corporativo.",
