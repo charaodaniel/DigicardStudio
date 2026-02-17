@@ -1,3 +1,34 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "User avatar",
+      "imageUrl": "https://images.unsplash.com/photo-1715615751025-e7ebe7f47eea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwcm9maWxlJTIwYXZhdGFyfGVufDB8fHx8MTc3MTMxMjAzMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "profile avatar"
+    },
+    {
+      "id": "profile-1",
+      "description": "Professional business profile photo",
+      "imageUrl": "https://images.unsplash.com/flagged/photo-1595514191830-3e96a518989b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwcm9mZXNzaW9uYWwlMjBwaG90b3xlbnwwfHx8fDE3NzEzNTExNzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional photo"
+    },
+    {
+      "id": "template-social",
+      "description": "Instagram Social Card Template",
+      "imageUrl": "https://images.unsplash.com/photo-1516251193007-45ef944ab0c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c29jaWFsJTIwbWVkaWF8ZW58MHx8fHwxNzcxMzQ4MTI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "social media"
+    },
+    {
+      "id": "template-spotify",
+      "description": "Spotify Wave Template",
+      "imageUrl": "https://images.unsplash.com/photo-1598520107176-c28e43cdc09c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtdXNpYyUyMGNyZWF0aXZlfGVufDB8fHx8MTc3MTM1MTE3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "music creative"
+    },
+    {
+      "id": "template-tiktok",
+      "description": "TikTok Influencer Neon Template",
+      "imageUrl": "https://images.unsplash.com/photo-1648237409808-aa4649c07ec8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxuZW9uJTIwaW5mbHVlbmNlcnxlbnwwfHx8fDE3NzEzNTExNzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "neon influencer"
+    }
+  ]
 }
