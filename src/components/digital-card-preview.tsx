@@ -8,7 +8,7 @@ type DigitalCardPreviewProps = {
 };
 
 export default function DigitalCardPreview({ cardData }: DigitalCardPreviewProps) {
-  const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor } = cardData;
+  const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
 
   return (
     <div className="flex h-full w-full flex-col">
@@ -73,7 +73,7 @@ export default function DigitalCardPreview({ cardData }: DigitalCardPreviewProps
           className="mt-10 w-full rounded-xl py-3 text-xs font-bold text-white shadow-lg"
           style={{ backgroundColor: themeColor, boxShadow: `0 4px 14px 0 ${themeColor}33` }}
         >
-          {cardData.saveContactLabel}
+          {saveContactLabel}
         </button>
       </div>
     </div>

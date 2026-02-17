@@ -2,6 +2,7 @@
 import { Button } from './ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Link from 'next/link';
 
 export default function AppHeader() {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
@@ -29,12 +30,12 @@ export default function AppHeader() {
           >
             Meus Projetos
           </a>
-          <a
+          <Link
             className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-            href="#"
+            href="/templates/modelos"
           >
             Modelos
-          </a>
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
           <Button
