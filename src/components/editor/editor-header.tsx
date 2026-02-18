@@ -76,6 +76,17 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DigiCard Studio</h1>
             </Link>
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+            
+            <Link 
+              href="/meus-cartoes" 
+              className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-semibold text-sm"
+            >
+              <span className="material-symbols-outlined text-lg">dashboard</span>
+              <span className="hidden sm:inline">Meus Cartões</span>
+            </Link>
+
+            <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+            
             <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 <button 
                   onClick={() => setMode('digital')}
