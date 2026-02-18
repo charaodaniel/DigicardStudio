@@ -98,44 +98,44 @@ export const downloadVCard = (cardData: CardData) => {
   document.body.removeChild(link);
 };
 
-// Helper para converter URL de imagem para Base64 (Data URL)
 async function imageToBase64(url: string): Promise<string> {
   try {
     const response = await fetch(url);
     const blob = await response.blob();
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = () => resolve(url); // Fallback para URL original se falhar
+      reader.onerror = () => resolve(url);
       reader.readAsDataURL(blob);
     });
   } catch (error) {
-    console.warn('CORS ou erro de rede ao converter imagem para SVG:', url);
+    console.warn('CORS ou erro de rede ao converter imagem:', url);
     return url;
   }
 }
 
-export const downloadPlotterSVG = async (cardData: CardData) => {
+const getContrastColor = (hexcolor: string) => {
+  if (!hexcolor) return '#000000';
+  const r = parseInt(hexcolor.slice(1, 3), 16);
+  const g = parseInt(hexcolor.slice(3, 5), 16);
+  const b = parseInt(hexcolor.slice(5, 7), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? '#000000' : '#ffffff';
+};
+
+/**
+ * Gera a string do SVG técnico para o modo físico (Frente + Verso)
+ */
+export async function generatePhysicalCardSVG(cardData: CardData): Promise<string> {
   const w = 85; // mm
   const h = 55; // mm
   const gap = 5; // mm
   
-  // Converter imagens para Base64 para garantir carregamento em softwares vetoriais
   const avatarBase64 = cardData.physicalShowAvatar ? await imageToBase64(cardData.avatarUrl) : '';
   const qrBase64 = cardData.physicalShowQR ? await imageToBase64(cardData.qrCodeUrl || '') : '';
-
-  const getContrastColor = (hexcolor: string) => {
-    if (!hexcolor) return '#000000';
-    const r = parseInt(hexcolor.slice(1, 3), 16);
-    const g = parseInt(hexcolor.slice(3, 5), 16);
-    const b = parseInt(hexcolor.slice(5, 7), 16);
-    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-    return yiq >= 128 ? '#000000' : '#ffffff';
-  };
-
   const textColor = getContrastColor(cardData.physicalBackgroundColor || '#ffffff');
 
-  const svg = `
+  return `
 <svg width="${(w * 2) + gap}mm" height="${h}mm" viewBox="0 0 ${(w * 2) + gap} ${h}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <clipPath id="avatar-clip">
@@ -202,7 +202,10 @@ export const downloadPlotterSVG = async (cardData: CardData) => {
   </g>
 </svg>
   `.trim();
+}
 
+export const downloadPlotterSVG = async (cardData: CardData) => {
+  const svg = await generatePhysicalCardSVG(cardData);
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -211,4 +214,52 @@ export const downloadPlotterSVG = async (cardData: CardData) => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+/**
+ * Exporta o cartão físico como PNG de alta resolução (350 DPI)
+ */
+export const downloadPhysicalPNG = async (cardData: CardData) => {
+  const svgString = await generatePhysicalCardSVG(cardData);
+  
+  // 350 DPI calculations for A4 width area (approx 175mm open)
+  const dpi = 350;
+  const mmPerInch = 25.4;
+  const widthMm = 175; // 85 + 5 + 85
+  const heightMm = 55;
+  
+  const widthPx = Math.round((widthMm / mmPerInch) * dpi);
+  const heightPx = Math.round((heightMm / mmPerInch) * dpi);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = widthPx;
+  canvas.height = heightPx;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) return;
+
+  const img = new Image();
+  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+
+  img.onload = () => {
+    ctx.fillStyle = 'white'; // Fundo branco padrão caso falte
+    ctx.fillRect(0, 0, widthPx, heightPx);
+    ctx.drawImage(img, 0, 0, widthPx, heightPx);
+    
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const pngUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = pngUrl;
+      link.setAttribute('download', `${cardData.fullName.toLowerCase().replace(/\s/g, '-')}-highres.png`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(pngUrl);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+
+  img.src = url;
 };

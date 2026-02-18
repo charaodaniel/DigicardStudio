@@ -3,8 +3,16 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { downloadPlotterSVG } from '@/lib/utils';
+import { downloadPlotterSVG, downloadPhysicalPNG } from '@/lib/utils';
 import type { CardData } from '@/lib/types';
+import { useState } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 type EditorHeaderProps = {
   onPreviewClick: () => void;
@@ -16,6 +24,7 @@ type EditorHeaderProps = {
 export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
   const { toast } = useToast();
+  const [isExporting, setIsExporting] = useState(false);
 
   const handlePrint = () => {
     if (mode !== 'physical') {
@@ -25,11 +34,23 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
     window.print();
   };
 
-  const handleExportSVG = () => {
-    downloadPlotterSVG(cardData);
+  const handleExportSVG = async () => {
+    setIsExporting(true);
+    await downloadPlotterSVG(cardData);
+    setIsExporting(false);
     toast({
       title: "Arquivo Vetorial Gerado",
       description: "O SVG foi otimizado com caminhos de corte e desenho para sua plotter.",
+    });
+  };
+
+  const handleExportPNG = async () => {
+    setIsExporting(true);
+    await downloadPhysicalPNG(cardData);
+    setIsExporting(false);
+    toast({
+      title: "PNG Gerado (350 DPI)",
+      description: "Imagem de alta resolução exportada com sucesso.",
     });
   };
 
@@ -39,7 +60,6 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
       description: "Sincronizando dados com o servidor e gerando link público.",
     });
     
-    // Simulação de delay de rede
     setTimeout(() => {
       toast({
         title: "Cartão Publicado!",
@@ -99,19 +119,52 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
 
             {mode === 'physical' && (
               <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
-                <button 
-                    onClick={handleExportSVG}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/20 text-primary rounded-lg font-bold text-sm hover:bg-primary/5 transition-all"
-                >
-                    <span className="material-symbols-outlined text-lg">vector_library</span>
-                    Exportar SVG
-                </button>
-                <button 
-                    onClick={handlePrint}
-                    className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
-                >
-                    PDF (A4)
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button 
+                        disabled={isExporting}
+                        className="flex items-center gap-2 px-4 py-2 border-2 border-primary/20 text-primary rounded-lg font-bold text-sm hover:bg-primary/5 transition-all disabled:opacity-50"
+                    >
+                        <span className="material-symbols-outlined text-lg">
+                          {isExporting ? 'progress_activity' : 'download'}
+                        </span>
+                        Exportar Gabarito
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-none p-2 bg-white dark:bg-slate-900">
+                    <DropdownMenuItem 
+                      onClick={handleExportSVG}
+                      className="gap-3 py-3 px-4 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                    >
+                      <span className="material-symbols-outlined text-primary">vector_library</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">Vetor (SVG)</span>
+                        <span className="text-[10px] text-slate-400">Para plotters e recorte</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handleExportPNG}
+                      className="gap-3 py-3 px-4 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                    >
+                      <span className="material-symbols-outlined text-primary">image</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">PNG (350 DPI)</span>
+                        <span className="text-[10px] text-slate-400">Alta resolução para web/print</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handlePrint}
+                      className="gap-3 py-3 px-4 rounded-lg cursor-pointer bg-primary text-white hover:bg-primary/90"
+                    >
+                      <span className="material-symbols-outlined">print</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">Gerar PDF (A4)</span>
+                        <span className="text-[10px] text-white/70">10 cartões por folha</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             )}
 
