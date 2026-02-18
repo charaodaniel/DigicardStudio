@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { CardData } from '@/lib/types';
 import type { Dispatch, SetStateAction } from 'react';
 import EditableCardPreview from './editable-card-preview';
@@ -12,15 +13,36 @@ type CanvasProps = {
 };
 
 export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool }: CanvasProps) {
+  const [zoom, setZoom] = useState(85);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 5, 150));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 5, 50));
+
   return (
     <section className="flex-1 bg-background-light dark:bg-background-dark relative flex items-center justify-center p-8 overflow-auto">
-      <div className="absolute top-6 left-6 flex items-center gap-4 bg-white dark:bg-slate-900 px-3 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
-        <button className="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors">remove</button>
-        <span className="text-xs font-bold w-12 text-center">85%</span>
-        <button className="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors">add</button>
+      {/* Controles de Zoom */}
+      <div className="absolute top-6 left-6 flex items-center gap-4 bg-white dark:bg-slate-900 px-3 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 z-20">
+        <button 
+          onClick={handleZoomOut}
+          className="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          remove
+        </button>
+        <span className="text-xs font-bold w-12 text-center">{zoom}%</span>
+        <button 
+          onClick={handleZoomIn}
+          className="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          add
+        </button>
       </div>
 
-      <div className="shadow-[0_0_0_12px_#1f2937,0_0_0_14px_#374151,0_20px_50px_rgba(0,0,0,0.1)] w-[360px] h-[720px] bg-white dark:bg-slate-900 rounded-[3rem] relative overflow-hidden flex flex-col">
+      {/* Smartphone Mockup com Zoom Aplicado */}
+      <div 
+        className="shadow-[0_0_0_12px_#1f2937,0_0_0_14px_#374151,0_20px_50px_rgba(0,0,0,0.1)] w-[360px] h-[720px] bg-white dark:bg-slate-900 rounded-[3rem] relative overflow-hidden flex flex-col transition-transform duration-200 ease-out"
+        style={{ transform: `scale(${zoom / 100})` }}
+      >
+        {/* Status Bar Mockup */}
         <div className="h-10 w-full flex items-center justify-between px-8 pt-4 shrink-0">
           <span className="text-[10px] font-bold text-slate-900 dark:text-slate-100">9:41</span>
           <div className="flex items-center gap-1.5 text-slate-900 dark:text-slate-100">
@@ -30,6 +52,7 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
           </div>
         </div>
 
+        {/* Digital Card Content */}
         <div className="flex-1 overflow-y-auto no-scrollbar pt-12 pb-8 px-6 flex flex-col items-center">
             <EditableCardPreview 
                 cardData={cardData} 
@@ -39,6 +62,7 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
             />
         </div>
         
+        {/* Home Indicator */}
         <div className="h-1.5 w-32 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4 shrink-0"></div>
       </div>
     </section>
