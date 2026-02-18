@@ -44,38 +44,49 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </header>
 
-                <div className="px-6 flex flex-col gap-3 relative z-10">
-                    <a 
-                        href={actionHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center text-center" 
-                        style={{backgroundColor: themeColor}}
-                    >
-                        Trabalhe Comigo
-                    </a>
-                    <div className="flex gap-3">
-                        {links.slice(0, 2).map(link => (
-                            <a 
-                                key={link.id} 
-                                href={formatHref(link.type, link.value)} 
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 h-12 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white font-semibold rounded-xl flex items-center justify-center gap-2 border border-white/10"
-                            >
-                                <span className="material-symbols-outlined text-lg">{link.icon}</span>
-                                <span className="text-xs truncate">{link.label}</span>
-                            </a>
-                        ))}
+                {/* Nova Seção de Conteúdo sobre o Blur */}
+                <div className="relative mt-4">
+                    {/* Grid de Fotos com Blur (Fundo) */}
+                    <div className="absolute inset-0 px-1 opacity-40 blur-[3px] pointer-events-none">
+                        <div className="grid grid-cols-3 gap-1 h-full">
+                            {[...Array(12)].map((_, i) => (
+                                <div key={i} className="aspect-square bg-cover bg-center bg-slate-800 rounded-sm" style={{ backgroundImage: `url('https://picsum.photos/seed/insta${i}/200')` }}></div>
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {/* Grid de Fotos com Blur */}
-                <div className="mt-8 bg-white/5 backdrop-blur-xl rounded-t-[2.5rem] pt-8 px-1 pb-10 relative z-10">
-                    <div className="grid grid-cols-3 gap-1">
-                    {[...Array(9)].map((_, i) => (
-                        <div key={i} className="aspect-square bg-cover bg-center bg-slate-800 blur-[2px] opacity-40 hover:opacity-70 transition-opacity cursor-pointer" style={{ backgroundImage: `url('https://picsum.photos/seed/insta${i}/200')` }}></div>
-                    ))}
+                    {/* Links e Botões (Sobrepostos) */}
+                    <div className="relative z-20 px-6 pt-8 pb-12 flex flex-col gap-4">
+                        <a 
+                            href={actionHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-xl transition-all flex items-center justify-center text-center text-base tracking-wide" 
+                            style={{backgroundColor: themeColor, boxShadow: `0 8px 30px ${themeColor}44` }}
+                        >
+                            Trabalhe Comigo
+                        </a>
+
+                        <div className="grid grid-cols-1 gap-3">
+                            {links.map(link => (
+                                <a 
+                                    key={link.id} 
+                                    href={formatHref(link.type, link.value)} 
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white font-semibold border border-white/10 transition-all group"
+                                >
+                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${link.color || themeColor}22` }}>
+                                        <span className="material-symbols-outlined text-xl" style={{ color: link.color || themeColor }}>{link.icon}</span>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold truncate">{link.label}</p>
+                                        <p className="text-[10px] text-white/40 truncate font-mono">{link.value}</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-white/20 group-hover:text-white group-hover:translate-x-1 transition-all">chevron_right</span>
+                                </a>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
