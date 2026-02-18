@@ -5,9 +5,7 @@ import { Input } from '@/components/ui/input';
 
 export default function PropertiesSidebar({ cardData, setCardData }: { cardData: CardData, setCardData: Dispatch<SetStateAction<CardData>> }) {
 
-    // This is a mocked version. A full implementation would require
-    // state to track the selected element on the canvas.
-    const selectedElement = 'button';
+    // Simulação de elemento selecionado (WhatsApp por padrão conforme o modelo)
     const activeLink = cardData.links[0];
 
     const colors = [
@@ -19,10 +17,10 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
             <div className="p-6 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-900 dark:text-white">Propriedades</h3>
-                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full font-bold uppercase">{selectedElement}</span>
+                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full font-bold uppercase">Botão</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{backgroundColor: activeLink.color}}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{backgroundColor: activeLink.color || '#25D366'}}>
                         <span className="material-symbols-outlined text-sm">{activeLink.icon}</span>
                     </div>
                     <div>
@@ -39,13 +37,21 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
                     <div className="space-y-3">
                         <div className="space-y-1.5">
                             <p className="text-[11px] font-medium text-slate-400 ml-1">Rótulo do Botão</p>
-                            <Input className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" type="text" defaultValue={activeLink.label}/>
+                            <Input 
+                                className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" 
+                                type="text" 
+                                defaultValue={activeLink.label}
+                            />
                         </div>
                         <div className="space-y-1.5">
                             <p className="text-[11px] font-medium text-slate-400 ml-1">Link / Telefone</p>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-slate-400">link</span>
-                                <Input className="w-full pl-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" type="text" defaultValue={activeLink.value}/>
+                                <Input 
+                                    className="w-full pl-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" 
+                                    type="text" 
+                                    defaultValue={activeLink.value}
+                                />
                             </div>
                         </div>
                     </div>
@@ -57,8 +63,8 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
                         <div className="space-y-1.5">
                             <p className="text-[11px] font-medium text-slate-400 ml-1">Cor do Fundo</p>
                             <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <div className="w-5 h-5 rounded" style={{backgroundColor: activeLink.color}}></div>
-                                <span className="text-[11px] font-mono">{activeLink.color}</span>
+                                <div className="w-5 h-5 rounded" style={{backgroundColor: activeLink.color || '#25D366'}}></div>
+                                <span className="text-[11px] font-mono">{activeLink.color || '#25D366'}</span>
                             </div>
                         </div>
                         <div className="space-y-1.5">
@@ -95,7 +101,8 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
                             {colors.map(color => (
                                 <button 
                                     key={color} 
-                                    className={`w-8 h-8 rounded-full`}
+                                    onClick={() => setCardData(prev => ({ ...prev, themeColor: color }))}
+                                    className={`w-8 h-8 rounded-full transition-all`}
                                     style={{
                                         backgroundColor: color,
                                         boxShadow: cardData.themeColor === color ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` : ''

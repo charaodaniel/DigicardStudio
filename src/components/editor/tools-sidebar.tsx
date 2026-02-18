@@ -8,7 +8,6 @@ type ToolsSidebarProps = {
 export default function ToolsSidebar({ activeTool, onToolClick }: ToolsSidebarProps) {
     const tools = [
         { id: 'modelos', label: 'Modelos', icon: 'dashboard_customize' },
-        { id: 'ai-assistant', label: 'Assistente IA', icon: 'auto_awesome' },
         { id: 'conteudo', label: 'Conteúdo', icon: 'text_fields' },
         { id: 'imagens', label: 'Imagens', icon: 'image' },
         { id: 'social', label: 'Social', icon: 'share' },
@@ -24,24 +23,18 @@ export default function ToolsSidebar({ activeTool, onToolClick }: ToolsSidebarPr
                         key={tool.id}
                         onClick={() => onToolClick(tool.id)}
                         className={`group flex flex-col lg:flex-row items-center gap-3 px-3 py-3 rounded-xl transition-all ${
-                            activeTool === tool.id && tool.id !== 'ai-assistant' 
-                            ? 'bg-primary/10 text-primary' 
+                            activeTool === tool.id 
+                            ? 'bg-primary/10 text-primary border border-primary/20' 
                             : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-                        } ${
-                            tool.id === 'ai-assistant' ? 'lg:bg-primary/10' : ''
                         }`}
                     >
                         <span className={`material-symbols-outlined transition-colors ${
-                            tool.id === 'ai-assistant' 
-                            ? 'text-primary bg-primary/10 lg:bg-transparent rounded-lg p-2 lg:p-0'
-                            : activeTool !== tool.id ? 'text-slate-500 group-hover:text-primary' : ''
+                            activeTool === tool.id ? 'text-primary' : 'text-slate-500 group-hover:text-primary'
                         }`}>{tool.icon}</span>
                         <span className={`hidden lg:block text-sm transition-colors ${
-                            activeTool === tool.id && tool.id !== 'ai-assistant'
-                            ? 'font-semibold' 
+                            activeTool === tool.id
+                            ? 'font-semibold text-primary' 
                             : 'font-medium text-slate-600 group-hover:text-slate-900 dark:group-hover:text-white'
-                        } ${
-                            tool.id === 'ai-assistant' ? '!text-primary font-semibold' : ''
                         }`}>{tool.label}</span>
                     </button>
                 ))}

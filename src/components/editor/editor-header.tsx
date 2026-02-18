@@ -1,6 +1,7 @@
 'use client';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function EditorHeader() {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
@@ -8,10 +9,10 @@ export default function EditorHeader() {
   return (
     <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 z-30 shrink-0">
         <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-primary">
+            <Link href="/meus-cartoes" className="flex items-center gap-2 text-primary">
                 <span className="material-symbols-outlined text-3xl font-bold">style</span>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DigiCard Studio</h1>
-            </div>
+            </Link>
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
             <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
                 <button className="px-4 py-1.5 text-sm font-semibold rounded bg-white dark:bg-slate-700 shadow-sm text-primary">Digital</button>

@@ -32,9 +32,20 @@ export default function EditableCardPreview({ cardData }: EditableCardPreviewPro
             <p className="text-slate-400 text-xs mt-1">São Paulo, Brasil</p>
 
             <div className="w-full mt-10 space-y-3">
-                {links.map(link => (
-                     <button key={link.id} className="w-full h-14 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center px-5 gap-4 border-2 border-transparent hover:border-primary/20 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white" style={{backgroundColor: link.color || '#333'}}>
+                {links.map((link, idx) => (
+                     <button 
+                        key={link.id} 
+                        className={`w-full h-14 bg-slate-100 dark:bg-slate-800/50 rounded-2xl flex items-center px-5 gap-4 border-2 transition-all hover:scale-[1.02] ${
+                            idx === 0 ? 'border-primary shadow-sm' : 'border-transparent hover:border-primary/20 hover:bg-slate-200 dark:hover:bg-slate-800'
+                        }`}
+                    >
+                        <div 
+                            className="w-10 h-10 rounded-xl flex items-center justify-center text-white" 
+                            style={{
+                                backgroundColor: link.color || '#333',
+                                boxShadow: idx === 0 ? `0 4px 12px ${link.color}33` : ''
+                            }}
+                        >
                             <span className="material-symbols-outlined">{link.icon}</span>
                         </div>
                         <span className="font-bold text-slate-800 dark:text-slate-200">{link.label}</span>

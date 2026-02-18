@@ -1,7 +1,7 @@
 'use client';
 
 import type { CardData } from '@/lib/types';
-import DigitalCardPreview from '@/components/digital-card-preview';
+import EditableCardPreview from './editable-card-preview';
 
 type CanvasProps = {
   cardData: CardData;
@@ -26,8 +26,8 @@ export default function Canvas({ cardData }: CanvasProps) {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar">
-            <DigitalCardPreview cardData={cardData} />
+        <div className="flex-1 overflow-y-auto no-scrollbar pt-12 pb-8 px-6 flex flex-col items-center">
+            <EditableCardPreview cardData={cardData} />
         </div>
         
         <div className="h-1.5 w-32 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-2 shrink-0"></div>
