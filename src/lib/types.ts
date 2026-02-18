@@ -18,6 +18,8 @@ export type CardData = {
   jobTitle: string;
   bio: string;
   avatarUrl: string;
+  bannerUrl?: string;
+  vCardUrl?: string;
   isVerified: boolean;
   themeColor: string;
   fontFamily: string;

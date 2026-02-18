@@ -63,12 +63,12 @@ export default function PropertiesSidebar({
         });
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl') => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                handleProfileChange('avatarUrl', reader.result as string);
+                handleProfileChange(field, reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -190,6 +190,30 @@ export default function PropertiesSidebar({
                             </div>
                         </div>
 
+                        {/* Configuração de VCard */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração de Contato</label>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Link do Arquivo VCF (VCard)</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.vCardUrl || ''}
+                                    onChange={(e) => handleProfileChange('vCardUrl', e.target.value)}
+                                    placeholder="https://exemplo.com/contato.vcf"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Texto do Botão Salvar</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.saveContactLabel}
+                                    onChange={(e) => handleProfileChange('saveContactLabel', e.target.value)}
+                                />
+                            </div>
+                        </div>
+
                         {/* Seção de Métricas / Stats */}
                         <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas e Atributos</label>
@@ -235,50 +259,62 @@ export default function PropertiesSidebar({
                 {/* 2. Ferramenta: IMAGENS */}
                 {activeTool === 'imagens' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                        {/* Avatar */}
                         <div className="space-y-4">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Foto de Perfil</label>
                             <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center gap-4">
                                 <img src={cardData.avatarUrl} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md bg-slate-200" alt="Preview" />
-                                <div className="text-center">
-                                    <p className="text-[11px] font-bold text-slate-900 dark:text-white">Pré-visualização</p>
-                                    <p className="text-[10px] text-slate-500">A imagem será cortada em círculo</p>
-                                </div>
                             </div>
                             
-                            <div className="flex flex-col gap-3 pt-2">
+                            <div className="flex flex-col gap-3">
                                 <Button 
                                     variant="outline" 
-                                    className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl h-12 font-bold text-xs shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+                                    className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl h-12 font-bold text-xs"
                                     onClick={() => document.getElementById('avatar-upload')?.click()}
                                 >
                                     <span className="material-symbols-outlined text-lg mr-2">upload_file</span>
                                     Fazer Upload da Foto
                                 </Button>
-                                <input 
-                                    id="avatar-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleImageUpload}
+                                <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'avatarUrl')} />
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.avatarUrl}
+                                    onChange={(e) => handleProfileChange('avatarUrl', e.target.value)}
+                                    placeholder="URL da foto..."
                                 />
-
-                                <div className="flex items-center gap-2 my-1">
-                                    <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                                    <span className="text-[10px] font-bold text-slate-400">OU</span>
-                                    <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">URL da Imagem</p>
-                                    <Input 
-                                        className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
-                                        type="text" 
-                                        value={cardData.avatarUrl}
-                                        onChange={(e) => handleProfileChange('avatarUrl', e.target.value)}
-                                        placeholder="https://exemplo.com/sua-foto.jpg"
-                                    />
-                                </div>
                             </div>
+                        </div>
+
+                        {/* Banner / Cover */}
+                        <div className="space-y-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Imagem de Capa (Banner)</label>
+                            <div className="aspect-video w-full bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                                {cardData.bannerUrl ? (
+                                    <img src={cardData.bannerUrl} className="w-full h-full object-cover" alt="Banner Preview" />
+                                ) : (
+                                    <span className="material-symbols-outlined text-slate-300">image</span>
+                                )}
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Button 
+                                    variant="outline" 
+                                    className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl h-12 font-bold text-xs"
+                                    onClick={() => document.getElementById('banner-upload')?.click()}
+                                >
+                                    <span className="material-symbols-outlined text-lg mr-2">upload_file</span>
+                                    Upload do Banner
+                                </Button>
+                                <input id="banner-upload" type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'bannerUrl')} />
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.bannerUrl || ''}
+                                    onChange={(e) => handleProfileChange('bannerUrl', e.target.value)}
+                                    placeholder="URL do banner..."
+                                />
+                            </div>
+                            <p className="text-[10px] text-slate-400 italic">Disponível nos modelos: YouTube, TikTok, Facebook, Discord.</p>
                         </div>
                     </div>
                 )}
@@ -311,7 +347,7 @@ export default function PropertiesSidebar({
                             </div>
                             <div className="space-y-1.5">
                                 <p className="text-[11px] font-medium text-slate-400 ml-1">Ícone</p>
-                                <div className="grid grid-cols-4 gap-2">
+                                <div className="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto p-1 no-scrollbar">
                                     {icons.map(icon => (
                                         <button 
                                             key={icon}

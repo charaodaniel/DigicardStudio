@@ -4,7 +4,10 @@ import React from 'react';
 import { formatHref } from '@/lib/utils';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor } = cardData;
+    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor, vCardUrl } = cardData;
+
+    const contactLink = links.find(l => l.type === 'email' || l.type === 'whatsapp' || l.type === 'website');
+    const actionHref = contactLink ? formatHref(contactLink.type, contactLink.value) : '#';
 
     return (
         <div className="bg-white dark:bg-[#1c1b2b] font-display text-[#121117] antialiased h-full flex flex-col overflow-hidden relative">
@@ -45,13 +48,22 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                         </p>
                     </div>
                     <div className="mt-6 flex w-full gap-3">
-                        <button className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90 shadow-lg" style={{backgroundColor: themeColor}}>
+                        <a 
+                            href={actionHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90 shadow-lg text-center" 
+                            style={{backgroundColor: themeColor}}
+                        >
                             <span className="material-symbols-outlined text-sm">mail</span>
                             Solicitar Orçamento
-                        </button>
-                        <button className="flex size-[52px] items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-primary">
-                            <span className="material-symbols-outlined">language</span>
-                        </button>
+                        </a>
+                        <a 
+                            href={vCardUrl || '#'}
+                            className="flex size-[52px] items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-primary"
+                        >
+                            <span className="material-symbols-outlined">person_add</span>
+                        </a>
                     </div>
                 </div>
 

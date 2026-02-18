@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function YoutubePreview({ cardData }: { cardData: CardData }) {
-    const { fullName, isVerified, avatarUrl, stats, themeColor, links } = cardData;
+    const { fullName, isVerified, avatarUrl, stats, themeColor, links, bannerUrl } = cardData;
     
     const youtubeLink = links.find(l => l.type === 'youtube' || l.type === 'website');
     const actionHref = youtubeLink ? formatHref(youtubeLink.type, youtubeLink.value) : '#';
@@ -19,7 +19,17 @@ export default function YoutubePreview({ cardData }: { cardData: CardData }) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
-                    <div className="relative flex flex-col items-center pt-8 pb-6 px-4">
+                    {/* Banner Image */}
+                    <div className="h-32 w-full bg-slate-200 dark:bg-slate-800 overflow-hidden shrink-0 relative">
+                        <img 
+                            alt="Banner do canal" 
+                            className="w-full h-full object-cover" 
+                            src={bannerUrl || 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080'} 
+                        />
+                        <div className="absolute inset-0 bg-black/20"></div>
+                    </div>
+
+                    <div className="relative flex flex-col items-center -mt-16 pb-6 px-4">
                         <div className="relative group">
                             <div className="absolute -inset-1 bg-gradient-to-tr from-[#FF0000] to-red-400 rounded-full blur opacity-25"></div>
                             <div className="relative bg-white p-1 rounded-full border-2 border-[#FF0000]">

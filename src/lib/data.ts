@@ -10,13 +10,15 @@ export const initialCardData: CardData = {
   jobTitle: "Designer de Produto",
   bio: "Especialista em criar experiências digitais centradas no usuário. 10+ anos transformando problemas complexos em interfaces simples e elegantes.",
   avatarUrl: profileImage?.imageUrl ?? "https://picsum.photos/seed/joao/128/128",
+  bannerUrl: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  vCardUrl: "https://firebasestudio.com/vcard-example.vcf",
   isVerified: true,
   themeColor: '#5048e5',
   fontFamily: 'Inter',
   links: [
-    { id: '1', type: 'whatsapp', label: 'WhatsApp', value: 'wa.me/5511999999999', icon: 'chat', color: '#25D366' },
-    { id: '2', type: 'instagram', label: 'Instagram', value: 'https://instagram.com/joao.silva', icon: 'photo_camera', color: '#E1306C' },
-    { id: '3', type: 'linkedin', label: 'LinkedIn', value: 'https://linkedin.com/in/joao-silva', icon: 'work', color: '#0077b5' },
+    { id: '1', type: 'whatsapp', label: 'WhatsApp', value: '5511999999999', icon: 'chat', color: '#25D366' },
+    { id: '2', type: 'instagram', label: 'Instagram', value: 'joao.silva', icon: 'photo_camera', color: '#E1306C' },
+    { id: '3', type: 'linkedin', label: 'LinkedIn', value: 'joao-silva', icon: 'work', color: '#0077b5' },
     { id: '4', type: 'website', label: 'Portfólio', value: 'https://joaosilva.design', icon: 'language', color: '#5048e5' },
   ],
   stats: [
