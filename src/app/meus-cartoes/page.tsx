@@ -16,7 +16,6 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 
 const Sidebar = ({ user }: { user: any }) => {
     const router = useRouter();
-    const userAvatar = PlaceHolderImages.find(p => p.id === 'meus-cartoes-avatar-1');
     
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -24,7 +23,7 @@ const Sidebar = ({ user }: { user: any }) => {
     };
 
     return (
-        <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col fixed h-full z-10">
+        <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed h-full z-10">
             <Link href="/" className="p-6 flex items-center gap-3">
                 <div className="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
                     <span className="material-symbols-outlined">style</span>
@@ -46,10 +45,6 @@ const Sidebar = ({ user }: { user: any }) => {
                 <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/editor">
                     <span className="material-symbols-outlined">edit_note</span>
                     <span className="text-sm font-medium">Abrir Editor</span>
-                </Link>
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-                    <span className="material-symbols-outlined">layers</span>
-                    <span className="text-sm font-medium">Modelos</span>
                 </Link>
                 <div className="pt-4 pb-2">
                     <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</p>
@@ -83,8 +78,8 @@ const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) =
     const router = useRouter();
 
     return (
-        <div className="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-shadow group">
-            <div className="aspect-[4/5] bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-shadow group">
+            <div className="aspect-[4/5] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
                 <div 
                     className="absolute inset-0 bg-cover bg-center" 
                     style={{ backgroundImage: `url(${card.bannerUrl || card.avatarUrl})` }}
@@ -137,7 +132,6 @@ const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) =
     );
 };
 
-
 export default function MeusCartoesPage() {
     const router = useRouter();
     const [cards, setCards] = useState<CardData[]>([]);
@@ -188,7 +182,7 @@ export default function MeusCartoesPage() {
     );
 
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+        <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex">
             <Sidebar user={user} />
             <main className="flex-1 ml-64 p-8">
                  <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -199,7 +193,7 @@ export default function MeusCartoesPage() {
                             {isSupabaseConfigured ? (
                                 <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Supabase Online</span>
                             ) : (
-                                <span className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Local Database</span>
+                                <span className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Modo Offline</span>
                             )}
                         </div>
                     </div>
@@ -212,7 +206,7 @@ export default function MeusCartoesPage() {
                     </Button>
                 </header>
 
-                <div className="bg-white dark:bg-background-dark/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
                     <div className="relative flex-1 min-w-[300px]">
                         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
                         <Input 
@@ -225,29 +219,22 @@ export default function MeusCartoesPage() {
                     </div>
                 </div>
 
-                {isLoading ? (
-                    <div className="h-64 flex flex-col items-center justify-center gap-4">
-                        <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
-                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Sincronizando dados...</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredCards.map(card => (
-                            <CardItem key={card.id} card={card} onDelete={handleDelete} />
-                        ))}
-                        
-                        <div 
-                            onClick={handleCreateNew}
-                            className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer min-h-[300px]"
-                        >
-                            <div className="size-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors mb-4">
-                                <span className="material-symbols-outlined text-3xl">add</span>
-                            </div>
-                            <h3 className="font-bold text-slate-900 dark:text-white">Novo Cartão</h3>
-                            <p className="text-sm text-slate-500 text-center mt-2 font-medium">Crie uma nova versão para sua identidade.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredCards.map(card => (
+                        <CardItem key={card.id} card={card} onDelete={handleDelete} />
+                    ))}
+                    
+                    <div 
+                        onClick={handleCreateNew}
+                        className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer min-h-[300px]"
+                    >
+                        <div className="size-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors mb-4">
+                            <span className="material-symbols-outlined text-3xl">add</span>
                         </div>
+                        <h3 className="font-bold text-slate-900 dark:text-white">Novo Cartão</h3>
+                        <p className="text-sm text-slate-500 text-center mt-2 font-medium">Crie uma nova versão para sua identidade.</p>
                     </div>
-                )}
+                </div>
             </main>
         </div>
     );

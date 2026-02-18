@@ -25,8 +25,8 @@ const toDb = (card: CardData, userId?: string) => ({
   theme_color: card.themeColor,
   font_family: card.fontFamily,
   base_font_size: card.baseFontSize,
-  links: card.links, // JSONB
-  stats: card.stats, // JSONB
+  links: card.links, // JSONB no Supabase
+  stats: card.stats, // JSONB no Supabase
   save_contact_label: card.saveContactLabel,
   qr_code_url: card.qrCodeUrl,
   custom_website_url: card.customWebsiteUrl,
@@ -61,8 +61,8 @@ const fromDb = (dbCard: any): CardData => ({
   themeColor: dbCard.theme_color,
   fontFamily: dbCard.font_family,
   baseFontSize: dbCard.base_font_size,
-  links: dbCard.links,
-  stats: dbCard.stats,
+  links: dbCard.links || [],
+  stats: dbCard.stats || [],
   saveContactLabel: dbCard.save_contact_label,
   qrCodeUrl: dbCard.qr_code_url,
   customWebsiteUrl: dbCard.custom_website_url,
@@ -96,7 +96,7 @@ export const supabaseService = {
       .order('last_updated', { ascending: false });
 
     if (error) {
-      console.error('Erro Supabase:', error);
+      console.error('Erro Supabase ao carregar cartões:', error);
       return [];
     }
 
@@ -113,7 +113,7 @@ export const supabaseService = {
       .single();
 
     if (error) {
-      console.error('Erro Supabase:', error);
+      console.error('Erro Supabase ao carregar cartão:', error);
       return null;
     }
 

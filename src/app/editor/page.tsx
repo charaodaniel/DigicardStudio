@@ -15,6 +15,7 @@ import TemplateLibrary from '@/components/editor/template-library';
 function EditorContent() {
   const searchParams = useSearchParams();
   const cardId = searchParams.get('id');
+  const router = useRouter();
 
   const [cardData, setCardData] = useState<CardData>(initialCardData);
   const [past, setPast] = useState<CardData[]>([]);
@@ -23,41 +24,51 @@ function EditorContent() {
   const [activeTool, setActiveTool] = useState('conteudo');
   const [mode, setMode] = useState<'digital' | 'physical'>('digital');
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(!!cardId);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Carrega do Supabase ou banco local no início
+  // Verifica autenticação e carrega dados
   useEffect(() => {
-    const loadCard = async () => {
+    const checkAuthAndLoad = async () => {
+      setIsLoading(true);
+      const user = await supabaseService.getCurrentUser();
+      
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
       if (cardId) {
-        setIsLoading(true);
         const savedCard = await supabaseService.getCardById(cardId);
         if (savedCard) {
           setCardData(savedCard);
+        } else {
+          // Se não encontrar o cartão, redireciona ou usa o inicial
+          console.warn('Cartão não encontrado, carregando padrão.');
         }
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
-    loadCard();
-  }, [cardId]);
+    checkAuthAndLoad();
+  }, [cardId, router]);
 
-  // Salva no banco sempre que mudar (Debounce simplificado pelo useEffect)
+  // Salva no banco sempre que mudar (com debounce para performance)
   useEffect(() => {
+    if (isLoading) return;
+
     const saveTimeout = setTimeout(() => {
       supabaseService.saveCard(cardData);
       localStorage.setItem('digicard-preview-data', JSON.stringify(cardData));
     }, 1000);
 
     return () => clearTimeout(saveTimeout);
-  }, [cardData]);
+  }, [cardData, isLoading]);
 
-  // Função para atualizar dados com registro de histórico
   const updateCardData = useCallback((newData: CardData | ((prev: CardData) => CardData)) => {
     setCardData(current => {
       const resolvedData = typeof newData === 'function' ? newData(current) : newData;
       
-      // Só adiciona ao histórico se houver mudança real
       if (JSON.stringify(resolvedData) !== JSON.stringify(current)) {
-        setPast(prev => [...prev.slice(-19), current]); // Limite de 20 estados
+        setPast(prev => [...prev.slice(-19), current]);
         setFuture([]);
       }
       
@@ -67,71 +78,51 @@ function EditorContent() {
 
   const undo = useCallback(() => {
     if (past.length === 0) return;
-    
     setPast(prevPast => {
       const previous = prevPast[prevPast.length - 1];
       const newPast = prevPast.slice(0, prevPast.length - 1);
-      
       setFuture(prevFuture => [cardData, ...prevFuture]);
       setCardData(previous);
-      
       return newPast;
     });
   }, [cardData, past]);
 
   const redo = useCallback(() => {
     if (future.length === 0) return;
-    
     setFuture(prevFuture => {
       const next = prevFuture[0];
       const newFuture = prevFuture.slice(1);
-      
       setPast(prevPast => [...prevPast, cardData]);
       setCardData(next);
-      
       return newFuture;
     });
   }, [cardData, future]);
 
-  // Atalhos de teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        if (e.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
+        if (e.shiftKey) redo(); else undo();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
         redo();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [undo, redo]);
-
-  const handleToolClick = (toolId: string) => {
-    setActiveTool(toolId);
-  };
-
-  const handlePreviewClick = () => {
-    window.open('/preview', '_blank');
-  };
 
   if (isLoading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-900 text-white">
         <span className="material-symbols-outlined animate-spin text-5xl text-primary mb-4">progress_activity</span>
-        <p className="text-xs font-black uppercase tracking-[0.2em]">Sincronizando Identidade...</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em]">Autenticando sessão...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
+    <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
       <EditorHeader 
-        onPreviewClick={handlePreviewClick} 
+        onPreviewClick={() => window.open('/preview', '_blank')} 
         mode={mode}
         setMode={setMode}
         cardData={cardData}
@@ -142,11 +133,7 @@ function EditorContent() {
       />
       
       <main className="flex-1 flex overflow-hidden">
-        <ToolsSidebar
-          activeTool={activeTool}
-          onToolClick={handleToolClick}
-        />
-        
+        <ToolsSidebar activeTool={activeTool} onToolClick={setActiveTool} />
         <Canvas 
           cardData={cardData} 
           selectedLinkId={selectedLinkId} 
@@ -154,7 +141,6 @@ function EditorContent() {
           setActiveTool={setActiveTool}
           mode={mode}
         />
-
         <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden">
           {activeTool === 'modelos' ? (
             <TemplateLibrary setCardData={updateCardData} />
@@ -170,7 +156,6 @@ function EditorContent() {
           )}
         </aside>
       </main>
-      
       <EditorFooter />
     </div>
   );
