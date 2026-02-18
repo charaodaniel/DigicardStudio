@@ -2,11 +2,11 @@
 import type { CardData } from '@/lib/types';
 
 export default function DigicardWebPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, saveContactLabel } = cardData;
     return (
-        <div className="bg-white dark:bg-background-dark min-h-full flex flex-col relative shadow-2xl overflow-y-auto no-scrollbar">
+        <div className="bg-white dark:bg-background-dark min-h-full flex flex-col relative shadow-2xl overflow-y-auto no-scrollbar pb-20">
             {/* Top Navigation Area */}
-            <div className="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md z-10 shrink-0">
+            <div className="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md z-10 shrink-0 border-b border-slate-50 dark:border-slate-800">
                 <div className="w-10 h-10 flex items-center justify-center text-primary">
                     <span className="material-symbols-outlined">qr_code_2</span>
                 </div>
@@ -37,7 +37,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                 <div className="w-full mt-8 px-2">
                     <button className="w-full text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all" style={{backgroundColor: themeColor}}>
                         <span className="material-symbols-outlined">person_add</span>
-                        Salvar Contato
+                        {saveContactLabel}
                     </button>
                 </div>
             </section>
@@ -54,7 +54,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                 ))}
             </section>
 
-            <footer className="mt-auto py-8 text-center bg-slate-50 dark:bg-background-dark shrink-0">
+            <footer className="mt-auto py-12 text-center bg-slate-50 dark:bg-background-dark/50 shrink-0">
                 <p className="text-slate-400 dark:text-slate-600 text-xs font-medium tracking-tight">
                     Criado com <span className="text-primary font-bold">DigiCard Web</span>
                 </p>

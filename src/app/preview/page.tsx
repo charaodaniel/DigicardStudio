@@ -7,7 +7,6 @@ export default function StandalonePreviewPage() {
   const [cardData, setCardData] = useState<CardData | null>(null);
 
   useEffect(() => {
-    // Função para carregar dados do localStorage
     const loadData = () => {
       const savedData = localStorage.getItem('digicard-preview-data');
       if (savedData) {
@@ -19,10 +18,8 @@ export default function StandalonePreviewPage() {
       }
     };
 
-    // Carregamento inicial
     loadData();
 
-    // Listener para atualizações em tempo real vindas da janela do editor
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'digicard-preview-data') {
         loadData();
@@ -30,8 +27,6 @@ export default function StandalonePreviewPage() {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
-    // Fallback para quando o localStorage.setItem não dispara 'storage' na mesma janela
     const interval = setInterval(loadData, 1000);
 
     return () => {
@@ -52,12 +47,13 @@ export default function StandalonePreviewPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-white dark:bg-slate-950 flex justify-center">
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex justify-center overflow-y-auto">
       {/* 
-        Ajustado para ocupar toda a largura em mobile e ter largura máxima em desktop (max-500px), 
-        removendo a moldura de smartphone para exibir o design completo (edge-to-edge).
+        Container responsivo: 
+        - Mobile: Largura total
+        - Desktop: Máximo de 500px para simular celular, mas com altura flexível
       */}
-      <div className="relative w-full max-w-[500px] h-screen bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-[500px] min-h-screen bg-white dark:bg-slate-900 shadow-2xl">
         <DigitalCardPreview cardData={cardData} />
       </div>
     </div>
