@@ -2,6 +2,7 @@
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 type EditorHeaderProps = {
   onPreviewClick: () => void;
@@ -11,6 +12,7 @@ type EditorHeaderProps = {
 
 export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
+  const { toast } = useToast();
 
   const handlePrint = () => {
     if (mode !== 'physical') {
@@ -18,6 +20,21 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
       return;
     }
     window.print();
+  };
+
+  const handlePublish = () => {
+    toast({
+      title: "Publicando cartão...",
+      description: "Sincronizando dados com o servidor e gerando link público.",
+    });
+    
+    // Simulação de delay de rede
+    setTimeout(() => {
+      toast({
+        title: "Cartão Publicado!",
+        description: "Seu link digital já está disponível para compartilhamento.",
+      });
+    }, 1500);
   };
 
   return (
@@ -52,7 +69,7 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
             </div>
         </div>
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mr-2">
                 <button className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
                     <span className="material-symbols-outlined text-xl">undo</span>
                 </button>
@@ -60,6 +77,7 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
                     <span className="material-symbols-outlined text-xl">redo</span>
                 </button>
             </div>
+            
             <button 
                 onClick={onPreviewClick}
                 className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
@@ -67,13 +85,25 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
                 <span className="material-symbols-outlined text-lg">visibility</span>
                 Preview
             </button>
+
+            {mode === 'physical' && (
+              <button 
+                  onClick={handlePrint}
+                  className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-right-4 duration-300"
+              >
+                  Exportar PDF
+              </button>
+            )}
+
             <button 
-                onClick={handlePrint}
-                className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
+                onClick={handlePublish}
+                className="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-all"
             >
-                Exportar PDF
+                Publicar
             </button>
+
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
+            
             <div className="flex items-center gap-3">
                 <div className="flex flex-col items-end">
                     <span className="text-xs font-bold text-emerald-500 flex items-center gap-1">
