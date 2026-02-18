@@ -1,46 +1,49 @@
--- Tabela de Cartões do DigiCard Studio
-CREATE TABLE IF NOT EXISTS cards (
-  id text PRIMARY KEY,
-  template text NOT NULL DEFAULT 'default',
-  full_name text NOT NULL,
-  full_name_link text,
-  job_title text,
-  job_title_link text,
-  bio text,
+
+-- 1. Tabela de Perfis (Estende a tabela auth.users do Supabase)
+create table profiles (
+  id uuid references auth.users on delete cascade primary key,
+  full_name text,
   avatar_url text,
-  avatar_link text,
-  banner_url text,
-  banner_link text,
-  vcard_url text,
-  is_verified boolean DEFAULT false,
-  theme_color text DEFAULT '#5048e5',
-  font_family text DEFAULT 'Inter',
-  base_font_size integer DEFAULT 16,
-  links jsonb DEFAULT '[]'::jsonb,
-  stats jsonb DEFAULT '[]'::jsonb,
-  save_contact_label text DEFAULT 'Salvar Contato',
-  qr_code_url text,
-  custom_website_url text,
-  footer_text text,
-  physical_show_avatar boolean DEFAULT true,
-  physical_show_title boolean DEFAULT true,
-  physical_show_stats boolean DEFAULT true,
-  physical_show_links boolean DEFAULT true,
-  physical_show_qr boolean DEFAULT true,
-  physical_show_footer boolean DEFAULT true,
-  physical_background_color text DEFAULT '#ffffff',
-  last_updated bigint
+  updated_at timestamp with time zone default now()
 );
 
--- Habilitar Row Level Security (Segurança por linha)
-ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
+-- 2. Atualizar a tabela de Cards para incluir o dono (user_id)
+-- Se a tabela já existir, apenas adicionamos a coluna
+do $$ 
+begin
+  if not exists (select 1 from pg_attribute where attrelid = 'cards'::regclass and attname = 'user_id') then
+    alter table cards add column user_id uuid references auth.users on delete cascade;
+  end if;
+end $$;
 
--- Criar política de acesso público total (Ideal para testes e prototipagem rápida)
--- NOTA: Em produção, você deve restringir isso para usuários autenticados (auth.uid() = user_id)
-CREATE POLICY "Acesso Público Total" ON cards 
-  FOR ALL 
-  USING (true) 
-  WITH CHECK (true);
+-- 3. Habilitar RLS (Row Level Security)
+alter table profiles enable row level security;
+alter table cards enable row level security;
 
--- Criar índices para busca rápida por ID
-CREATE INDEX IF NOT EXISTS idx_cards_id ON cards(id);
+-- 4. Políticas para Perfis
+create policy "Usuários podem ver o próprio perfil" on profiles for select using (auth.uid() = id);
+create policy "Usuários podem atualizar o próprio perfil" on profiles for update using (auth.uid() = id);
+
+-- 5. Políticas para Cards
+-- Permitir que qualquer pessoa veja um cartão pelo ID (para a página pública /c/slug)
+create policy "Visualização pública de cartões" on cards for select using (true);
+
+-- Permitir que usuários autenticados gerenciem apenas seus próprios cartões
+create policy "Usuários gerenciam seus próprios cartões" on cards 
+  for all 
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- 6. Trigger para criar perfil automaticamente ao cadastrar
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();

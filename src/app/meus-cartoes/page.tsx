@@ -8,13 +8,21 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabaseService } from '@/lib/supabase-service';
+import { supabase } from '@/lib/supabase';
 import type { CardData } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
-const Sidebar = () => {
+const Sidebar = ({ user }: { user: any }) => {
+    const router = useRouter();
     const userAvatar = PlaceHolderImages.find(p => p.id === 'meus-cartoes-avatar-1');
+    
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        router.push('/login');
+    };
+
     return (
         <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col fixed h-full z-10">
             <Link href="/" className="p-6 flex items-center gap-3">
@@ -53,12 +61,18 @@ const Sidebar = () => {
             </nav>
             <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3 p-2">
-                    {userAvatar && <Image alt="Avatar do usuário" className="size-9 rounded-full object-cover" src={userAvatar.imageUrl} width={36} height={36} />}
+                    <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                        {user?.user_metadata?.avatar_url ? (
+                            <Image alt="Avatar" className="size-full object-cover" src={user.user_metadata.avatar_url} width={36} height={36} />
+                        ) : (
+                            <span className="material-symbols-outlined text-slate-400">person</span>
+                        )}
+                    </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">Ricardo Silva</p>
+                        <p className="text-sm font-semibold truncate">{user?.user_metadata?.full_name || user?.email}</p>
                         <p className="text-xs text-slate-500 truncate">Plano Pro</p>
                     </div>
-                    <Link href="/" className="material-symbols-outlined text-slate-400 text-lg">logout</Link>
+                    <button onClick={handleLogout} className="material-symbols-outlined text-slate-400 text-lg hover:text-red-500 transition-colors">logout</button>
                 </div>
             </div>
         </aside>
@@ -127,18 +141,27 @@ const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) =
 export default function MeusCartoesPage() {
     const router = useRouter();
     const [cards, setCards] = useState<CardData[]>([]);
+    const [user, setUser] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const loadCards = async () => {
+        const loadInitialData = async () => {
             setIsLoading(true);
+            const currentUser = await supabaseService.getCurrentUser();
+            
+            if (!currentUser) {
+                router.push('/login');
+                return;
+            }
+
+            setUser(currentUser);
             const data = await supabaseService.getAllCards();
             setCards(data);
             setIsLoading(false);
         };
-        loadCards();
-    }, []);
+        loadInitialData();
+    }, [router]);
 
     const handleCreateNew = async () => {
         const newCard = await supabaseService.createNewCard();
@@ -158,9 +181,15 @@ export default function MeusCartoesPage() {
         c.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    if (isLoading && !user) return (
+        <div className="h-screen w-full flex items-center justify-center">
+            <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+        </div>
+    );
+
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
-            <Sidebar />
+            <Sidebar user={user} />
             <main className="flex-1 ml-64 p-8">
                  <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
@@ -219,28 +248,6 @@ export default function MeusCartoesPage() {
                         </div>
                     </div>
                 )}
-
-                {!isLoading && (
-                    <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                        <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Total de Cartões</span>
-                                <span className="material-symbols-outlined text-primary">credit_card</span>
-                            </div>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white">{cards.length}</p>
-                            <p className="text-xs text-slate-500 font-bold mt-1">Sincronizados via {isSupabaseConfigured ? 'Supabase' : 'JSON Local'}</p>
-                        </div>
-                        <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Storage</span>
-                                <span className="material-symbols-outlined text-primary">database</span>
-                            </div>
-                            <p className="text-2xl font-black text-slate-900 dark:text-white">Ativo</p>
-                            <p className="text-xs text-slate-500 font-bold mt-1">Conexão estável</p>
-                        </div>
-                    </div>
-                )}
-
             </main>
         </div>
     );

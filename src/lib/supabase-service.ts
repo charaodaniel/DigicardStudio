@@ -7,8 +7,9 @@ import { localDb } from './local-database';
 /**
  * Mapeia o objeto da aplicação (camelCase) para o banco de dados (snake_case)
  */
-const toDb = (card: CardData) => ({
+const toDb = (card: CardData, userId?: string) => ({
   id: card.id,
+  user_id: userId,
   template: card.template,
   full_name: card.fullName,
   full_name_link: card.fullNameLink,
@@ -77,17 +78,26 @@ const fromDb = (dbCard: any): CardData => ({
 });
 
 export const supabaseService = {
+  async getCurrentUser() {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user;
+  },
+
   async getAllCards(): Promise<CardData[]> {
     if (!isSupabaseConfigured) return localDb.getAllCards();
+
+    const user = await this.getCurrentUser();
+    if (!user) return [];
 
     const { data, error } = await supabase
       .from('cards')
       .select('*')
+      .eq('user_id', user.id)
       .order('last_updated', { ascending: false });
 
     if (error) {
       console.error('Erro Supabase:', error);
-      return localDb.getAllCards();
+      return [];
     }
 
     return (data || []).map(fromDb);
@@ -104,7 +114,7 @@ export const supabaseService = {
 
     if (error) {
       console.error('Erro Supabase:', error);
-      return localDb.getCardById(id) || null;
+      return null;
     }
 
     return fromDb(data);
@@ -116,13 +126,15 @@ export const supabaseService = {
       return;
     }
 
+    const user = await this.getCurrentUser();
+    if (!user) return;
+
     const { error } = await supabase
       .from('cards')
-      .upsert(toDb(card));
+      .upsert(toDb(card, user.id));
 
     if (error) {
-      console.error('Erro Supabase:', error);
-      localDb.saveCard(card);
+      console.error('Erro Supabase ao salvar:', error);
     }
   },
 
@@ -138,12 +150,12 @@ export const supabaseService = {
       .eq('id', id);
 
     if (error) {
-      console.error('Erro Supabase:', error);
-      localDb.deleteCard(id);
+      console.error('Erro Supabase ao deletar:', error);
     }
   },
 
   async createNewCard(): Promise<CardData> {
+    const user = await this.getCurrentUser();
     const newCard: CardData = {
       ...initialCardData,
       id: `card_${Date.now()}`,
@@ -151,7 +163,12 @@ export const supabaseService = {
       lastUpdated: Date.now()
     };
 
-    await this.saveCard(newCard);
+    if (user) {
+      await this.saveCard(newCard);
+    } else {
+      localDb.saveCard(newCard);
+    }
+    
     return newCard;
   }
 };
