@@ -98,18 +98,40 @@ export const downloadVCard = (cardData: CardData) => {
   document.body.removeChild(link);
 };
 
-async function imageToBase64(url: string): Promise<string> {
+/**
+ * Converte uma URL de imagem em uma string Base64 PNG de alta qualidade.
+ * Isso garante que o SVG seja auto-contido e as plotters consigam carregar os elementos.
+ */
+async function imageToHighQualityBase64(url: string): Promise<string> {
+  if (!url) return '';
   try {
     const response = await fetch(url);
     const blob = await response.blob();
+    
     return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = () => resolve(url);
-      reader.readAsDataURL(blob);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Redimensionar para garantir alta qualidade na impressão (approx 1024px para manter peso vs qualidade)
+        const scale = 1024 / Math.max(img.width, img.height);
+        canvas.width = img.width * (scale < 1 ? scale : 1);
+        canvas.height = img.height * (scale < 1 ? scale : 1);
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(url);
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/png', 1.0)); // Qualidade máxima
+      };
+      img.onerror = () => resolve(url);
+      img.src = URL.createObjectURL(blob);
     });
   } catch (error) {
-    console.warn('CORS ou erro de rede ao converter imagem:', url);
+    console.warn('Erro ao processar imagem para Base64:', url);
     return url;
   }
 }
@@ -124,15 +146,16 @@ const getContrastColor = (hexcolor: string) => {
 };
 
 /**
- * Gera a string do SVG técnico para o modo físico (Frente + Verso)
+ * Gera a string do SVG técnico para o modo físico (Frente + Verso lado a lado)
  */
 export async function generatePhysicalCardSVG(cardData: CardData): Promise<string> {
   const w = 85; // mm
   const h = 55; // mm
   const gap = 5; // mm
   
-  const avatarBase64 = cardData.physicalShowAvatar ? await imageToBase64(cardData.avatarUrl) : '';
-  const qrBase64 = cardData.physicalShowQR ? await imageToBase64(cardData.qrCodeUrl || '') : '';
+  // Captura as imagens em alta resolução
+  const avatarBase64 = cardData.physicalShowAvatar ? await imageToHighQualityBase64(cardData.avatarUrl) : '';
+  const qrBase64 = cardData.physicalShowQR ? await imageToHighQualityBase64(cardData.qrCodeUrl || '') : '';
   const textColor = getContrastColor(cardData.physicalBackgroundColor || '#ffffff');
 
   return `
@@ -216,16 +239,13 @@ export const downloadPlotterSVG = async (cardData: CardData) => {
   document.body.removeChild(link);
 };
 
-/**
- * Exporta o cartão físico como PNG de alta resolução (350 DPI)
- */
 export const downloadPhysicalPNG = async (cardData: CardData) => {
   const svgString = await generatePhysicalCardSVG(cardData);
   
   // 350 DPI calculations for A4 width area (approx 175mm open)
   const dpi = 350;
   const mmPerInch = 25.4;
-  const widthMm = 175; // 85 + 5 + 85
+  const widthMm = 175; 
   const heightMm = 55;
   
   const widthPx = Math.round((widthMm / mmPerInch) * dpi);
@@ -243,7 +263,7 @@ export const downloadPhysicalPNG = async (cardData: CardData) => {
   const url = URL.createObjectURL(svgBlob);
 
   img.onload = () => {
-    ctx.fillStyle = 'white'; // Fundo branco padrão caso falte
+    ctx.fillStyle = 'white'; 
     ctx.fillRect(0, 0, widthPx, heightPx);
     ctx.drawImage(img, 0, 0, widthPx, heightPx);
     
@@ -258,7 +278,7 @@ export const downloadPhysicalPNG = async (cardData: CardData) => {
       document.body.removeChild(link);
       URL.revokeObjectURL(pngUrl);
       URL.revokeObjectURL(url);
-    }, 'image/png');
+    }, 'image/png', 1.0); // Qualidade máxima para PNG
   };
 
   img.src = url;
