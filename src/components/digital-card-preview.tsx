@@ -1,3 +1,4 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import DefaultPreview from './card-templates/DefaultPreview';
@@ -22,7 +23,10 @@ export default function DigitalCardPreview({
   cardData,
 }: DigitalCardPreviewProps) {
   const PreviewComponent = () => {
-    switch (cardData.template) {
+    // Tratamento dinâmico para variações horizontais/verticais selecionarem o template base correto
+    const baseTemplate = cardData.template.split('-')[0];
+
+    switch (baseTemplate) {
       case 'professionals':
         return <ProfessionalsPreview cardData={cardData} />;
       case 'linkedin':
@@ -31,7 +35,7 @@ export default function DigitalCardPreview({
         return <InstagramPreview cardData={cardData} />;
       case 'whatsapp':
         return <WhatsappPreview cardData={cardData} />;
-      case 'designer-studio':
+      case 'designer':
         return <DesignerStudioPreview cardData={cardData} />;
       case 'executive':
         return <ExecutivePreview cardData={cardData} />;
@@ -43,7 +47,9 @@ export default function DigitalCardPreview({
         return <YoutubePreview cardData={cardData} />;
       case 'tiktok':
         return <TiktokPreview cardData={cardData} />;
-      case 'digicard-web':
+      case 'twitch':
+        return <TiktokPreview cardData={cardData} />; // Reutiliza TikTok como base gamer se não houver um específico
+      case 'digicard':
         return <DigicardWebPreview cardData={cardData} />;
       case 'discord':
         return <DiscordPreview cardData={cardData} />;

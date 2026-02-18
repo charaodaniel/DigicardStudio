@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from "react";
@@ -6,20 +7,22 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import type { Dispatch, SetStateAction } from "react";
 import type { CardData } from "@/lib/types";
 
-const templates = [
-    { id: 'default', name: 'Padrão Moderno', imageId: 'template-default', category: 'Corp' },
-    { id: 'professionals', name: 'Profissionais', imageId: 'template-professionals', category: 'Corp' },
-    { id: 'linkedin', name: 'LinkedIn', imageId: 'template-linkedin', category: 'Social' },
-    { id: 'instagram', name: 'Instagram', imageId: 'template-instagram', category: 'Social' },
-    { id: 'whatsapp', name: 'WhatsApp', imageId: 'template-whatsapp', category: 'Social' },
-    { id: 'designer-studio', name: 'Designer Studio', imageId: 'template-designer-studio', category: 'Corp' },
-    { id: 'executive', name: 'Executivo', imageId: 'template-executive', category: 'Corp' },
-    { id: 'facebook', name: 'Facebook', imageId: 'template-facebook', category: 'Social' },
-    { id: 'spotify', name: 'Spotify', imageId: 'template-spotify', category: 'Social' },
-    { id: 'youtube', name: 'YouTube', imageId: 'template-youtube', category: 'Social' },
-    { id: 'tiktok', name: 'TikTok', imageId: 'template-tiktok', category: 'Social' },
-    { id: 'digicard-web', name: 'DigiCard Web', imageId: 'template-digicard-web', category: 'Corp' },
-    { id: 'discord', name: 'Discord Style', imageId: 'template-discord', category: 'Social' },
+export const templates = [
+    { id: 'default', name: 'Padrão Moderno', imageId: 'template-default', category: 'Corp', orientation: 'horizontal' },
+    { id: 'professionals', name: 'Arquiteto/Design', imageId: 'template-professionals', category: 'Corp', orientation: 'horizontal' },
+    { id: 'executive', name: 'Executivo Elite', imageId: 'template-executive', category: 'Corp', orientation: 'horizontal' },
+    { id: 'linkedin', name: 'LinkedIn Card', imageId: 'template-linkedin', category: 'Social', orientation: 'vertical' },
+    { id: 'instagram', name: 'InstaCard Studio', imageId: 'template-instagram', category: 'Social', orientation: 'horizontal' },
+    { id: 'instagram-v', name: 'InstaCard Vertical', imageId: 'template-instagram', category: 'Social', orientation: 'vertical' },
+    { id: 'whatsapp', name: 'WhatsApp Business', imageId: 'template-whatsapp', category: 'Social', orientation: 'horizontal' },
+    { id: 'twitch-h', name: 'Twitch Horizontal', imageId: 'template-discord', category: 'Social', orientation: 'horizontal' },
+    { id: 'twitch-v', name: 'Twitch Vertical', imageId: 'template-discord', category: 'Social', orientation: 'vertical' },
+    { id: 'facebook', name: 'Facebook Pro', imageId: 'template-facebook', category: 'Social', orientation: 'horizontal' },
+    { id: 'facebook-v', name: 'Facebook Vertical', imageId: 'template-facebook', category: 'Social', orientation: 'vertical' },
+    { id: 'spotify', name: 'Spotify Music', imageId: 'template-spotify', category: 'Social', orientation: 'horizontal' },
+    { id: 'spotify-v', name: 'Spotify Vertical', imageId: 'template-spotify', category: 'Social', orientation: 'vertical' },
+    { id: 'youtube', name: 'YouTube Channel', imageId: 'template-youtube', category: 'Social', orientation: 'horizontal' },
+    { id: 'youtube-v', name: 'YouTube Vertical', imageId: 'template-youtube', category: 'Social', orientation: 'vertical' },
 ];
 
 const templatePresets: Record<string, Partial<CardData>> = {
@@ -27,15 +30,17 @@ const templatePresets: Record<string, Partial<CardData>> = {
     'professionals': { themeColor: '#5048e5' },
     'linkedin': { themeColor: '#0A66C2' },
     'instagram': { themeColor: '#E1306C' },
+    'instagram-v': { themeColor: '#E1306C' },
     'whatsapp': { themeColor: '#25D366'},
-    'designer-studio': { themeColor: '#5048e5'},
     'executive': { themeColor: '#D4AF37'},
     'facebook': { themeColor: '#1877F2'},
+    'facebook-v': { themeColor: '#1877F2'},
     'spotify': { themeColor: '#1DB954'},
+    'spotify-v': { themeColor: '#1DB954'},
     'youtube': { themeColor: '#FF0000'},
-    'tiktok': { themeColor: '#ff0050'},
-    'digicard-web': { themeColor: '#5048e5'},
-    'discord': { themeColor: '#5865F2'},
+    'youtube-v': { themeColor: '#FF0000'},
+    'twitch-h': { themeColor: '#9146FF'},
+    'twitch-v': { themeColor: '#9146FF'},
 }
 
 type TemplateLibraryPanelProps = {
@@ -103,6 +108,11 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
                             </div>
                         )}
                         <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+                        <div className="absolute top-2 right-2">
+                            <span className="bg-black/60 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                                {template.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'}
+                            </span>
+                        </div>
                     </div>
                     <p className="mt-2 text-xs font-bold text-slate-700 dark:text-slate-200">{template.name}</p>
                 </div>
