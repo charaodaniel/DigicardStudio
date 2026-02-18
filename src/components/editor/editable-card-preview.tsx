@@ -3,6 +3,7 @@ import type { CardData } from '@/lib/types';
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import DigitalCardPreview from '@/components/digital-card-preview';
+import { cn } from '@/lib/utils';
 
 type EditableCardPreviewProps = {
     cardData: CardData;
@@ -17,20 +18,61 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
     // Overlay para templates não-padrão para permitir edição de áreas específicas
     if (template !== 'default') {
         return (
-            <div className="w-full h-full relative group">
+            <div className="w-full h-full relative group overflow-hidden flex flex-col">
                 <DigitalCardPreview cardData={cardData} />
                 
-                {/* Overlay de Edição Inteligente - Non-scrolling fixed indicators */}
-                <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center">
-                    {/* Zona da Foto */}
-                    <div 
-                        onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
-                        className="w-32 h-32 mt-12 cursor-pointer flex items-center justify-center group/avatar pointer-events-auto"
-                        title="Alterar Foto"
-                    >
-                        <div className="bg-primary text-white p-2 rounded-full opacity-0 group-hover/avatar:opacity-100 shadow-xl transition-opacity flex items-center gap-2">
-                             <span className="material-symbols-outlined text-sm">photo_camera</span>
-                             <span className="text-[10px] font-bold pr-1">Alterar</span>
+                {/* Overlay de Edição Inteligente - Camada de Interatividade do Editor */}
+                <div className="absolute inset-0 z-50 pointer-events-none">
+                    <div className="h-full w-full relative">
+                        {/* Zona 1: Foto e Capa (Topo) */}
+                        <div 
+                            onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
+                            className="absolute top-0 left-0 w-full h-[25%] cursor-pointer pointer-events-auto group/edit"
+                        >
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-full opacity-0 group-hover/edit:opacity-100 shadow-xl transition-all flex items-center gap-2 border border-white/20 backdrop-blur-md">
+                                <span className="material-symbols-outlined text-sm">photo_camera</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Editar Imagens</span>
+                            </div>
+                        </div>
+
+                        {/* Zona 2: Identidade (Nome, Cargo, Bio) */}
+                        <div 
+                            onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                            className="absolute top-[25%] left-0 w-full h-[20%] cursor-pointer pointer-events-auto group/edit"
+                        >
+                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-full opacity-0 group-hover/edit:opacity-100 shadow-xl transition-all flex items-center gap-2 border border-white/20 backdrop-blur-md">
+                                <span className="material-symbols-outlined text-sm">edit</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Editar Perfil</span>
+                            </div>
+                        </div>
+
+                        {/* Zona 3: Métricas / Stats (Meio) */}
+                        <div 
+                            onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                            className="absolute top-[45%] left-0 w-full h-[15%] cursor-pointer pointer-events-auto group/edit"
+                        >
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-full opacity-0 group-hover/edit:opacity-100 shadow-xl transition-all flex items-center gap-2 border border-white/20 backdrop-blur-md">
+                                <span className="material-symbols-outlined text-sm">insights</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Editar Métricas</span>
+                            </div>
+                        </div>
+
+                        {/* Zona 4: Links (Base) */}
+                        <div 
+                            onClick={(e) => { e.stopPropagation(); setActiveTool('social'); }}
+                            className="absolute top-[60%] left-0 w-full h-[30%] cursor-pointer pointer-events-auto group/edit"
+                        >
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary text-white px-3 py-1.5 rounded-full opacity-0 group-hover/edit:opacity-100 shadow-xl transition-all flex items-center gap-2 border border-white/20 backdrop-blur-md">
+                                <span className="material-symbols-outlined text-sm">share</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Editar Links</span>
+                            </div>
+                        </div>
+
+                        {/* Zona 5: QR Code (Rodapé extremo) */}
+                        <div 
+                            onClick={(e) => { e.stopPropagation(); setActiveTool('qrcode'); }}
+                            className="absolute bottom-0 left-0 w-full h-[10%] cursor-pointer pointer-events-auto group/edit"
+                        >
                         </div>
                     </div>
                 </div>
@@ -38,7 +80,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
         );
     }
 
-    // Template Padrão com edição direta e visual no canvas
+    // Template Padrão com edição direta e visual no canvas (Mantendo lógica original por ser mais precisa)
     return (
         <div className="w-full h-full flex flex-col items-center pt-12 pb-8 px-6 overflow-y-auto no-scrollbar">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
@@ -74,13 +116,21 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                 <p className="text-slate-500 dark:text-slate-400 font-medium text-sm group-hover:text-primary/70 transition-colors">{jobTitle}</p>
             </div>
             
-            <div className="flex items-center gap-1 text-slate-400 text-xs mt-1 shrink-0">
-                <span className="material-symbols-outlined text-xs">location_on</span>
-                <span>São Paulo, Brasil</span>
+            {/* Métricas (Default Template) */}
+            <div 
+                onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                className="mt-6 flex gap-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 p-3 rounded-xl transition-colors border-2 border-transparent hover:border-primary/20"
+            >
+                {cardData.stats.map((stat, i) => (
+                    <div key={i} className="text-center">
+                        <p className="text-lg font-bold text-slate-900 dark:text-white">{stat.value}</p>
+                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{stat.label}</p>
+                    </div>
+                ))}
             </div>
 
             {/* Links - Ao clicar seleciona o link e abre ferramenta Social */}
-            <div className="w-full mt-10 space-y-3 shrink-0">
+            <div className="w-full mt-8 space-y-3 shrink-0">
                 {links.map((link) => (
                      <button 
                         key={link.id} 
