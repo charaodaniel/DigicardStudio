@@ -1,10 +1,15 @@
 'use client';
-import { Metadata } from 'next';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { localDb } from '@/lib/local-database';
+import type { CardData } from '@/lib/types';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const Sidebar = () => {
     const userAvatar = PlaceHolderImages.find(p => p.id === 'meus-cartoes-avatar-1');
@@ -58,68 +63,57 @@ const Sidebar = () => {
     );
 };
 
-const Card = ({ title, lastEdited, status, bgImageUrl, cardData }) => {
-    const cardBg1 = PlaceHolderImages.find(p => p.id === 'meus-cartoes-card-bg-1');
-    const cardBg2 = PlaceHolderImages.find(p => p.id === 'meus-cartoes-card-bg-2');
-    const cardBg3 = PlaceHolderImages.find(p => p.id === 'meus-cartoes-card-bg-3');
-    
-    let image = cardBg1?.imageUrl;
-    if (bgImageUrl === 'meus-cartoes-card-bg-2') image = cardBg2?.imageUrl;
-    if (bgImageUrl === 'meus-cartoes-card-bg-3') image = cardBg3?.imageUrl;
-
+const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) => void }) => {
+    const router = useRouter();
 
     return (
         <div className="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-xl transition-shadow group">
             <div className="aspect-[4/5] bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
-                {cardData === 'card1' && image && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex flex-col justify-end text-white" style={{backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                        <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 border border-white/20">
-                            <div className="size-8 bg-white rounded flex items-center justify-center mb-2">
-                                <span className="material-symbols-outlined text-indigo-600 text-sm">qr_code_2</span>
-                            </div>
-                            <p className="text-xs font-bold opacity-80 uppercase tracking-widest">Digital Card</p>
-                            <p className="text-sm font-bold">Ricardo Silva</p>
+                <div 
+                    className="absolute inset-0 bg-cover bg-center" 
+                    style={{ backgroundImage: `url(${card.bannerUrl || card.avatarUrl})` }}
+                >
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-white text-center">
+                        <div className="size-16 rounded-full border-4 border-white/30 overflow-hidden mb-3">
+                            <img src={card.avatarUrl} alt={card.fullName} className="w-full h-full object-cover" />
                         </div>
+                        <h3 className="font-bold text-lg leading-tight">{card.fullName}</h3>
+                        <p className="text-xs opacity-70 mt-1">{card.jobTitle}</p>
                     </div>
-                )}
-                {cardData === 'card2' && image && (
-                     <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 p-6 flex flex-col items-center justify-center text-white" style={{backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                        <div className="size-16 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center mb-4 border border-white/30">
-                            <span className="material-symbols-outlined text-3xl">person</span>
-                        </div>
-                        <p className="text-lg font-black tracking-tighter">Freelancer Pro</p>
-                    </div>
-                )}
-                 {cardData === 'card3' && image && (
-                     <div className="absolute inset-0 bg-primary p-6 flex flex-col justify-between text-white" style={{backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
-                        <span className="material-symbols-outlined text-4xl font-light">language</span>
-                        <div>
-                            <p className="text-xl font-black">Startup Pitch</p>
-                            <p className="text-xs opacity-70">digicard.web/pitch-1</p>
-                        </div>
-                    </div>
-                )}
+                </div>
 
-
-                <div className="absolute top-3 right-3">
-                    <span className={`backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded uppercase ${status === 'Ativo' ? 'bg-green-500/90' : 'bg-amber-500/90'}`}>{status}</span>
+                <div className="absolute top-3 right-3 flex gap-2">
+                     <button 
+                        onClick={(e) => { e.preventDefault(); onDelete(card.id); }}
+                        className="bg-red-500/90 hover:bg-red-500 p-2 rounded-lg text-white shadow-lg transition-colors"
+                        title="Excluir"
+                    >
+                        <span className="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                    <span className="backdrop-blur-md bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded uppercase border border-white/20">
+                        {card.template}
+                    </span>
                 </div>
             </div>
             <div className="p-4">
-                <h3 className="font-bold text-slate-900 dark:text-white truncate">{title}</h3>
-                <p className="text-xs text-slate-500 mt-1">{lastEdited}</p>
-                <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <button className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-primary/5 group/btn transition-colors">
-                        <span className="material-symbols-outlined text-slate-400 group-hover/btn:text-primary transition-colors text-xl">edit</span>
-                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 group-hover/btn:text-primary transition-colors">Editar</span>
+                <h3 className="font-bold text-slate-900 dark:text-white truncate">{card.fullName}</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                    Editado {card.lastUpdated ? formatDistanceToNow(card.lastUpdated, { addSuffix: true, locale: ptBR }) : 'recentemente'}
+                </p>
+                <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button 
+                        onClick={() => router.push(`/?id=${card.id}`)}
+                        className="flex items-center justify-center gap-2 p-2 rounded-lg bg-primary text-white font-bold text-xs hover:bg-primary/90 transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-sm">edit</span>
+                        Editar
                     </button>
-                    <button className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-primary/5 group/btn transition-colors">
-                        <span className="material-symbols-outlined text-slate-400 group-hover/btn:text-primary transition-colors text-xl">share</span>
-                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 group-hover/btn:text-primary transition-colors">Enviar</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-primary/5 group/btn transition-colors">
-                        <span className="material-symbols-outlined text-slate-400 group-hover/btn:text-primary transition-colors text-xl">insights</span>
-                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 group-hover/btn:text-primary transition-colors">Análise</span>
+                    <button 
+                        onClick={() => window.open(`/c/${card.id}`, '_blank')}
+                        className="flex items-center justify-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        Ver
                     </button>
                 </div>
             </div>
@@ -129,6 +123,31 @@ const Card = ({ title, lastEdited, status, bgImageUrl, cardData }) => {
 
 
 export default function MeusCartoesPage() {
+    const router = useRouter();
+    const [cards, setCards] = useState<CardData[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        setCards(localDb.getAllCards());
+    }, []);
+
+    const handleCreateNew = () => {
+        const newCard = localDb.createNewCard();
+        router.push(`/?id=${newCard.id}`);
+    };
+
+    const handleDelete = (id: string) => {
+        if (confirm('Tem certeza que deseja excluir este cartão?')) {
+            localDb.deleteCard(id);
+            setCards(localDb.getAllCards());
+        }
+    };
+
+    const filteredCards = cards.filter(c => 
+        c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        c.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
             <Sidebar />
@@ -138,7 +157,10 @@ export default function MeusCartoesPage() {
                         <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Meus Cartões</h2>
                         <p className="text-slate-500 mt-1 font-medium">Gerencie e compartilhe sua identidade digital profissional.</p>
                     </div>
-                    <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 h-auto">
+                    <Button 
+                        onClick={handleCreateNew}
+                        className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 h-auto"
+                    >
                         <span className="material-symbols-outlined">add_circle</span>
                         Criar Novo Cartão
                     </Button>
@@ -147,22 +169,25 @@ export default function MeusCartoesPage() {
                 <div className="bg-white dark:bg-background-dark/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
                     <div className="relative flex-1 min-w-[300px]">
                         <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                        <Input className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm h-auto" placeholder="Pesquisar por nome do cartão..." type="text" />
-                    </div>
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-                        <Button variant="ghost" className="px-4 py-2 bg-primary/10 text-primary rounded-lg text-sm font-bold whitespace-nowrap h-auto hover:bg-primary/20">Todos</Button>
-                        <Button variant="ghost" className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-sm font-medium whitespace-nowrap h-auto">Ativos</Button>
-                        <Button variant="ghost" className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-sm font-medium whitespace-nowrap h-auto">Rascunhos</Button>
-                        <Button variant="ghost" className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-sm font-medium whitespace-nowrap h-auto">Inativos</Button>
+                        <Input 
+                            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm h-auto" 
+                            placeholder="Pesquisar por nome ou cargo..." 
+                            type="text" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <Card title="Cartão Executivo V1" lastEdited="Última edição: 2 horas atrás" status="Ativo" bgImageUrl="meus-cartoes-card-bg-1" cardData="card1" />
-                    <Card title="Portfolio Design" lastEdited="Última edição: Ontem" status="Rascunho" bgImageUrl="meus-cartoes-card-bg-2" cardData="card2" />
-                    <Card title="Comercial / Vendas" lastEdited="Última edição: 4 dias atrás" status="Ativo" bgImageUrl="meus-cartoes-card-bg-3" cardData="card3" />
+                    {filteredCards.map(card => (
+                        <CardItem key={card.id} card={card} onDelete={handleDelete} />
+                    ))}
                     
-                    <div className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer">
+                    <div 
+                        onClick={handleCreateNew}
+                        className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer min-h-[300px]"
+                    >
                         <div className="size-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors mb-4">
                             <span className="material-symbols-outlined text-3xl">add</span>
                         </div>
@@ -174,33 +199,19 @@ export default function MeusCartoesPage() {
                 <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Visualizações Totais</span>
-                            <span className="material-symbols-outlined text-primary">visibility</span>
+                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Total de Cartões</span>
+                            <span className="material-symbols-outlined text-primary">credit_card</span>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 dark:text-white">12.482</p>
-                        <p className="text-xs text-green-500 font-bold mt-1 flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">trending_up</span>
-                            +12% este mês
-                        </p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white">{cards.length}</p>
+                        <p className="text-xs text-slate-500 font-bold mt-1">Armazenados localmente</p>
                     </div>
                     <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Novos Contatos</span>
-                            <span className="material-symbols-outlined text-primary">person_add</span>
+                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Espaço Usado</span>
+                            <span className="material-symbols-outlined text-primary">database</span>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 dark:text-white">458</p>
-                        <p className="text-xs text-green-500 font-bold mt-1 flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">trending_up</span>
-                            +5% este mês
-                        </p>
-                    </div>
-                    <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">CTR Médio</span>
-                            <span className="material-symbols-outlined text-primary">ads_click</span>
-                        </div>
-                        <p className="text-2xl font-black text-slate-900 dark:text-white">8.2%</p>
-                        <p className="text-xs text-slate-500 font-bold mt-1">Média do mercado: 4.1%</p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white">~{Math.round(JSON.stringify(cards).length / 1024)} KB</p>
+                        <p className="text-xs text-slate-500 font-bold mt-1">Sincronizado com JSON</p>
                     </div>
                 </div>
 

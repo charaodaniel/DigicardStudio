@@ -14,6 +14,7 @@ export type StatItem = {
 };
 
 export type CardData = {
+  id: string; // ID obrigatório para o banco local
   template: string;
   fullName: string;
   fullNameLink?: string;
@@ -43,4 +44,5 @@ export type CardData = {
   physicalShowQR?: boolean;
   physicalShowFooter?: boolean;
   physicalBackgroundColor?: string;
+  lastUpdated?: number;
 };

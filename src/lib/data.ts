@@ -5,6 +5,7 @@ const profileImage = PlaceHolderImages.find(img => img.id === 'profile-joao-silv
 const qrImage = PlaceHolderImages.find(img => img.id === 'qr-code-1');
 
 export const initialCardData: CardData = {
+  id: 'default_card_1',
   template: 'default',
   fullName: "João Silva",
   fullNameLink: '',
@@ -42,4 +43,5 @@ export const initialCardData: CardData = {
   physicalShowQR: true,
   physicalShowFooter: true,
   physicalBackgroundColor: '#ffffff',
+  lastUpdated: Date.now(),
 };
