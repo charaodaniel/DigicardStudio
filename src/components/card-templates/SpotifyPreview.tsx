@@ -1,12 +1,25 @@
 'use client';
 import type { CardData } from '@/lib/types';
-import { formatHref } from '@/lib/utils';
+import { formatHref, shareCard } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { toast } = useToast();
     
     const spotifyLink = links.find(l => l.type === 'spotify' || l.type === 'website');
     const actionHref = spotifyLink ? formatHref(spotifyLink.type, spotifyLink.value) : '#';
+
+    const handleShare = async () => {
+        const result = await shareCard(
+            `Escute agora: ${fullName}`,
+            `Confira o perfil de ${fullName} no Spotify`,
+            window.location.href
+        );
+        if (result.success && result.method === 'clipboard') {
+            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
+        }
+    };
 
     return (
         <div className="bg-[#121121] text-white h-full flex flex-col relative overflow-hidden font-display">
@@ -74,7 +87,9 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
             <nav className="bg-black/80 backdrop-blur-xl border-t border-white/10 p-4 flex items-center justify-between z-30 shrink-0">
                 <div className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
-                    <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
+                    <button onClick={handleShare} className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center hover:text-white transition-colors">
+                        share
+                    </button>
                 </div>
                 <a 
                     href={actionHref}

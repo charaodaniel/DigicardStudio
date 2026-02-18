@@ -1,13 +1,26 @@
 'use client';
 import type { CardData } from '@/lib/types';
 import React from 'react';
-import { formatHref } from '@/lib/utils';
+import { formatHref, shareCard } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor, vCardUrl } = cardData;
+    const { toast } = useToast();
 
     const contactLink = links.find(l => l.type === 'email' || l.type === 'whatsapp' || l.type === 'website');
     const actionHref = contactLink ? formatHref(contactLink.type, contactLink.value) : '#';
+
+    const handleShare = async () => {
+        const result = await shareCard(
+            `Portfólio Digital - ${fullName}`,
+            `Confira o trabalho de ${fullName}`,
+            window.location.href
+        );
+        if (result.success && result.method === 'clipboard') {
+            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
+        }
+    };
 
     return (
         <div className="bg-white dark:bg-[#1c1b2b] font-display text-[#121117] antialiased h-full flex flex-col overflow-hidden relative">
@@ -17,7 +30,10 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                     <span className="material-symbols-outlined text-[22px]">arrow_back</span>
                 </button>
                 <h1 className="text-sm font-semibold uppercase tracking-widest text-[#656487] dark:text-gray-400">Portfólio</h1>
-                <button className="flex size-10 items-center justify-center rounded-full bg-slate-50 text-[#121117] dark:bg-primary/10 dark:text-white">
+                <button 
+                    onClick={handleShare}
+                    className="flex size-10 items-center justify-center rounded-full bg-slate-50 text-[#121117] dark:bg-primary/10 dark:text-white hover:bg-slate-100 transition-colors"
+                >
                     <span className="material-symbols-outlined text-[22px]">share</span>
                 </button>
             </div>

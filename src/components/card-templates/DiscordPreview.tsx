@@ -1,12 +1,25 @@
 'use client';
 import type { CardData } from '@/lib/types';
-import { formatHref } from '@/lib/utils';
+import { formatHref, shareCard } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DiscordPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, bannerUrl, vCardUrl } = cardData;
+    const { toast } = useToast();
     
     const discordLink = links.find(l => l.type === 'discord') || links.find(l => l.type === 'website');
     const actionHref = vCardUrl || (discordLink ? formatHref(discordLink.type, discordLink.value) : '#');
+
+    const handleShare = async () => {
+        const result = await shareCard(
+            `Comunidade Discord - ${fullName}`,
+            `Entre na comunidade de ${fullName} no Discord`,
+            window.location.href
+        );
+        if (result.success && result.method === 'clipboard') {
+            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
+        }
+    };
 
     return (
         <div className="bg-[#1E1F22] text-white h-full font-display flex flex-col overflow-hidden relative">
@@ -112,7 +125,10 @@ export default function DiscordPreview({ cardData }: { cardData: CardData }) {
                             >
                                 Adicionar aos Contatos
                             </a>
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded transition-all text-sm flex items-center justify-center gap-2">
+                            <button 
+                                onClick={handleShare}
+                                className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded transition-all text-sm flex items-center justify-center gap-2"
+                            >
                                 <span className="material-symbols-outlined text-sm">share</span>
                                 Compartilhar
                             </button>

@@ -1,8 +1,23 @@
 'use client';
 import type { CardData } from '@/lib/types';
+import { shareCard } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DigicardWebPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, saveContactLabel } = cardData;
+    const { toast } = useToast();
+
+    const handleShare = async () => {
+        const result = await shareCard(
+            `Cartão Digital - ${fullName}`,
+            `Confira o cartão digital de ${fullName}`,
+            window.location.href
+        );
+        if (result.success && result.method === 'clipboard') {
+            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
+        }
+    };
+
     return (
         <div className="bg-white dark:bg-background-dark min-h-full flex flex-col relative shadow-2xl overflow-y-auto no-scrollbar pb-20">
             {/* Top Navigation Area */}
@@ -13,7 +28,10 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                 <div className="flex-1 text-center">
                     <span className="text-xs font-bold uppercase tracking-widest text-primary/60">DigiCard Web</span>
                 </div>
-                <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+                <button 
+                    onClick={handleShare}
+                    className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors"
+                >
                     <span className="material-symbols-outlined">share</span>
                 </button>
             </div>

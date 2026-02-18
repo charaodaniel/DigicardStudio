@@ -1,12 +1,25 @@
 'use client';
 import type { CardData } from '@/lib/types';
-import { formatHref } from '@/lib/utils';
+import { formatHref, shareCard } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
     const { fullName, fullNameLink, jobTitle, jobTitleLink, bio, isVerified, avatarUrl, avatarLink, themeColor, links, stats, bannerUrl, bannerLink } = cardData;
+    const { toast } = useToast();
     
     const linkedinLink = links.find(l => l.type === 'linkedin' || l.type === 'website');
     const actionHref = linkedinLink ? formatHref(linkedinLink.type, linkedinLink.value) : '#';
+
+    const handleShare = async () => {
+        const result = await shareCard(
+            `Cartão Digital Executivo - ${fullName}`,
+            `Confira o perfil executivo de ${fullName}`,
+            window.location.href
+        );
+        if (result.success && result.method === 'clipboard') {
+            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
+        }
+    };
 
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
@@ -17,7 +30,9 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                     <span className="text-sm font-medium">Voltar</span>
                 </button>
                 <h1 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Perfil Verificado</h1>
-                <span className="material-symbols-outlined text-xl text-slate-400">share</span>
+                <button onClick={handleShare} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                    <span className="material-symbols-outlined text-xl text-slate-400">share</span>
+                </button>
             </header>
 
             {/* Scrollable Content */}

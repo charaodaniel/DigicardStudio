@@ -47,3 +47,25 @@ export function formatHref(type: string, value: string) {
       return cleanValue.includes('.') ? `https://${cleanValue}` : '#';
   }
 }
+
+export const shareCard = async (title: string, text: string, url: string) => {
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      return { success: true, method: 'native' };
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error('Error sharing:', err);
+      }
+      return { success: false };
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(url);
+      return { success: true, method: 'clipboard' };
+    } catch (err) {
+      console.error('Error copying to clipboard:', err);
+      return { success: false };
+    }
+  }
+};
