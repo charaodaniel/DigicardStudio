@@ -1,19 +1,20 @@
 'use client';
 import type { CardData } from '@/lib/types';
+import { formatHref } from '@/lib/utils';
 
 export default function FacebookPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
     return (
-        <div className="bg-white dark:bg-[#1c1b2b] h-full flex flex-col overflow-hidden">
+        <div className="bg-white dark:bg-[#1c1b2b] h-full flex flex-col overflow-hidden relative">
             {/* Header / Navigation - LOCKED TOP */}
-            <div className="flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
+            <div className="absolute top-0 left-0 right-0 flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
                 <span className="material-symbols-outlined">arrow_back</span>
                 <h2 className="text-lg font-bold flex-1 ml-4">Perfil</h2>
                 <span className="material-symbols-outlined">more_horiz</span>
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col relative">
+            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col pt-16 pb-20">
                 {/* Cover Photo */}
                 <div className="relative shrink-0">
                     <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 bg-center bg-cover" style={{ backgroundImage: "url('https://picsum.photos/seed/fb-cover/400/150')" }}>
@@ -46,7 +47,25 @@ export default function FacebookPreview({ cardData }: { cardData: CardData }) {
                             Enviar Mensagem
                         </button>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    
+                    {/* Dynamic Links List */}
+                    <div className="flex flex-col gap-2 mt-4">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Meus Contatos</h3>
+                        {links.map(link => (
+                            <a 
+                                key={link.id} 
+                                href={formatHref(link.type, link.value)} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/30 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-100 transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-lg" style={{color: link.color || themeColor}}>{link.icon}</span>
+                                <span className="text-sm font-semibold">{link.label}</span>
+                            </a>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mt-4">
                         <div className="flex flex-col gap-1 rounded-lg border p-4 bg-gray-50/50 dark:bg-gray-900/30">
                             <p className="text-2xl font-bold">1.2k</p>
                             <p className="text-[#656487] text-xs font-medium uppercase tracking-wider">Seguidores</p>
@@ -60,7 +79,7 @@ export default function FacebookPreview({ cardData }: { cardData: CardData }) {
             </div>
             
             {/* Bottom Nav - LOCKED FOOTER */}
-            <div className="bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
                 <span className="material-symbols-outlined text-slate-400">play_circle</span>
                 <span className="material-symbols-outlined text-slate-400">group</span>

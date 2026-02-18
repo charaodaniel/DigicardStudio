@@ -1,6 +1,7 @@
 'use client';
 import Image from 'next/image';
 import type { CardData } from '@/lib/types';
+import { formatHref } from '@/lib/utils';
 
 type DefaultPreviewProps = {
   cardData: CardData;
@@ -48,15 +49,27 @@ export default function DefaultPreview({ cardData }: DefaultPreviewProps) {
         </p>
         <div className="mt-8 grid w-full grid-cols-2 gap-3">
           {links.slice(0, 2).map(link => (
-            <button key={link.id} className="flex flex-col items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100 transition-colors">
+            <a 
+              key={link.id} 
+              href={formatHref(link.type, link.value)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100 transition-colors"
+            >
               <span className="material-symbols-outlined" style={{color: link.color || themeColor}}>{link.icon}</span>
               <span className="text-[10px] font-bold text-slate-700">{link.label}</span>
-            </button>
+            </a>
           ))}
         </div>
         <div className="mt-6 w-full space-y-2">
           {links.slice(2).map(link => (
-            <div key={link.id} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 hover:bg-slate-100 transition-colors cursor-pointer">
+            <a 
+              key={link.id} 
+              href={formatHref(link.type, link.value)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{backgroundColor: link.color || themeColor}}>
                   <span className="material-symbols-outlined text-lg">{link.icon}</span>
@@ -64,7 +77,7 @@ export default function DefaultPreview({ cardData }: DefaultPreviewProps) {
                 <span className="text-xs font-bold text-slate-700">{link.label}</span>
               </div>
               <span className="material-symbols-outlined text-sm text-slate-400">arrow_forward_ios</span>
-            </div>
+            </a>
           ))}
         </div>
         <button
