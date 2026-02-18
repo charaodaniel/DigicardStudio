@@ -12,6 +12,7 @@ import TemplateLibrary from '@/components/editor/template-library';
 export default function EditorPage() {
   const [cardData, setCardData] = useState<CardData>(initialCardData);
   const [activeTool, setActiveTool] = useState('conteudo');
+  const [selectedLinkId, setSelectedLinkId] = useState<string | null>(cardData.links[0]?.id || null);
 
   const handleToolClick = (toolId: string) => {
     setActiveTool(toolId);
@@ -19,7 +20,7 @@ export default function EditorPage() {
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
-      <EditorHeader />
+      <EditorHeader cardData={cardData} />
       <main className="flex-1 flex overflow-hidden">
         <ToolsSidebar
           activeTool={activeTool}
@@ -29,8 +30,18 @@ export default function EditorPage() {
           <TemplateLibrary setCardData={setCardData} />
         ) : (
           <>
-            <Canvas cardData={cardData} />
-            <PropertiesSidebar cardData={cardData} setCardData={setCardData} />
+            <Canvas 
+              cardData={cardData} 
+              selectedLinkId={selectedLinkId} 
+              setSelectedLinkId={setSelectedLinkId} 
+            />
+            <PropertiesSidebar 
+              cardData={cardData} 
+              setCardData={setCardData} 
+              selectedLinkId={selectedLinkId}
+              setSelectedLinkId={setSelectedLinkId}
+              activeTool={activeTool}
+            />
           </>
         )}
       </main>

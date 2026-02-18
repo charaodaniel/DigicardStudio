@@ -1,70 +1,152 @@
 'use client';
 import type { Dispatch, SetStateAction } from 'react';
-import type { CardData } from '@/lib/types';
+import type { CardData, SocialLink } from '@/lib/types';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
-export default function PropertiesSidebar({ cardData, setCardData }: { cardData: CardData, setCardData: Dispatch<SetStateAction<CardData>> }) {
+type PropertiesSidebarProps = {
+    cardData: CardData;
+    setCardData: Dispatch<SetStateAction<CardData>>;
+    selectedLinkId: string | null;
+    setSelectedLinkId: Dispatch<SetStateAction<string | null>>;
+    activeTool: string;
+};
 
-    // Simulação de elemento selecionado (WhatsApp por padrão conforme o modelo)
-    const activeLink = cardData.links[0];
+export default function PropertiesSidebar({ 
+    cardData, 
+    setCardData, 
+    selectedLinkId, 
+    activeTool 
+}: PropertiesSidebarProps) {
+
+    const activeLink = cardData.links.find(l => l.id === selectedLinkId) || cardData.links[0];
 
     const colors = [
         '#5048e5', '#e11d48', '#10b981', '#f59e0b', '#3b82f6'
     ];
+
+    const handleProfileChange = (field: keyof CardData, value: string) => {
+        setCardData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleLinkChange = (id: string, field: keyof SocialLink, value: string) => {
+        setCardData(prev => ({
+            ...prev,
+            links: prev.links.map(l => l.id === id ? { ...l, [field]: value } : l)
+        }));
+    };
+
+    const deleteLink = (id: string) => {
+        setCardData(prev => ({
+            ...prev,
+            links: prev.links.filter(l => l.id !== id)
+        }));
+    };
 
     return (
         <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
             <div className="p-6 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-900 dark:text-white">Propriedades</h3>
-                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full font-bold uppercase">Botão</span>
+                    <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full font-bold uppercase">
+                        {activeTool === 'conteudo' ? 'Perfil' : 'Botão'}
+                    </span>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{backgroundColor: activeLink.color || '#25D366'}}>
-                        <span className="material-symbols-outlined text-sm">{activeLink.icon}</span>
+                
+                {activeTool === 'social' && activeLink && (
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{backgroundColor: activeLink.color || '#25D366'}}>
+                            <span className="material-symbols-outlined text-sm">{activeLink.icon}</span>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-slate-900 dark:text-white">{activeLink.label}</p>
+                            <p className="text-[10px] text-slate-500">Elemento Ativo</p>
+                        </div>
+                        <button 
+                            onClick={() => deleteLink(activeLink.id)}
+                            className="ml-auto material-symbols-outlined text-slate-400 hover:text-red-500 transition-colors"
+                        >
+                            delete
+                        </button>
                     </div>
-                    <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white">{activeLink.label}</p>
-                        <p className="text-[10px] text-slate-500">Elemento Ativo</p>
-                    </div>
-                    <button className="ml-auto material-symbols-outlined text-slate-400 hover:text-red-500 transition-colors">delete</button>
-                </div>
+                )}
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8">
-                <div className="space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Conteúdo</label>
-                    <div className="space-y-3">
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-medium text-slate-400 ml-1">Rótulo do Botão</p>
-                            <Input 
-                                className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" 
-                                type="text" 
-                                defaultValue={activeLink.label}
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-medium text-slate-400 ml-1">Link / Telefone</p>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-slate-400">link</span>
+                {/* Profile Fields */}
+                {activeTool === 'conteudo' && (
+                    <div className="space-y-4">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Informações Básicas</label>
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Nome Completo</p>
                                 <Input 
-                                    className="w-full pl-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
                                     type="text" 
-                                    defaultValue={activeLink.value}
+                                    value={cardData.fullName}
+                                    onChange={(e) => handleProfileChange('fullName', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Cargo / Título</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.jobTitle}
+                                    onChange={(e) => handleProfileChange('jobTitle', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Bio Curta</p>
+                                <Textarea 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm min-h-[100px]" 
+                                    value={cardData.bio}
+                                    onChange={(e) => handleProfileChange('bio', e.target.value)}
                                 />
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
+                {/* Link Fields */}
+                {(activeTool === 'social' || activeTool === 'conteudo') && activeLink && (
+                    <div className="space-y-4">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração do Botão</label>
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Rótulo do Botão</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={activeLink.label}
+                                    onChange={(e) => handleLinkChange(activeLink.id, 'label', e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Link / Telefone</p>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-sm text-slate-400">link</span>
+                                    <Input 
+                                        className="w-full pl-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                        type="text" 
+                                        value={activeLink.value}
+                                        onChange={(e) => handleLinkChange(activeLink.id, 'value', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Styling */}
                 <div className="space-y-4">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estilo e Cor</label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
                             <p className="text-[11px] font-medium text-slate-400 ml-1">Cor do Fundo</p>
                             <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <div className="w-5 h-5 rounded" style={{backgroundColor: activeLink.color || '#25D366'}}></div>
-                                <span className="text-[11px] font-mono">{activeLink.color || '#25D366'}</span>
+                                <div className="w-5 h-5 rounded" style={{backgroundColor: activeLink?.color || cardData.themeColor}}></div>
+                                <span className="text-[11px] font-mono uppercase">{activeLink?.color || cardData.themeColor}</span>
                             </div>
                         </div>
                         <div className="space-y-1.5">
@@ -75,26 +157,10 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
                             </div>
                         </div>
                     </div>
-                    <div className="space-y-1.5">
-                        <p className="text-[11px] font-medium text-slate-400 ml-1">Arredondamento</p>
-                        <div className="flex items-center gap-4">
-                            <input className="flex-1 accent-primary" max="32" min="0" type="range" defaultValue="16"/>
-                            <span className="text-xs font-bold text-slate-600 dark:text-slate-400">16px</span>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Página Geral</label>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                        <div className="flex items-center gap-2">
-                            <span className="material-symbols-outlined text-lg">dark_mode</span>
-                            <span className="text-xs font-semibold">Modo Escuro</span>
-                        </div>
-                        <div className="w-10 h-5 bg-primary rounded-full relative cursor-pointer p-0.5">
-                            <div className="w-4 h-4 bg-white rounded-full translate-x-[100%]"></div>
-                        </div>
-                    </div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração Geral</label>
                     <div className="space-y-2">
                         <p className="text-[11px] font-medium text-slate-400 ml-1">Cor Primária do Tema</p>
                         <div className="flex gap-2">
@@ -118,7 +184,16 @@ export default function PropertiesSidebar({ cardData, setCardData }: { cardData:
             </div>
             
             <div className="p-6 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800">
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                <button 
+                    onClick={() => {
+                        const newId = Math.random().toString(36).substr(2, 9);
+                        setCardData(prev => ({
+                            ...prev,
+                            links: [...prev.links, { id: newId, type: 'website', label: 'Novo Link', value: '', icon: 'link', color: prev.themeColor }]
+                        }));
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                >
                     <span className="material-symbols-outlined text-lg">add_circle</span>
                     Novo Elemento
                 </button>
