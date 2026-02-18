@@ -20,7 +20,7 @@ export default function PropertiesSidebar({
     activeTool 
 }: PropertiesSidebarProps) {
 
-    const activeLink = cardData.links.find(l => l.id === selectedLinkId) || cardData.links[0];
+    const activeLink = cardData.links.find(l => l.id === selectedLinkId);
 
     const colors = [
         '#5048e5', '#e11d48', '#10b981', '#f59e0b', '#3b82f6'
@@ -38,10 +38,17 @@ export default function PropertiesSidebar({
     };
 
     const deleteLink = (id: string) => {
-        setCardData(prev => ({
-            ...prev,
-            links: prev.links.filter(l => l.id !== id)
-        }));
+        setCardData(prev => {
+            const newLinks = prev.links.filter(l => l.id !== id);
+            // Se deletamos o link selecionado, selecionamos o primeiro da lista nova ou nenhum
+            if (selectedLinkId === id) {
+                setSelectedLinkId(newLinks.length > 0 ? newLinks[0].id : null);
+            }
+            return {
+                ...prev,
+                links: newLinks
+            };
+        });
     };
 
     const getToolLabel = () => {
@@ -64,21 +71,26 @@ export default function PropertiesSidebar({
                     </span>
                 </div>
                 
-                {activeTool === 'social' && activeLink && (
+                {activeTool === 'social' && activeLink ? (
                     <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{backgroundColor: activeLink.color || '#25D366'}}>
                             <span className="material-symbols-outlined text-sm">{activeLink.icon}</span>
                         </div>
-                        <div>
-                            <p className="text-xs font-bold text-slate-900 dark:text-white">{activeLink.label}</p>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{activeLink.label}</p>
                             <p className="text-[10px] text-slate-500">Elemento Ativo</p>
                         </div>
                         <button 
                             onClick={() => deleteLink(activeLink.id)}
-                            className="ml-auto material-symbols-outlined text-slate-400 hover:text-red-500 transition-colors"
+                            className="ml-auto material-symbols-outlined text-slate-400 hover:text-red-500 transition-colors p-1"
+                            title="Remover Link"
                         >
                             delete
                         </button>
+                    </div>
+                ) : activeTool === 'social' && (
+                    <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-800">
+                        <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">Selecione um botão no cartão para editar ou adicione um novo abaixo.</p>
                     </div>
                 )}
             </div>
@@ -165,7 +177,7 @@ export default function PropertiesSidebar({
 
                 {/* Campos de Botões Sociais */}
                 {activeTool === 'social' && activeLink && (
-                    <div className="space-y-4">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-2 duration-200">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração do Botão</label>
                         <div className="space-y-3">
                             <div className="space-y-1.5">
@@ -187,6 +199,20 @@ export default function PropertiesSidebar({
                                         value={activeLink.value}
                                         onChange={(e) => handleLinkChange(activeLink.id, 'value', e.target.value)}
                                     />
+                                </div>
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Ícone</p>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {['chat', 'photo_camera', 'work', 'language', 'mail', 'phone', 'alternate_email', 'share'].map(icon => (
+                                        <button 
+                                            key={icon}
+                                            onClick={() => handleLinkChange(activeLink.id, 'icon', icon)}
+                                            className={`p-2 rounded-lg border transition-all ${activeLink.icon === icon ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-100'}`}
+                                        >
+                                            <span className="material-symbols-outlined text-xl">{icon}</span>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                             <div className="space-y-1.5">
@@ -237,7 +263,7 @@ export default function PropertiesSidebar({
             <div className="p-6 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-200 dark:border-slate-800">
                 <button 
                     onClick={() => {
-                        const newId = Math.random().toString(36).substr(2, 9);
+                        const newId = `link-${Date.now()}`;
                         setCardData(prev => ({
                             ...prev,
                             links: [...prev.links, { id: newId, type: 'website', label: 'Novo Link', value: '', icon: 'link', color: prev.themeColor }]
@@ -245,10 +271,10 @@ export default function PropertiesSidebar({
                         setSelectedLinkId(newId);
                         setActiveTool('social');
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-[0.98]"
                 >
                     <span className="material-symbols-outlined text-lg">add_circle</span>
-                    Novo Elemento
+                    Novo Link
                 </button>
             </div>
         </aside>
