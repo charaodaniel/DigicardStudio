@@ -16,6 +16,7 @@ export default function PropertiesSidebar({
     cardData, 
     setCardData, 
     selectedLinkId, 
+    setSelectedLinkId,
     activeTool 
 }: PropertiesSidebarProps) {
 
@@ -43,13 +44,23 @@ export default function PropertiesSidebar({
         }));
     };
 
+    const getToolLabel = () => {
+        switch (activeTool) {
+            case 'conteudo': return 'Perfil';
+            case 'social': return 'Botão';
+            case 'imagens': return 'Imagens';
+            case 'qrcode': return 'QR Code';
+            default: return 'Geral';
+        }
+    }
+
     return (
         <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
             <div className="p-6 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-slate-900 dark:text-white">Propriedades</h3>
                     <span className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-full font-bold uppercase">
-                        {activeTool === 'conteudo' ? 'Perfil' : 'Botão'}
+                        {getToolLabel()}
                     </span>
                 </div>
                 
@@ -73,7 +84,7 @@ export default function PropertiesSidebar({
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-8">
-                {/* Profile Fields */}
+                {/* Campos de Perfil */}
                 {activeTool === 'conteudo' && (
                     <div className="space-y-4">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Informações Básicas</label>
@@ -108,8 +119,52 @@ export default function PropertiesSidebar({
                     </div>
                 )}
 
-                {/* Link Fields */}
-                {(activeTool === 'social' || activeTool === 'conteudo') && activeLink && (
+                {/* Campos de Imagem */}
+                {activeTool === 'imagens' && (
+                    <div className="space-y-4">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Foto de Perfil</label>
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">URL da Imagem</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.avatarUrl}
+                                    onChange={(e) => handleProfileChange('avatarUrl', e.target.value)}
+                                />
+                            </div>
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center gap-3">
+                                <img src={cardData.avatarUrl} className="w-20 h-20 rounded-full object-cover border-2 border-white shadow-sm" alt="Preview" />
+                                <p className="text-[10px] text-slate-500 text-center">Cole um link de imagem acima para atualizar sua foto.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Campos de QR Code */}
+                {activeTool === 'qrcode' && (
+                    <div className="space-y-4">
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração do QR Code</label>
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">URL / Link do QR Code</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.qrCodeUrl || ''}
+                                    onChange={(e) => handleProfileChange('qrCodeUrl', e.target.value)}
+                                />
+                            </div>
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col items-center gap-3">
+                                {cardData.qrCodeUrl && <img src={cardData.qrCodeUrl} className="w-24 h-24 bg-white p-1 rounded shadow-sm" alt="QR Preview" />}
+                                <p className="text-[10px] text-slate-500 text-center">Este código redireciona para o seu perfil digital.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Campos de Botões Sociais */}
+                {activeTool === 'social' && activeLink && (
                     <div className="space-y-4">
                         <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração do Botão</label>
                         <div className="space-y-3">
@@ -134,35 +189,31 @@ export default function PropertiesSidebar({
                                     />
                                 </div>
                             </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Cor Personalizada</p>
+                                <div className="flex gap-2">
+                                    {colors.map(color => (
+                                        <button 
+                                            key={color} 
+                                            onClick={() => handleLinkChange(activeLink.id, 'color', color)}
+                                            className={`w-6 h-6 rounded-full transition-all`}
+                                            style={{
+                                                backgroundColor: color,
+                                                boxShadow: activeLink.color === color ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` : ''
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* Styling */}
-                <div className="space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estilo e Cor</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-medium text-slate-400 ml-1">Cor do Fundo</p>
-                            <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <div className="w-5 h-5 rounded" style={{backgroundColor: activeLink?.color || cardData.themeColor}}></div>
-                                <span className="text-[11px] font-mono uppercase">{activeLink?.color || cardData.themeColor}</span>
-                            </div>
-                        </div>
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-medium text-slate-400 ml-1">Cor do Texto</p>
-                            <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                                <div className="w-5 h-5 rounded bg-white border border-slate-200"></div>
-                                <span className="text-[11px] font-mono">#FFFFFF</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                {/* Estilo Geral */}
                 <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configuração Geral</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estilo e Cor do Tema</label>
                     <div className="space-y-2">
-                        <p className="text-[11px] font-medium text-slate-400 ml-1">Cor Primária do Tema</p>
+                        <p className="text-[11px] font-medium text-slate-400 ml-1">Cor Primária</p>
                         <div className="flex gap-2">
                             {colors.map(color => (
                                 <button 
@@ -191,6 +242,8 @@ export default function PropertiesSidebar({
                             ...prev,
                             links: [...prev.links, { id: newId, type: 'website', label: 'Novo Link', value: '', icon: 'link', color: prev.themeColor }]
                         }));
+                        setSelectedLinkId(newId);
+                        setActiveTool('social');
                     }}
                     className="w-full flex items-center justify-center gap-2 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                 >

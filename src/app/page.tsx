@@ -33,7 +33,8 @@ export default function EditorPage() {
             <Canvas 
               cardData={cardData} 
               selectedLinkId={selectedLinkId} 
-              setSelectedLinkId={setSelectedLinkId} 
+              setSelectedLinkId={setSelectedLinkId}
+              setActiveTool={setActiveTool}
             />
             <PropertiesSidebar 
               cardData={cardData} 

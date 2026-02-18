@@ -8,9 +8,10 @@ type CanvasProps = {
   cardData: CardData;
   selectedLinkId: string | null;
   setSelectedLinkId: Dispatch<SetStateAction<string | null>>;
+  setActiveTool: (toolId: string) => void;
 };
 
-export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId }: CanvasProps) {
+export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool }: CanvasProps) {
   return (
     <section className="flex-1 bg-background-light dark:bg-background-dark relative flex items-center justify-center p-8 overflow-auto">
       <div className="absolute top-6 left-6 flex items-center gap-4 bg-white dark:bg-slate-900 px-3 py-2 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
@@ -33,7 +34,8 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId }: 
             <EditableCardPreview 
                 cardData={cardData} 
                 selectedLinkId={selectedLinkId} 
-                setSelectedLinkId={setSelectedLinkId} 
+                setSelectedLinkId={setSelectedLinkId}
+                setActiveTool={setActiveTool}
             />
         </div>
         
