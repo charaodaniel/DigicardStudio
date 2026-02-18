@@ -35,7 +35,7 @@ const Sidebar = () => {
                     <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>credit_card</span>
                     <span className="text-sm font-medium">Meus Cartões</span>
                 </Link>
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/templates/modelos">
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
                     <span className="material-symbols-outlined">layers</span>
                     <span className="text-sm font-medium">Modelos</span>
                 </Link>

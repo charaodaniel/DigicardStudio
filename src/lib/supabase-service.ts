@@ -5,13 +5,78 @@ import { initialCardData } from './data';
 import { localDb } from './local-database';
 
 /**
- * Serviço para gerenciar operações CRUD no Supabase.
- * Se as credenciais não estiverem configuradas, ele faz o fallback para o LocalStorage.
+ * Mapeia o objeto da aplicação (camelCase) para o banco de dados (snake_case)
  */
+const toDb = (card: CardData) => ({
+  id: card.id,
+  template: card.template,
+  full_name: card.fullName,
+  full_name_link: card.fullNameLink,
+  job_title: card.jobTitle,
+  job_title_link: card.jobTitleLink,
+  bio: card.bio,
+  avatar_url: card.avatarUrl,
+  avatar_link: card.avatarLink,
+  banner_url: card.bannerUrl,
+  banner_link: card.bannerLink,
+  vcard_url: card.vCardUrl,
+  is_verified: card.isVerified,
+  theme_color: card.themeColor,
+  font_family: card.fontFamily,
+  base_font_size: card.baseFontSize,
+  links: card.links, // JSONB
+  stats: card.stats, // JSONB
+  save_contact_label: card.saveContactLabel,
+  qr_code_url: card.qrCodeUrl,
+  custom_website_url: card.customWebsiteUrl,
+  footer_text: card.footerText,
+  physical_show_avatar: card.physicalShowAvatar,
+  physical_show_title: card.physicalShowTitle,
+  physical_show_stats: card.physicalShowStats,
+  physical_show_links: card.physicalShowLinks,
+  physical_show_qr: card.physicalShowQR,
+  physical_show_footer: card.physicalShowFooter,
+  physical_background_color: card.physicalBackgroundColor,
+  last_updated: Date.now()
+});
+
+/**
+ * Mapeia o banco de dados (snake_case) de volta para o objeto da aplicação (camelCase)
+ */
+const fromDb = (dbCard: any): CardData => ({
+  id: dbCard.id,
+  template: dbCard.template,
+  fullName: dbCard.full_name,
+  fullNameLink: dbCard.full_name_link,
+  jobTitle: dbCard.job_title,
+  jobTitleLink: dbCard.job_title_link,
+  bio: dbCard.bio,
+  avatarUrl: dbCard.avatar_url,
+  avatarLink: dbCard.avatar_link,
+  bannerUrl: dbCard.banner_url,
+  bannerLink: dbCard.banner_link,
+  vCardUrl: dbCard.vcard_url,
+  isVerified: dbCard.is_verified,
+  themeColor: dbCard.theme_color,
+  fontFamily: dbCard.font_family,
+  baseFontSize: dbCard.base_font_size,
+  links: dbCard.links,
+  stats: dbCard.stats,
+  saveContactLabel: dbCard.save_contact_label,
+  qrCodeUrl: dbCard.qr_code_url,
+  customWebsiteUrl: dbCard.custom_website_url,
+  footerText: dbCard.footer_text,
+  physicalShowAvatar: dbCard.physical_show_avatar,
+  physicalShowTitle: dbCard.physical_show_title,
+  physicalShowStats: dbCard.physical_show_stats,
+  physicalShowLinks: dbCard.physical_show_links,
+  physicalShowQR: dbCard.physical_show_qr,
+  physicalShowFooter: dbCard.physical_show_footer,
+  physicalBackgroundColor: dbCard.physical_background_color,
+  lastUpdated: dbCard.last_updated
+});
+
 export const supabaseService = {
-  /**
-   * Busca todos os cartões (No futuro: filtrados por usuário logado)
-   */
   async getAllCards(): Promise<CardData[]> {
     if (!isSupabaseConfigured) return localDb.getAllCards();
 
@@ -21,16 +86,13 @@ export const supabaseService = {
       .order('last_updated', { ascending: false });
 
     if (error) {
-      console.error('Erro ao buscar cartões no Supabase:', error);
+      console.error('Erro Supabase:', error);
       return localDb.getAllCards();
     }
 
-    return data as CardData[];
+    return (data || []).map(fromDb);
   },
 
-  /**
-   * Busca um cartão por ID
-   */
   async getCardById(id: string): Promise<CardData | null> {
     if (!isSupabaseConfigured) return localDb.getCardById(id) || null;
 
@@ -41,16 +103,13 @@ export const supabaseService = {
       .single();
 
     if (error) {
-      console.error(`Erro ao buscar cartão ${id} no Supabase:`, error);
+      console.error('Erro Supabase:', error);
       return localDb.getCardById(id) || null;
     }
 
-    return data as CardData;
+    return fromDb(data);
   },
 
-  /**
-   * Salva ou atualiza um cartão
-   */
   async saveCard(card: CardData): Promise<void> {
     if (!isSupabaseConfigured) {
       localDb.saveCard(card);
@@ -59,17 +118,14 @@ export const supabaseService = {
 
     const { error } = await supabase
       .from('cards')
-      .upsert({ ...card, last_updated: Date.now() });
+      .upsert(toDb(card));
 
     if (error) {
-      console.error('Erro ao salvar cartão no Supabase:', error);
+      console.error('Erro Supabase:', error);
       localDb.saveCard(card);
     }
   },
 
-  /**
-   * Remove um cartão
-   */
   async deleteCard(id: string): Promise<void> {
     if (!isSupabaseConfigured) {
       localDb.deleteCard(id);
@@ -82,14 +138,11 @@ export const supabaseService = {
       .eq('id', id);
 
     if (error) {
-      console.error(`Erro ao deletar cartão ${id} no Supabase:`, error);
+      console.error('Erro Supabase:', error);
       localDb.deleteCard(id);
     }
   },
 
-  /**
-   * Cria um novo cartão
-   */
   async createNewCard(): Promise<CardData> {
     const newCard: CardData = {
       ...initialCardData,
