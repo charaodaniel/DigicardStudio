@@ -1,12 +1,15 @@
-
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { SiInstagram, SiSpotify, SiLinkedin, SiWhatsapp } from "react-icons/si";
+import AuthModal from '@/components/auth-modal';
 
 export default function LandingPage() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const heroImage = PlaceHolderImages.find(img => img.id === 'template-digicard-web');
   const templateEx1 = PlaceHolderImages.find(img => img.id === 'template-executive');
   const templateEx2 = PlaceHolderImages.find(img => img.id === 'template-instagram');
@@ -27,9 +30,13 @@ export default function LandingPage() {
             <a href="#pricing" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Preços</a>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/meus-cartoes">
-              <Button variant="ghost" className="font-bold">Login</Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              className="font-bold"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
+              Login
+            </Button>
             <Link href="/editor">
               <Button className="bg-primary hover:bg-primary/90 text-white px-6 font-bold rounded-xl shadow-lg shadow-primary/20">
                 Criar Agora
@@ -215,6 +222,8 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      <AuthModal isOpen={isAuthModalOpen} onOpenChange={setIsAuthModalOpen} />
     </div>
   );
 }
