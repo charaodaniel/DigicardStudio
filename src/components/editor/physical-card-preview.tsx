@@ -1,17 +1,18 @@
 
 'use client';
 import type { CardData } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
 type PhysicalCardPreviewProps = {
   cardData: CardData;
+  setActiveTool: (toolId: string) => void;
 };
 
-export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewProps) {
-  const { fullName, jobTitle, themeColor, qrCodeUrl, avatarUrl } = cardData;
+export default function PhysicalCardPreview({ cardData, setActiveTool }: PhysicalCardPreviewProps) {
+  const { fullName, jobTitle, themeColor, qrCodeUrl, avatarUrl, links } = cardData;
 
-  // Design do Cartão (Face Comum)
   const CardFace = ({ side }: { side: 'front' | 'back' }) => (
-    <div className="relative">
+    <div className="relative group/face">
       {/* Guias de Corte (Crop Marks) */}
       <div className="absolute -top-6 -left-6 w-10 h-[1px] bg-slate-400"></div>
       <div className="absolute -top-6 -left-6 w-[1px] h-10 bg-slate-400"></div>
@@ -23,7 +24,7 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
       <div className="absolute -bottom-6 -right-6 w-[1px] h-10 bg-slate-400"></div>
 
       {/* Card Container (com Bleed de 20px) */}
-      <div className="relative w-[840px] h-[490px] bg-white shadow-2xl overflow-hidden border border-red-200/50 rounded-sm">
+      <div className="relative w-[840px] h-[490px] bg-white shadow-2xl overflow-hidden border border-red-200/50 rounded-sm cursor-default">
         
         {/* Sangria (Bleed Guide) */}
         <div className="absolute inset-0 border-2 border-dashed border-red-400/30 pointer-events-none z-50"></div>
@@ -38,7 +39,10 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
             /* CONTEÚDO FRENTE */
             <div className="flex-1 flex flex-col justify-between p-10 relative">
               <div className="flex justify-between items-start">
-                <div className="space-y-2">
+                <div 
+                  className="space-y-2 cursor-pointer hover:bg-primary/5 p-2 rounded-xl transition-colors group/edit"
+                  onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                >
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-1.5 rounded-full" style={{ backgroundColor: themeColor }}></div>
                     <div>
@@ -51,14 +55,35 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
                       "Identidade digital para o mundo físico. Escaneie para conectar-se instantaneamente."
                     </p>
                   </div>
+                  {/* Botão flutuante de edição */}
+                  <div className="absolute -top-2 -left-2 bg-primary text-white text-[8px] font-bold px-2 py-1 rounded-full opacity-0 group-hover/edit:opacity-100 transition-opacity">EDITAR PERFIL</div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
+                <div 
+                  className="flex flex-col items-end gap-2 cursor-pointer hover:bg-primary/5 p-2 rounded-xl transition-colors group/edit"
+                  onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
+                >
                    <div className="size-24 rounded-full border-4 border-slate-50 shadow-md overflow-hidden bg-slate-100">
                     <img src={avatarUrl} className="w-full h-full object-cover" alt="Avatar" />
                   </div>
                    <div className="bg-primary/10 text-primary text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Perfil Verificado</div>
+                   <div className="absolute -top-2 -right-2 bg-primary text-white text-[8px] font-bold px-2 py-1 rounded-full opacity-0 group-hover/edit:opacity-100 transition-opacity">EDITAR FOTO</div>
                 </div>
+              </div>
+
+              {/* Seção Dinâmica: Links Sociais no Cartão Físico */}
+              <div 
+                className="mt-4 flex flex-wrap gap-x-6 gap-y-3 cursor-pointer hover:bg-primary/5 p-4 rounded-xl transition-colors group/edit border border-transparent hover:border-primary/20"
+                onClick={(e) => { e.stopPropagation(); setActiveTool('social'); }}
+              >
+                {links.slice(0, 4).map(link => (
+                  <div key={link.id} className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm" style={{ color: link.color || themeColor }}>{link.icon}</span>
+                    <span className="text-[10px] font-bold text-slate-600 truncate max-w-[120px]">{link.value}</span>
+                  </div>
+                ))}
+                {links.length === 0 && <p className="text-[8px] text-slate-300 italic uppercase tracking-widest">Nenhum link adicionado</p>}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[8px] font-bold px-3 py-1 rounded-full opacity-0 group-hover/edit:opacity-100 transition-opacity whitespace-nowrap">GERENCIAR LINKS</div>
               </div>
 
               <div className="flex justify-between items-end">
@@ -84,14 +109,21 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
               {/* Pattern de fundo sutil */}
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
               
-              <div className="relative z-10 flex flex-col items-center gap-6">
-                <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl scale-110">
+              <div 
+                className="relative z-10 flex flex-col items-center gap-6 cursor-pointer hover:scale-105 transition-transform group/edit"
+                onClick={(e) => { e.stopPropagation(); setActiveTool('qrcode'); }}
+              >
+                <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl scale-110 relative">
                   {qrCodeUrl && <img src={qrCodeUrl} className="size-40" alt="QR Code Large" />}
+                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover/edit:opacity-100 rounded-[2.5rem] flex items-center justify-center transition-opacity border-2 border-white backdrop-blur-[2px]">
+                    <span className="material-symbols-outlined text-primary text-3xl">qr_code_2</span>
+                  </div>
                 </div>
                 <div className="text-center space-y-1">
                   <h3 className="text-white text-2xl font-black tracking-tighter uppercase">{fullName}</h3>
                   <p className="text-white/70 text-[10px] font-bold tracking-[0.3em] uppercase">Escaneie para salvar meu contato</p>
                 </div>
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white text-primary text-[8px] font-bold px-3 py-1 rounded-full opacity-0 group-hover/edit:opacity-100 transition-opacity whitespace-nowrap shadow-xl">EDITAR QR CODE</div>
               </div>
 
               {/* Marca D'água do Sistema */}
@@ -115,10 +147,10 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
       <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl max-w-[800px] text-center">
         <h4 className="text-sm font-bold text-primary flex items-center justify-center gap-2 mb-1">
           <span className="material-symbols-outlined text-lg">print</span>
-          Gabarito Técnico (90x50mm)
+          Editor Físico Interativo (90x50mm)
         </h4>
         <p className="text-[10px] text-slate-500 leading-tight">
-          As linhas vermelhas são a <strong>Sangria</strong>. O tracejado azul é a <strong>Margem de Segurança</strong>.
+          Clique em qualquer elemento para editar. Os <strong>Links Sociais</strong> adicionados no modo Digital aparecerão automaticamente aqui.
         </p>
       </div>
 

@@ -80,7 +80,7 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
             className="relative transition-transform duration-200 ease-out flex flex-col items-center shrink-0 origin-top"
             style={{ transform: `scale(${zoom / 100})` }}
           >
-            <PhysicalCardPreview cardData={cardData} />
+            <PhysicalCardPreview cardData={cardData} setActiveTool={setActiveTool} />
           </div>
         )}
       </div>
