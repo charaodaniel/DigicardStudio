@@ -14,17 +14,16 @@ type EditableCardPreviewProps = {
 export default function EditableCardPreview({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool }: EditableCardPreviewProps) {
     const { avatarUrl, fullName, jobTitle, isVerified, links, qrCodeUrl, themeColor, template } = cardData;
 
-    // Se o template não for o padrão, mostramos o preview real do template selecionado
+    // Para outros templates, permitimos o clique geral para abrir Conteúdo
     if (template !== 'default') {
         return (
-            <div className="w-full h-full min-h-full">
+            <div className="w-full h-full min-h-full relative group cursor-pointer" onClick={() => setActiveTool('conteudo')}>
                 <DigitalCardPreview cardData={cardData} />
-                {/* Overlay invisível para permitir cliques e navegação no editor mesmo em templates customizados */}
-                <div 
-                    className="absolute inset-0 z-10 cursor-pointer" 
-                    onClick={() => setActiveTool('conteudo')}
-                    title="Clique para editar conteúdo"
-                />
+                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border-2 border-primary/20 pointer-events-none">
+                    <div className="bg-primary text-white px-4 py-2 rounded-full font-bold text-xs shadow-xl">
+                        Clique para editar perfil
+                    </div>
+                </div>
             </div>
         );
     }
@@ -34,7 +33,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
         <div className="w-full flex flex-col items-center pt-12 pb-8 px-6">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
             <div 
-                onClick={() => setActiveTool('imagens')}
+                onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
                 className="relative group cursor-pointer transition-transform hover:scale-105"
             >
                 <Image 
@@ -51,7 +50,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
 
             {/* Nome e Cargo - Ao clicar abre ferramenta de Conteúdo */}
             <div 
-                onClick={() => setActiveTool('conteudo')}
+                onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
                 className="mt-6 flex flex-col items-center gap-1 cursor-pointer border-2 border-transparent hover:border-primary/40 p-1 rounded-lg transition-colors text-center"
             >
                 <div className="flex items-center gap-2">
@@ -71,7 +70,8 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                 {links.map((link) => (
                      <button 
                         key={link.id} 
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedLinkId(link.id);
                             setActiveTool('social');
                         }}
@@ -99,7 +99,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
             {/* QR Code - Ao clicar abre ferramenta QR Code */}
             {qrCodeUrl && (
                 <div 
-                    onClick={() => setActiveTool('qrcode')}
+                    onClick={(e) => { e.stopPropagation(); setActiveTool('qrcode'); }}
                     className="mt-12 flex flex-col items-center cursor-pointer group"
                 >
                     <div className="p-3 bg-white rounded-xl shadow-sm mb-4 border border-slate-100 group-hover:border-primary transition-colors">

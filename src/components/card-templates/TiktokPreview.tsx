@@ -1,7 +1,7 @@
 import type { CardData } from '@/lib/types';
 
 export default function TiktokPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, links } = cardData;
     return (
         <div className="bg-white font-display text-[#121117] min-h-full flex flex-col overflow-x-hidden">
             <div className="relative h-40 w-full overflow-hidden shrink-0">
@@ -10,47 +10,31 @@ export default function TiktokPreview({ cardData }: { cardData: CardData }) {
             </div>
             <div className="relative px-6 -mt-16 z-30 flex flex-col items-center">
                 <div className="relative">
-                    <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-neon-pink via-primary to-neon-cyan neon-border-pink">
+                    <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-[#ff0050] via-primary to-[#00f2ea] shadow-[0_0_10px_rgba(255,0,80,0.5)]">
                         <div className="w-full h-full rounded-full overflow-hidden border-4 border-white bg-white">
-                            <img alt="Profile Picture" className="w-full h-full object-cover" src={cardData.avatarUrl} />
+                            <img alt={fullName} className="w-full h-full object-cover" src={avatarUrl} />
                         </div>
                     </div>
                 </div>
                 <div className="mt-4 text-center">
                     <div className="flex items-center justify-center gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">@{fullName.toLowerCase().replace(' ', '_')}</h1>
-                        {isVerified && <span className="material-symbols-outlined text-neon-cyan text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>}
+                        <h1 className="text-2xl font-bold tracking-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h1>
+                        {isVerified && <span className="material-symbols-outlined text-[#00f2ea] text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>}
                     </div>
                     <p className="text-gray-600 mt-1 max-w-[280px]">{bio}</p>
-                    <p className="text-primary font-medium text-sm mt-1">Lifestyle • Gaming • Humor</p>
                 </div>
-                <div className="flex w-full mt-6 justify-center gap-8 py-4 border-y border-gray-100">
-                    <div className="text-center">
-                        <p className="text-xl font-bold">1.2M</p>
-                        <p className="text-xs text-gray-400 uppercase tracking-widest">Seguidores</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-xl font-bold">15M</p>
-                        <p className="text-xs text-gray-400 uppercase tracking-widest">Curtidas</p>
-                    </div>
-                </div>
-                <div className="flex w-full gap-3 mt-6">
-                    <button className="flex-1 bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/90 transition shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-sm">person_add</span>
-                        Seguir
-                    </button>
-                    <button className="flex-1 bg-gray-100 text-gray-800 font-bold py-3 rounded-xl hover:bg-gray-200 transition flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-sm">mail</span>
-                        Mensagem
-                    </button>
+                <div className="w-full mt-8 space-y-3">
+                    {links.map(link => (
+                        <a key={link.id} href="#" className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-xl hover:border-primary transition-all">
+                            <div className="flex items-center gap-3">
+                                <span className="material-symbols-outlined" style={{ color: link.color }}>{link.icon}</span>
+                                <span className="text-sm font-bold">{link.label}</span>
+                            </div>
+                            <span className="material-symbols-outlined text-gray-300">chevron_right</span>
+                        </a>
+                    ))}
                 </div>
             </div>
-            <style jsx>{`
-                .neon-border-pink { box-shadow: 0 0 10px rgba(255, 0, 80, 0.5); }
-                .text-neon-cyan { color: #00f2ea; }
-                .from-neon-pink { --tw-gradient-from: #ff0050; --tw-gradient-to: rgb(255 0 80 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-                .to-neon-cyan { --tw-gradient-to: #00f2ea; }
-            `}</style>
         </div>
     )
 }

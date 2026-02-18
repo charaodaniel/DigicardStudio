@@ -1,7 +1,7 @@
 import type { CardData } from '@/lib/types';
 
 export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, links } = cardData;
 
     return (
         <div className="relative w-full h-full bg-white dark:bg-[#1a192e] shadow-2xl flex flex-col overflow-y-auto">
@@ -10,10 +10,10 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
             </div>
             <div className="px-6 -mt-16 flex flex-col items-center">
                 <div className="relative group">
-                    <div className="size-32 rounded-full border-4 border-white dark:border-[#1a192e] bg-cover bg-center shadow-lg" style={{ backgroundImage: `url('${cardData.avatarUrl}')` }}>
+                    <div className="size-32 rounded-full border-4 border-white dark:border-[#1a192e] bg-cover bg-center shadow-lg" style={{ backgroundImage: `url('${avatarUrl}')` }}>
                     </div>
                     {isVerified && <div className="absolute bottom-1 right-1 bg-primary text-white rounded-full p-0.5 border-[3px] border-white flex items-center justify-center">
-                        <span className="material-symbols-outlined text-[16px] font-bold">check</span>
+                        <span className="material-symbols-outlined text-[16px] font-bold text-white">check</span>
                     </div>}
                 </div>
                 <div className="mt-4 text-center">
@@ -46,20 +46,15 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
             </div>
             <div className="mt-8 px-6 space-y-3 pb-8">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Links Profissionais</h3>
-                <a className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all" href="#">
-                    <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary">language</span>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Portfólio Behance</span>
-                    </div>
-                    <span className="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
-                </a>
-                <a className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all" href="#">
-                    <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-primary">business</span>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Website da Empresa</span>
-                    </div>
-                    <span className="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
-                </a>
+                {links.map(link => (
+                    <a key={link.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all" href="#">
+                        <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-primary">{link.icon}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{link.label}</span>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
+                    </a>
+                ))}
             </div>
         </div>
     )

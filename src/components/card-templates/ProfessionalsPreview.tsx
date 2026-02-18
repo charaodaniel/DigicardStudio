@@ -4,19 +4,12 @@ import Image from 'next/image';
 import React from 'react';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, avatarUrl, isVerified } = cardData;
+    const { fullName, jobTitle, avatarUrl, isVerified, links } = cardData;
 
     const stats = [
         { label: 'Anos Exp.', value: '12' },
         { label: 'Projetos', value: '150+' },
         { label: 'Prêmios', value: '08' },
-    ];
-    const specialities = ['Arquitetura Sustentável', 'Design Minimalista', 'Reformas de Luxo', 'Consultoria'];
-    const portfolio = [
-        { imageUrl: 'https://picsum.photos/seed/prof1/300/400', title: 'Residência Alpha', aspect: '3/4', marginTop: false, pullUp: false },
-        { imageUrl: 'https://picsum.photos/seed/prof2/300/300', title: 'Casa do Lago', aspect: 'square', marginTop: true, pullUp: false },
-        { imageUrl: 'https://picsum.photos/seed/prof3/300/300', title: 'Apartamento Loft', aspect: 'square', marginTop: false, pullUp: true },
-        { imageUrl: 'https://picsum.photos/seed/prof4/300/400', title: 'Escritório Central', aspect: '3/4', marginTop: false, pullUp: false },
     ];
     
     return (
@@ -25,7 +18,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                 <div className="flex flex-col items-center px-6 pt-6 pb-8">
                     <div className="relative mb-4">
                         <div className="size-32 overflow-hidden rounded-full border-4 border-white ring-2 ring-primary/20">
-                          <Image src={avatarUrl} alt="Professional portrait" width={128} height={128} className="h-full w-full object-cover" />
+                          <Image src={avatarUrl} alt={fullName} width={128} height={128} className="h-full w-full object-cover" />
                         </div>
                         {isVerified && (
                             <div className="absolute bottom-1 right-1 flex size-8 items-center justify-center rounded-full bg-primary text-white shadow-lg ring-4 ring-white">
@@ -46,9 +39,6 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                             <span className="material-symbols-outlined text-sm">mail</span>
                             Solicitar Orçamento
                         </button>
-                        <button className="flex size-[52px] items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-primary transition-colors hover:bg-primary/10">
-                            <span className="material-symbols-outlined">language</span>
-                        </button>
                     </div>
                 </div>
                 <div className="mx-6 mb-8 flex items-center justify-around rounded-2xl bg-background/50 py-4 dark:bg-white/5">
@@ -63,33 +53,13 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                     ))}
                 </div>
                 <div className="px-6 mb-8">
-                    <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Especialidades</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {specialities.map(spec => (
-                             <span key={spec} className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">{spec}</span>
-                        ))}
-                    </div>
-                </div>
-                <div className="px-6 pb-12">
-                    <div className="mb-5 flex items-center justify-between">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Destaques</h3>
-                        <button className="text-xs font-bold text-primary">Ver todos</button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        {portfolio.map((item, index) => (
-                            <div key={index} className={`group relative overflow-hidden rounded-2xl bg-gray-100 ${item.marginTop ? 'mt-4' : ''} ${item.pullUp ? '-mt-4' : ''}`}>
-                                <Image 
-                                    className={`w-full object-cover transition-transform duration-500 group-hover:scale-110 ${item.aspect === '3/4' ? 'aspect-[3/4]' : 'aspect-square'}`} 
-                                    alt={item.title} 
-                                    src={item.imageUrl}
-                                    width={200}
-                                    height={item.aspect === '3/4' ? 266 : 200}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100"></div>
-                                <div className="absolute bottom-3 left-3 opacity-0 transition-opacity group-hover:opacity-100">
-                                    <p className="text-xs font-bold text-white">{item.title}</p>
-                                </div>
-                            </div>
+                    <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Meus Links</h3>
+                    <div className="flex flex-col gap-2">
+                        {links.map(link => (
+                             <a key={link.id} href="#" className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
+                                <span className="material-symbols-outlined" style={{ color: link.color }}>{link.icon}</span>
+                                <span className="text-sm font-bold">{link.label}</span>
+                             </a>
                         ))}
                     </div>
                 </div>
