@@ -1,11 +1,22 @@
+'use client';
 import type { CardData } from '@/lib/types';
 
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor } = cardData;
     return (
-        <div className="bg-[#0a0a0b] font-display text-slate-900 antialiased h-full overflow-y-auto no-scrollbar">
+        <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full overflow-y-auto no-scrollbar">
             <div className="relative flex min-h-full w-full flex-col items-center justify-center p-4 sm:p-8">
-                <div className="w-full max-w-md overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl">
+                {/* Top Nav Mockup */}
+                <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+                        <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
+                        <span className="text-sm font-medium">Voltar</span>
+                    </div>
+                    <h1 className="text-sm font-bold uppercase tracking-widest text-slate-400">Perfil Verificado</h1>
+                    <span className="material-symbols-outlined text-2xl text-slate-400">share</span>
+                </div>
+
+                <div className="mt-16 w-full max-w-md overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl">
                     <div className="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     <div className="relative p-8 flex flex-col items-center">
                         <div className="relative mb-6">
@@ -41,7 +52,24 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                                 {bio}
                             </p>
                         </div>
+                        <div className="w-full space-y-3">
+                            <button className="w-full py-4 rounded-lg bg-white text-black font-bold text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                                Conectar Agora
+                            </button>
+                            <button className="w-full py-4 rounded-lg border border-white/20 text-white font-medium text-sm uppercase tracking-widest">
+                                Salvar VCF
+                            </button>
+                        </div>
                     </div>
+                </div>
+                
+                {/* Fixed Bottom Navbar Mockup */}
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 pb-6 pt-3 flex justify-around items-center">
+                    <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+                    <span className="material-symbols-outlined text-slate-400">group</span>
+                    <div className="relative -top-8"><button className="bg-black p-4 rounded-full shadow-2xl border-4 border-slate-50"><span className="material-symbols-outlined text-[#D4AF37] text-3xl">qr_code_2</span></button></div>
+                    <span className="material-symbols-outlined text-slate-400">chat_bubble</span>
+                    <span className="material-symbols-outlined text-slate-400">account_circle</span>
                 </div>
             </div>
         </div>

@@ -1,16 +1,28 @@
+'use client';
 import type { CardData } from '@/lib/types';
 
 export default function DesignerStudioPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, avatarUrl, isVerified, links } = cardData;
+    const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-full overflow-y-auto no-scrollbar">
+        <div className="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-full overflow-y-auto no-scrollbar">
             <div className="max-w-md mx-auto flex flex-col relative pb-24">
-                <section className="flex flex-col items-center px-6 pt-8 pb-8">
+                {/* Header */}
+                <header className="flex items-center justify-between p-6 sticky top-0 bg-slate-50/80 dark:bg-background-dark/80 backdrop-blur-md z-30">
+                    <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                        <h1 className="font-bold text-lg tracking-tight">Designer Studio</h1>
+                    </div>
+                    <button className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm">
+                        <span className="material-symbols-outlined text-slate-600">share</span>
+                    </button>
+                </header>
+
+                <section className="flex flex-col items-center px-6 pt-4 pb-8">
                     <div className="relative mb-6">
                         <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1">
                             <img alt={fullName} className="w-full h-full object-cover rounded-full shadow-lg" src={avatarUrl} />
                         </div>
-                        {isVerified && <div className="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-background-light dark:border-background-dark flex items-center justify-center">
+                        {isVerified && <div className="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-slate-50 dark:border-background-dark flex items-center justify-center">
                             <span className="material-symbols-outlined text-[16px] font-bold">verified</span>
                         </div>}
                     </div>
@@ -18,7 +30,7 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                         <h2 className="text-2xl font-bold tracking-tight mb-1">{fullName}</h2>
                         <p className="text-slate-500 dark:text-slate-400 font-medium mb-4">{jobTitle}</p>
                         <div className="flex gap-3 justify-center">
-                            <button className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/25 active:scale-95 transition-transform">
+                            <button className="text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition-transform" style={{backgroundColor: themeColor}}>
                                 Contrate-me
                             </button>
                             <button className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm active:scale-95 transition-transform flex items-center gap-2">
@@ -28,14 +40,15 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                         </div>
                     </div>
                 </section>
+
                 <section className="px-6 mb-8">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4 px-1">Meus Links</h3>
                     <div className="grid grid-cols-1 gap-3">
                         {links.map(link => (
                             <a key={link.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-primary/40 transition-colors" href="#">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${link.color}15` }}>
-                                        <span className="material-symbols-outlined" style={{ color: link.color }}>{link.icon}</span>
+                                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${link.color || themeColor}15` }}>
+                                        <span className="material-symbols-outlined" style={{ color: link.color || themeColor }}>{link.icon}</span>
                                     </div>
                                     <div>
                                         <p className="font-bold text-sm">{link.label}</p>
@@ -47,6 +60,32 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                         ))}
                     </div>
                 </section>
+
+                {/* Portfolio Horizontal */}
+                <section className="mb-8">
+                    <div className="flex items-center justify-between px-6 mb-4">
+                        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Trabalhos</h3>
+                        <span className="text-xs font-bold text-primary">Ver todos</span>
+                    </div>
+                    <div className="flex gap-4 overflow-x-auto px-6 no-scrollbar pb-2">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="min-w-[240px] flex-shrink-0 rounded-xl overflow-hidden aspect-video relative shadow-md">
+                                <img src={`https://picsum.photos/seed/ds${i}/400/225`} className="w-full h-full object-cover" alt="DS Portfolio" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3 text-white text-xs font-medium">Projeto UI/UX {i}</div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Fixed Bottom Nav */}
+                <nav className="fixed bottom-6 left-0 right-0 max-w-md mx-auto z-50 px-6">
+                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-full shadow-2xl p-2 flex items-center justify-around">
+                        <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+                        <span className="material-symbols-outlined text-slate-400">auto_awesome_motion</span>
+                        <span className="material-symbols-outlined text-slate-400">chat_bubble</span>
+                        <span className="material-symbols-outlined text-slate-400">person</span>
+                    </div>
+                </nav>
             </div>
         </div>
     );

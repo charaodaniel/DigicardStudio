@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React from 'react';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, avatarUrl, isVerified, links } = cardData;
+    const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
 
     const stats = [
         { label: 'Anos Exp.', value: '12' },
@@ -13,12 +13,24 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
     ];
     
     return (
-        <div className="bg-card font-display text-foreground antialiased h-full overflow-y-auto no-scrollbar">
-            <div className="relative mx-auto min-h-full max-w-md bg-card">
+        <div className="bg-white dark:bg-[#1c1b2b] font-display text-[#121117] antialiased h-full overflow-y-auto no-scrollbar">
+            <div className="relative mx-auto min-h-full max-w-md bg-white dark:bg-[#1c1b2b]">
+                {/* Sticky Top Bar */}
+                <div className="sticky top-0 z-50 flex items-center justify-between bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-[#1c1b2b]/80">
+                    <button className="flex size-10 items-center justify-center rounded-full bg-slate-50 text-[#121117] dark:bg-primary/10 dark:text-white">
+                        <span className="material-symbols-outlined text-[22px]">arrow_back</span>
+                    </button>
+                    <h1 className="text-sm font-semibold uppercase tracking-widest text-[#656487] dark:text-gray-400">Portfólio</h1>
+                    <button className="flex size-10 items-center justify-center rounded-full bg-slate-50 text-[#121117] dark:bg-primary/10 dark:text-white">
+                        <span className="material-symbols-outlined text-[22px]">share</span>
+                    </button>
+                </div>
+
+                {/* Profile Header Section */}
                 <div className="flex flex-col items-center px-6 pt-6 pb-8">
                     <div className="relative mb-4">
                         <div className="size-32 overflow-hidden rounded-full border-4 border-white ring-2 ring-primary/20">
-                          <Image src={avatarUrl} alt={fullName} width={128} height={128} className="h-full w-full object-cover" />
+                          <img src={avatarUrl} alt={fullName} className="h-full w-full object-cover" />
                         </div>
                         {isVerified && (
                             <div className="absolute bottom-1 right-1 flex size-8 items-center justify-center rounded-full bg-primary text-white shadow-lg ring-4 ring-white">
@@ -27,41 +39,74 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                         )}
                     </div>
                     <div className="text-center">
-                        <h2 className="text-2xl font-bold tracking-tight text-foreground">{fullName}</h2>
-                        <p className="mt-1 text-sm font-medium text-primary">{jobTitle}</p>
-                        <div className="mt-2 flex items-center justify-center gap-1 text-xs font-semibold text-muted-foreground">
+                        <h2 className="text-2xl font-bold tracking-tight text-[#121117] dark:text-white">{fullName}</h2>
+                        <p className="mt-1 text-sm font-medium" style={{color: themeColor}}>{jobTitle}</p>
+                        <div className="mt-2 flex items-center justify-center gap-1 text-xs font-semibold text-[#656487] dark:text-gray-400">
                             <span className="material-symbols-outlined text-xs">location_on</span>
                             <span>São Paulo, Brasil</span>
                         </div>
                     </div>
                     <div className="mt-6 flex w-full gap-3">
-                        <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90">
+                        <button className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90" style={{backgroundColor: themeColor}}>
                             <span className="material-symbols-outlined text-sm">mail</span>
                             Solicitar Orçamento
                         </button>
+                        <button className="flex size-[52px] items-center justify-center rounded-xl border border-primary/20 bg-primary/5 text-primary">
+                            <span className="material-symbols-outlined">language</span>
+                        </button>
                     </div>
                 </div>
-                <div className="mx-6 mb-8 flex items-center justify-around rounded-2xl bg-background/50 py-4 dark:bg-white/5">
+
+                {/* Stats Overview */}
+                <div className="mx-6 mb-8 flex items-center justify-around rounded-2xl bg-slate-50 dark:bg-white/5 py-4">
                     {stats.map((stat, index) => (
                         <React.Fragment key={stat.label}>
                             <div className="text-center">
-                                <p className="text-xl font-bold text-foreground">{stat.value}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{stat.label}</p>
+                                <p className="text-xl font-bold text-[#121117] dark:text-white">{stat.value}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#656487] dark:text-gray-400">{stat.label}</p>
                             </div>
-                            {index < stats.length - 1 && <div className="h-8 w-px bg-border"></div>}
+                            {index < stats.length - 1 && <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>}
                         </React.Fragment>
                     ))}
                 </div>
+
+                {/* Expertise Tags */}
                 <div className="px-6 mb-8">
-                    <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Meus Links</h3>
-                    <div className="flex flex-col gap-2">
-                        {links.map(link => (
-                             <a key={link.id} href="#" className="flex items-center gap-3 p-4 rounded-xl border border-border bg-background/50 hover:bg-primary/5 transition-colors">
-                                <span className="material-symbols-outlined" style={{ color: link.color }}>{link.icon}</span>
-                                <span className="text-sm font-bold">{link.label}</span>
-                             </a>
+                    <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-[#656487] dark:text-gray-400">Especialidades</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {['Consultoria', 'Design Minimalista', 'Estratégia'].map(tag => (
+                            <span key={tag} className="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">{tag}</span>
                         ))}
                     </div>
+                </div>
+
+                {/* Portfolio Grid Section */}
+                <div className="px-6 pb-24">
+                    <div className="mb-5 flex items-center justify-between">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-[#656487] dark:text-gray-400">Destaques</h3>
+                        <button className="text-xs font-bold text-primary">Ver todos</button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="group relative overflow-hidden rounded-2xl bg-gray-100 aspect-square">
+                                <img className="w-full h-full object-cover" src={`https://picsum.photos/seed/prof${i}/300/300`} alt="Portfolio" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Floating Navigation */}
+                <div className="fixed bottom-6 left-1/2 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-white/90 p-2 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:bg-[#1c1b2b]/90">
+                    <button className="flex size-12 items-center justify-center rounded-full bg-primary text-white">
+                        <span className="material-symbols-outlined">person</span>
+                    </button>
+                    <button className="flex size-12 items-center justify-center rounded-full text-[#656487] dark:text-gray-400">
+                        <span className="material-symbols-outlined">grid_view</span>
+                    </button>
+                    <button className="flex size-12 items-center justify-center rounded-full text-[#656487] dark:text-gray-400">
+                        <span className="material-symbols-outlined">collections_bookmark</span>
+                    </button>
                 </div>
             </div>
         </div>

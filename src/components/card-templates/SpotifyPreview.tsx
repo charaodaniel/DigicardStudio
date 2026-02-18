@@ -1,10 +1,11 @@
+'use client';
 import type { CardData } from '@/lib/types';
 
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, isVerified, avatarUrl, links } = cardData;
+    const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
     return (
         <div className="bg-[#121121] text-white min-h-full font-display overflow-y-auto no-scrollbar">
-            <div className="max-w-md mx-auto min-h-full flex flex-col">
+            <div className="max-w-md mx-auto min-h-full flex flex-col pb-24">
                 <header className="relative w-full aspect-square overflow-hidden shadow-2xl shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121121] via-transparent to-transparent z-10"></div>
                     <img alt="Artist Profile" className="w-full h-full object-cover" src={avatarUrl} />
@@ -14,9 +15,33 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                             <span className="text-xs font-bold uppercase tracking-widest text-blue-400">Artista Verificado</span>
                         </div>}
                         <h1 className="text-4xl font-black tracking-tighter">{fullName}</h1>
-                        <p className="text-gray-400 text-sm mt-1">1.2M ouvintes mensais</p>
+                        <p className="text-gray-400 text-sm mt-1">1.2M ouvintes mensais • São Paulo, BR</p>
                     </div>
                 </header>
+
+                {/* Now Playing Widget Mockup */}
+                <div className="px-4 -mt-4 z-30">
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-xl">
+                        <div className="flex items-center justify-between mb-3 text-[#1DB954]">
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1DB954] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1DB954]"></span>
+                                </span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest">Ouvindo Agora</span>
+                            </div>
+                            <span className="material-symbols-outlined text-xl">graphic_eq</span>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="size-14 rounded-lg overflow-hidden shrink-0"><img src={`https://picsum.photos/seed/music/100/100`} className="w-full h-full object-cover" alt="Album" /></div>
+                            <div className="flex flex-col justify-center">
+                                <p className="font-bold text-sm">Digital Card Beats</p>
+                                <p className="text-xs text-gray-400">{fullName}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <main className="px-4 mt-8 flex-1">
                     <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4 px-1">Links &amp; Lançamentos</h3>
                     <div className="space-y-3">
@@ -34,9 +59,16 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                         ))}
                     </div>
                 </main>
-                <footer className="mt-auto py-8 text-center px-4">
-                    <p className="text-[10px] text-gray-600 uppercase tracking-widest font-semibold">© 2024 {fullName}</p>
-                </footer>
+
+                <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm z-50">
+                    <div className="bg-black/80 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-2xl flex items-center justify-between">
+                        <div className="flex items-center gap-1 pl-2">
+                            <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
+                            <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
+                        </div>
+                        <button className="bg-[#1DB954] text-black font-black px-8 py-3 rounded-full text-sm uppercase tracking-wider active:scale-95">Seguir</button>
+                    </div>
+                </nav>
             </div>
         </div>
     )
