@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { CardData, SocialLink } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 type PropertiesSidebarProps = {
     cardData: CardData;
@@ -35,6 +36,17 @@ export default function PropertiesSidebar({
             ...prev,
             links: prev.links.map(l => l.id === id ? { ...l, [field]: value } : l)
         }));
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                handleProfileChange('avatarUrl', reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const deleteLink = (id: string) => {
@@ -148,21 +160,46 @@ export default function PropertiesSidebar({
                         <div className="space-y-4">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Foto de Perfil</label>
                             <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center gap-4">
-                                <img src={cardData.avatarUrl} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md" alt="Preview" />
+                                <img src={cardData.avatarUrl} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md bg-slate-200" alt="Preview" />
                                 <div className="text-center">
                                     <p className="text-[11px] font-bold text-slate-900 dark:text-white">Pré-visualização</p>
                                     <p className="text-[10px] text-slate-500">A imagem será cortada em círculo</p>
                                 </div>
                             </div>
-                            <div className="space-y-1.5">
-                                <p className="text-[11px] font-medium text-slate-400 ml-1">URL da Imagem</p>
-                                <Input 
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
-                                    type="text" 
-                                    value={cardData.avatarUrl}
-                                    onChange={(e) => handleProfileChange('avatarUrl', e.target.value)}
-                                    placeholder="https://exemplo.com/sua-foto.jpg"
+                            
+                            <div className="flex flex-col gap-3 pt-2">
+                                <Button 
+                                    variant="outline" 
+                                    className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl h-12 font-bold text-xs shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+                                    onClick={() => document.getElementById('avatar-upload')?.click()}
+                                >
+                                    <span className="material-symbols-outlined text-lg mr-2">upload_file</span>
+                                    Fazer Upload da Foto
+                                </Button>
+                                <input 
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
                                 />
+
+                                <div className="flex items-center gap-2 my-1">
+                                    <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                                    <span className="text-[10px] font-bold text-slate-400">OU</span>
+                                    <div className="h-[1px] flex-1 bg-slate-100 dark:bg-slate-800"></div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">URL da Imagem</p>
+                                    <Input 
+                                        className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                        type="text" 
+                                        value={cardData.avatarUrl}
+                                        onChange={(e) => handleProfileChange('avatarUrl', e.target.value)}
+                                        placeholder="https://exemplo.com/sua-foto.jpg"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -309,7 +346,6 @@ export default function PropertiesSidebar({
                             ...prev,
                             links: [...prev.links, newLink]
                         }));
-                        setSelectedLinkId(newId);
                         setSelectedLinkId(newId);
                     }}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-[0.98]"

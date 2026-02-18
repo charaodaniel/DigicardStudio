@@ -14,21 +14,51 @@ type EditableCardPreviewProps = {
 export default function EditableCardPreview({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool }: EditableCardPreviewProps) {
     const { avatarUrl, fullName, jobTitle, isVerified, links, qrCodeUrl, themeColor, template } = cardData;
 
-    // Para outros templates, permitimos o clique geral para abrir Conteúdo
+    // Overlay para templates não-padrão para permitir edição de áreas específicas
     if (template !== 'default') {
         return (
-            <div className="w-full h-full min-h-full relative group cursor-pointer" onClick={() => setActiveTool('conteudo')}>
+            <div className="w-full h-full min-h-full relative group">
                 <DigitalCardPreview cardData={cardData} />
-                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border-2 border-primary/20 pointer-events-none">
-                    <div className="bg-primary text-white px-4 py-2 rounded-full font-bold text-xs shadow-xl">
-                        Clique para editar perfil
+                
+                {/* Overlay de Edição Inteligente */}
+                <div className="absolute inset-0 z-10 pointer-events-none group-hover:bg-primary/5 transition-colors"></div>
+                
+                {/* Zonas de Clique Interativas nos Templates */}
+                <div className="absolute inset-0 z-20 flex flex-col items-center">
+                    {/* Zona da Foto */}
+                    <div 
+                        onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
+                        className="w-32 h-32 mt-12 cursor-pointer flex items-center justify-center group/avatar"
+                        title="Alterar Foto"
+                    >
+                        <div className="bg-primary text-white p-2 rounded-full opacity-0 group-hover/avatar:opacity-100 shadow-xl transition-opacity flex items-center gap-2">
+                             <span className="material-symbols-outlined text-sm">photo_camera</span>
+                             <span className="text-[10px] font-bold pr-1">Alterar</span>
+                        </div>
+                    </div>
+                    
+                    {/* Zona do Perfil (Texto) */}
+                    <div 
+                        onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                        className="w-full h-24 cursor-pointer flex items-center justify-center"
+                        title="Editar Textos"
+                    >
+                        {/* Invisível, apenas para hit area */}
+                    </div>
+
+                    {/* Zona dos Links (Resto da página) */}
+                    <div 
+                        onClick={(e) => { e.stopPropagation(); setActiveTool('social'); }}
+                        className="w-full flex-1 cursor-pointer"
+                        title="Editar Links"
+                    >
                     </div>
                 </div>
             </div>
         );
     }
 
-    // Template Padrão com edição direta no canvas
+    // Template Padrão com edição direta e visual no canvas
     return (
         <div className="w-full flex flex-col items-center pt-12 pb-8 px-6">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
@@ -36,28 +66,32 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                 onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
                 className="relative group cursor-pointer transition-transform hover:scale-105"
             >
-                <Image 
-                    className="w-28 h-28 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-xl" 
-                    src={avatarUrl}
-                    alt="Foto de perfil"
-                    width={112}
-                    height={112}
-                />
-                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 rounded-full flex items-center justify-center transition-opacity border-2 border-primary">
-                    <span className="material-symbols-outlined text-white">edit</span>
+                <div className="relative">
+                    <Image 
+                        className="w-28 h-28 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-xl bg-slate-100" 
+                        src={avatarUrl}
+                        alt="Foto de perfil"
+                        width={112}
+                        height={112}
+                    />
+                    <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 rounded-full flex flex-col items-center justify-center transition-opacity border-2 border-primary backdrop-blur-[2px]">
+                        <span className="material-symbols-outlined text-white text-3xl">photo_camera</span>
+                        <span className="text-white text-[10px] font-black uppercase mt-1">Alterar Foto</span>
+                    </div>
                 </div>
             </div>
 
             {/* Nome e Cargo - Ao clicar abre ferramenta de Conteúdo */}
             <div 
                 onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
-                className="mt-6 flex flex-col items-center gap-1 cursor-pointer border-2 border-transparent hover:border-primary/40 p-1 rounded-lg transition-colors text-center"
+                className="mt-6 flex flex-col items-center gap-1 cursor-pointer border-2 border-transparent hover:border-primary/40 hover:bg-primary/5 p-2 rounded-xl transition-all text-center group"
+                title="Editar Nome e Título"
             >
                 <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{fullName}</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">{fullName}</h2>
                     {isVerified && <span className="material-symbols-outlined text-primary text-xl" style={{fontVariationSettings: "'FILL' 1", color: themeColor}}>verified</span>}
                 </div>
-                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">{jobTitle}</p>
+                <p className="text-slate-500 dark:text-slate-400 font-medium text-sm group-hover:text-primary/70 transition-colors">{jobTitle}</p>
             </div>
             
             <div className="flex items-center gap-1 text-slate-400 text-xs mt-1">
@@ -101,8 +135,9 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                 <div 
                     onClick={(e) => { e.stopPropagation(); setActiveTool('qrcode'); }}
                     className="mt-12 flex flex-col items-center cursor-pointer group"
+                    title="Configurar QR Code"
                 >
-                    <div className="p-3 bg-white rounded-xl shadow-sm mb-4 border border-slate-100 group-hover:border-primary transition-colors">
+                    <div className="p-3 bg-white rounded-xl shadow-sm mb-4 border border-slate-100 group-hover:border-primary group-hover:scale-110 transition-all">
                         <Image 
                             className="w-24 h-24" 
                             alt="QR Code" 
