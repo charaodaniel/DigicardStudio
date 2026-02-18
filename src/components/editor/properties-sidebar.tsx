@@ -35,13 +35,18 @@ export default function PropertiesSidebar({
     ];
 
     const icons = [
-        'chat', 'photo_camera', 'work', 'language', 'mail', 'phone', 
-        'alternate_email', 'share', 'play_circle', 'subscriptions', 
-        'music_note', 'forum', 'shopping_bag', 'description', 
-        'person', 'group', 'video_library', 'calendar_today', 
-        'location_on', 'star', 'code', 'terminal', 
-        'article', 'headphones', 'smart_display', 'payments', 
-        'wallet', 'campaign'
+        // Comunicação & Redes
+        'chat', 'call', 'mail', 'alternate_email', 'send', 'forum', 'sms', 'contact_page',
+        // Social Brands (representados por símbolos aproximados ou nomes que trataremos no renderer)
+        'language', 'public', 'share', 'groups', 'hub', 'connect_without_contact', 'diversity_3',
+        // Media
+        'photo_camera', 'camera_alt', 'play_circle', 'subscriptions', 'video_library', 'music_note', 'headphones', 'mic',
+        // E-commerce & Business
+        'work', 'shopping_cart', 'shopping_bag', 'storefront', 'payments', 'wallet', 'card_membership', 'campaign',
+        // Utilidades
+        'person', 'person_add', 'notifications', 'event', 'calendar_month', 'location_on', 'map', 'star', 'favorite', 'verified',
+        // Tech
+        'code', 'terminal', 'article', 'description', 'attach_file', 'cloud_download', 'qr_code_2', 'auto_awesome'
     ];
 
     const handleProfileChange = (field: keyof CardData, value: any) => {
