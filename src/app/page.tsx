@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
@@ -35,6 +34,7 @@ export default function EditorPage() {
         onPreviewClick={handlePreviewClick} 
         mode={mode}
         setMode={setMode}
+        cardData={cardData}
       />
       
       <main className="flex-1 flex overflow-hidden">

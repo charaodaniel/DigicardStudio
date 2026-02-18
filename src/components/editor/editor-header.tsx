@@ -3,14 +3,17 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { downloadPlotterSVG } from '@/lib/utils';
+import type { CardData } from '@/lib/types';
 
 type EditorHeaderProps = {
   onPreviewClick: () => void;
   mode: 'digital' | 'physical';
   setMode: (mode: 'digital' | 'physical') => void;
+  cardData: CardData;
 };
 
-export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHeaderProps) {
+export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
   const { toast } = useToast();
 
@@ -20,6 +23,14 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
       return;
     }
     window.print();
+  };
+
+  const handleExportSVG = () => {
+    downloadPlotterSVG(cardData);
+    toast({
+      title: "Arquivo Vetorial Gerado",
+      description: "O SVG foi otimizado com caminhos de corte e desenho para sua plotter.",
+    });
   };
 
   const handlePublish = () => {
@@ -87,12 +98,21 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
             </button>
 
             {mode === 'physical' && (
-              <button 
-                  onClick={handlePrint}
-                  className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all animate-in fade-in slide-in-from-right-4 duration-300"
-              >
-                  Exportar PDF
-              </button>
+              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+                <button 
+                    onClick={handleExportSVG}
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-primary/20 text-primary rounded-lg font-bold text-sm hover:bg-primary/5 transition-all"
+                >
+                    <span className="material-symbols-outlined text-lg">vector_library</span>
+                    Exportar SVG
+                </button>
+                <button 
+                    onClick={handlePrint}
+                    className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
+                >
+                    PDF (A4)
+                </button>
+              </div>
             )}
 
             <button 

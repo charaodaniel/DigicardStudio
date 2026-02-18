@@ -97,3 +97,52 @@ export const downloadVCard = (cardData: CardData) => {
   link.click();
   document.body.removeChild(link);
 };
+
+export const downloadPlotterSVG = (cardData: CardData) => {
+  const w = 85; // mm
+  const h = 55; // mm
+  const gap = 5; // mm
+  
+  // Gerar SVG técnico para plotter
+  // Vermelho (#FF0000) = Corte
+  // Preto (#000000) = Desenho/Gravação
+  const svg = `
+<svg width="${(w * 2) + gap}mm" height="${h}mm" viewBox="0 0 ${(w * 2) + gap} ${h}" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .cut { fill: none; stroke: #FF0000; stroke-width: 0.1; }
+    .draw { fill: none; stroke: #000000; stroke-width: 0.1; }
+    .text { fill: #000000; font-family: ${cardData.fontFamily}, sans-serif; font-weight: bold; }
+  </style>
+
+  <!-- FRENTE (Esquerda) -->
+  <g id="front">
+    <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
+    <text x="5" y="10" class="text" font-size="5">${cardData.fullName.toUpperCase()}</text>
+    <text x="5" y="16" class="text" font-size="3" opacity="0.6">${cardData.jobTitle}</text>
+    
+    <!-- Placeholder de Elementos do Template -->
+    <rect class="draw" x="5" y="25" width="40" height="0.1" />
+    ${cardData.links.slice(0, 3).map((l, i) => `
+      <text x="5" y="${32 + (i * 5)}" class="text" font-size="2.5">${l.value}</text>
+    `).join('')}
+  </g>
+
+  <!-- VERSO (Direita) -->
+  <g id="back" transform="translate(${w + gap}, 0)">
+    <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
+    <!-- Guia do QR Code -->
+    <rect class="draw" x="${(w / 2) - 10}" y="${(h / 2) - 10}" width="20" height="20" />
+    <text x="${w / 2}" y="${(h / 2) + 15}" class="text" font-size="2" text-anchor="middle">SCAN TO CONNECT</text>
+  </g>
+</svg>
+  `.trim();
+
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${cardData.fullName.toLowerCase().replace(/\s/g, '-')}-plotter.svg`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
