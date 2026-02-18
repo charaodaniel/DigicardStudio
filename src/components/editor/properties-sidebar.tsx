@@ -34,11 +34,17 @@ export default function PropertiesSidebar({
     ];
 
     const icons = [
+        // Comunicação
         'chat', 'call', 'mail', 'alternate_email', 'send', 'forum', 'sms', 'contact_page',
+        // Redes Sociais & Web
         'language', 'public', 'share', 'groups', 'hub', 'connect_without_contact', 'diversity_3',
+        // Mídia & Entretenimento
         'photo_camera', 'camera_alt', 'play_circle', 'subscriptions', 'video_library', 'music_note', 'headphones', 'mic',
+        // Negócios & Utilidades
         'work', 'shopping_cart', 'shopping_bag', 'storefront', 'payments', 'wallet', 'card_membership', 'campaign',
+        // Identidade & Status
         'person', 'person_add', 'notifications', 'event', 'calendar_month', 'location_on', 'map', 'star', 'favorite', 'verified',
+        // Desenvolvimento & Documentos
         'code', 'terminal', 'article', 'description', 'attach_file', 'cloud_download', 'qr_code_2', 'auto_awesome'
     ];
 
@@ -59,17 +65,6 @@ export default function PropertiesSidebar({
             newStats[index] = { ...newStats[index], [field]: value };
             return { ...prev, stats: newStats };
         });
-    };
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl') => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                handleProfileChange(field, reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const deleteLink = (id: string) => {
@@ -156,6 +151,20 @@ export default function PropertiesSidebar({
                                     <Input className="h-7 text-[10px] bg-white" placeholder="Link da métrica..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Rodapé do Cartão Físico</label>
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Website exibido (Rodapé)</p>
+                                    <Input className="text-sm" placeholder="www.seusite.com" value={cardData.customWebsiteUrl || ''} onChange={(e) => handleProfileChange('customWebsiteUrl', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Texto de Copyright / Info</p>
+                                    <Input className="text-sm" placeholder="DESIGNED BY..." value={cardData.footerText || ''} onChange={(e) => handleProfileChange('footerText', e.target.value)} />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}
