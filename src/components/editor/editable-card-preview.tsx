@@ -17,41 +17,21 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
     // Overlay para templates não-padrão para permitir edição de áreas específicas
     if (template !== 'default') {
         return (
-            <div className="w-full h-full min-h-full relative group">
+            <div className="w-full h-full relative group">
                 <DigitalCardPreview cardData={cardData} />
                 
-                {/* Overlay de Edição Inteligente */}
-                <div className="absolute inset-0 z-10 pointer-events-none group-hover:bg-primary/5 transition-colors"></div>
-                
-                {/* Zonas de Clique Interativas nos Templates */}
-                <div className="absolute inset-0 z-20 flex flex-col items-center">
+                {/* Overlay de Edição Inteligente - Non-scrolling fixed indicators */}
+                <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center">
                     {/* Zona da Foto */}
                     <div 
                         onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
-                        className="w-32 h-32 mt-12 cursor-pointer flex items-center justify-center group/avatar"
+                        className="w-32 h-32 mt-12 cursor-pointer flex items-center justify-center group/avatar pointer-events-auto"
                         title="Alterar Foto"
                     >
                         <div className="bg-primary text-white p-2 rounded-full opacity-0 group-hover/avatar:opacity-100 shadow-xl transition-opacity flex items-center gap-2">
                              <span className="material-symbols-outlined text-sm">photo_camera</span>
                              <span className="text-[10px] font-bold pr-1">Alterar</span>
                         </div>
-                    </div>
-                    
-                    {/* Zona do Perfil (Texto) */}
-                    <div 
-                        onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
-                        className="w-full h-24 cursor-pointer flex items-center justify-center"
-                        title="Editar Textos"
-                    >
-                        {/* Invisível, apenas para hit area */}
-                    </div>
-
-                    {/* Zona dos Links (Resto da página) */}
-                    <div 
-                        onClick={(e) => { e.stopPropagation(); setActiveTool('social'); }}
-                        className="w-full flex-1 cursor-pointer"
-                        title="Editar Links"
-                    >
                     </div>
                 </div>
             </div>
@@ -60,11 +40,11 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
 
     // Template Padrão com edição direta e visual no canvas
     return (
-        <div className="w-full flex flex-col items-center pt-12 pb-8 px-6">
+        <div className="w-full h-full flex flex-col items-center pt-12 pb-8 px-6 overflow-y-auto no-scrollbar">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
             <div 
                 onClick={(e) => { e.stopPropagation(); setActiveTool('imagens'); }}
-                className="relative group cursor-pointer transition-transform hover:scale-105"
+                className="relative group cursor-pointer transition-transform hover:scale-105 shrink-0"
             >
                 <div className="relative">
                     <Image 
@@ -84,7 +64,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
             {/* Nome e Cargo - Ao clicar abre ferramenta de Conteúdo */}
             <div 
                 onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
-                className="mt-6 flex flex-col items-center gap-1 cursor-pointer border-2 border-transparent hover:border-primary/40 hover:bg-primary/5 p-2 rounded-xl transition-all text-center group"
+                className="mt-6 flex flex-col items-center gap-1 cursor-pointer border-2 border-transparent hover:border-primary/40 hover:bg-primary/5 p-2 rounded-xl transition-all text-center group shrink-0"
                 title="Editar Nome e Título"
             >
                 <div className="flex items-center gap-2">
@@ -94,13 +74,13 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                 <p className="text-slate-500 dark:text-slate-400 font-medium text-sm group-hover:text-primary/70 transition-colors">{jobTitle}</p>
             </div>
             
-            <div className="flex items-center gap-1 text-slate-400 text-xs mt-1">
+            <div className="flex items-center gap-1 text-slate-400 text-xs mt-1 shrink-0">
                 <span className="material-symbols-outlined text-xs">location_on</span>
                 <span>São Paulo, Brasil</span>
             </div>
 
             {/* Links - Ao clicar seleciona o link e abre ferramenta Social */}
-            <div className="w-full mt-10 space-y-3">
+            <div className="w-full mt-10 space-y-3 shrink-0">
                 {links.map((link) => (
                      <button 
                         key={link.id} 
@@ -134,7 +114,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
             {qrCodeUrl && (
                 <div 
                     onClick={(e) => { e.stopPropagation(); setActiveTool('qrcode'); }}
-                    className="mt-12 flex flex-col items-center cursor-pointer group"
+                    className="mt-12 flex flex-col items-center cursor-pointer group shrink-0 pb-8"
                     title="Configurar QR Code"
                 >
                     <div className="p-3 bg-white rounded-xl shadow-sm mb-4 border border-slate-100 group-hover:border-primary group-hover:scale-110 transition-all">

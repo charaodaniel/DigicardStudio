@@ -52,8 +52,8 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
           </div>
         </div>
 
-        {/* Digital Card Content area */}
-        <div className="flex-1 overflow-y-auto no-scrollbar relative">
+        {/* Digital Card Content area - Scroll handled internally by templates */}
+        <div className="flex-1 relative overflow-hidden">
             <EditableCardPreview 
                 cardData={cardData} 
                 selectedLinkId={selectedLinkId} 

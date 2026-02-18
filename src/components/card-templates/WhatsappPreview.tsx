@@ -5,23 +5,24 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
 
     return (
-        <div className="bg-slate-50 dark:bg-background-dark font-display text-[#121117] dark:text-white antialiased h-full overflow-y-auto no-scrollbar">
-            <div className="relative min-h-full w-full max-w-md mx-auto pb-12">
-                {/* Pattern Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2NIwDjvvyCGKhJtbJtrYEGQTH_Ry7PHGeiAzP64h25T0fbS66_hC40vvyXcqRWCfJcf54BX9XMIbXihBQHLWCiF_G7ueMI3WrUdA4SInUvIuB7u_4oB4TdAfGAooO1Ja3ao10lDIIOJPtKe-t0ufPEmECxYZG-IUHxqVbtoGMZIMeUiPWXa7BspU6b9h5YYAtuTuJrpS0dZ1NpO_bdaDRtYxQ6qHRqdLADSvxlRraFidhfc0EbLbWT0zT2yAs6QvBMIaBmIeHIbFu')" }}></div>
-                
-                {/* Top App Bar */}
-                <div className="sticky top-0 z-50 flex items-center bg-white dark:bg-background-dark/90 backdrop-blur-md p-4 justify-between border-b border-primary/10">
-                    <div className="text-primary flex size-10 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </div>
-                    <h2 className="text-base font-bold flex-1 text-center">Perfil Comercial</h2>
-                    <div className="flex w-10 items-center justify-end">
-                        <span className="material-symbols-outlined text-primary">more_vert</span>
-                    </div>
+        <div className="bg-slate-50 dark:bg-background-dark font-display text-[#121117] dark:text-white h-full flex flex-col overflow-hidden relative">
+            {/* Pattern Overlay */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2NIwDjvvyCGKhJtbJtrYEGQTH_Ry7PHGeiAzP64h25T0fbS66_hC40vvyXcqRWCfJcf54BX9XMIbXihBQHLWCiF_G7ueMI3WrUdA4SInUvIuB7u_4oB4TdAfGAooO1Ja3ao10lDIIOJPtKe-t0ufPEmECxYZG-IUHxqVbtoGMZIMeUiPWXa7BspU6b9h5YYAtuTuJrpS0dZ1NpO_bdaDRtYxQ6qHRqdLADSvxlRraFidhfc0EbLbWT0zT2yAs6QvBMIaBmIeHIbFu')" }}></div>
+            
+            {/* Top App Bar - LOCKED TOP */}
+            <div className="flex items-center bg-white dark:bg-background-dark/90 backdrop-blur-md p-4 justify-between border-b border-primary/10 shrink-0 z-20">
+                <div className="text-primary flex size-10 items-center justify-center rounded-full hover:bg-primary/10 cursor-pointer">
+                    <span className="material-symbols-outlined">arrow_back</span>
                 </div>
+                <h2 className="text-base font-bold flex-1 text-center">Perfil Comercial</h2>
+                <div className="flex w-10 items-center justify-end">
+                    <span className="material-symbols-outlined text-primary">more_vert</span>
+                </div>
+            </div>
 
-                <div className="flex p-6 flex-col gap-6 items-center relative z-10">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto no-scrollbar relative z-10 flex flex-col">
+                <div className="flex p-6 flex-col gap-6 items-center">
                     <div className="relative">
                         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full border-4 border-white dark:border-background-dark shadow-xl size-32" style={{ backgroundImage: `url('${avatarUrl}')` }}>
                         </div>
@@ -43,7 +44,7 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
                     </button>
                 </div>
 
-                <div className="px-4 space-y-6 relative z-10">
+                <div className="px-4 space-y-6 pb-12">
                     <div className="flex gap-3">
                         <div className="flex flex-1 flex-col gap-1 rounded-xl p-4 bg-white dark:bg-white/5 border border-primary/10">
                             <span className="material-symbols-outlined text-primary text-xl">timer</span>
