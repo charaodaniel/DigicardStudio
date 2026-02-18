@@ -40,4 +40,5 @@ export const initialCardData: CardData = {
   physicalShowLinks: true,
   physicalShowQR: true,
   physicalShowFooter: true,
+  physicalBackgroundColor: '#ffffff',
 };

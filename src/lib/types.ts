@@ -41,4 +41,5 @@ export type CardData = {
   physicalShowLinks?: boolean;
   physicalShowQR?: boolean;
   physicalShowFooter?: boolean;
+  physicalBackgroundColor?: string;
 };

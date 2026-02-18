@@ -17,17 +17,32 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     physicalShowStats = true,
     physicalShowLinks = true,
     physicalShowQR = true,
-    physicalShowFooter = true
+    physicalShowFooter = true,
+    physicalBackgroundColor = '#ffffff'
   } = cardData;
 
   const currentTemplate = templates.find(t => t.id === template);
   const isVertical = currentTemplate?.orientation === 'vertical';
 
+  // Helper para determinar cor de texto baseada no brilho do fundo
+  const getContrastColor = (hexcolor: string) => {
+    if (!hexcolor) return '#000000';
+    const r = parseInt(hexcolor.slice(1, 3), 16);
+    const g = parseInt(hexcolor.slice(3, 5), 16);
+    const b = parseInt(hexcolor.slice(5, 7), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#000000' : '#ffffff';
+  };
+
+  const textColor = getContrastColor(physicalBackgroundColor);
+  const isDarkBg = textColor === '#ffffff';
+
   const EmptySlot = ({ label, tool, className }: { label: string, tool: string, className?: string }) => (
     <div 
         onClick={(e) => { e.stopPropagation(); setActiveTool(tool); }}
         className={cn(
-            "border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center p-4 text-slate-300 group hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer",
+            "border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-4 transition-all cursor-pointer",
+            isDarkBg ? "border-white/20 text-white/30 hover:border-primary/40 hover:bg-primary/5" : "border-slate-200 text-slate-300 hover:border-primary/40 hover:bg-primary/5",
             className
         )}
     >
@@ -40,11 +55,13 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     switch (template) {
       case 'spotify':
       case 'spotify-v':
+        const spotifyBg = physicalBackgroundColor === '#ffffff' ? '#121212' : physicalBackgroundColor;
+        const spotifyText = getContrastColor(spotifyBg);
         return (
           <div className={cn(
-            "flex-1 bg-[#121212] flex p-8 text-white relative overflow-hidden",
+            "flex-1 flex p-8 relative overflow-hidden",
             isVertical ? "flex-col items-center" : "flex-row items-start gap-8"
-          )}>
+          )} style={{ backgroundColor: spotifyBg, color: spotifyText }}>
             <div className="absolute top-6 right-8 text-[8px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
             
             <div className={cn("shrink-0", isVertical ? "w-full mb-6" : "w-48")}>
@@ -74,12 +91,12 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
               <div className="flex-1 space-y-2 mb-6">
                 {physicalShowLinks ? (
                     <div onClick={() => setActiveTool('social')} className="cursor-pointer group/links space-y-1.5">
-                        <p className="text-[8px] font-bold uppercase tracking-widest text-white/40 mb-2">Playlist de Contatos</p>
+                        <p className={cn("text-[8px] font-bold uppercase tracking-widest mb-2", spotifyText === '#ffffff' ? 'text-white/40' : 'text-black/40')}>Playlist de Contatos</p>
                         {links.slice(0, 3).map((l, i) => (
-                            <div key={l.id} className="flex items-center gap-3 text-[10px] py-1 border-b border-white/5 group-hover/links:border-white/20 transition-colors">
-                                <span className="text-white/30 font-mono">0{i+1}</span>
+                            <div key={l.id} className={cn("flex items-center gap-3 text-[10px] py-1 border-b transition-colors", spotifyText === '#ffffff' ? 'border-white/5' : 'border-black/5')}>
+                                <span className="opacity-30 font-mono">0{i+1}</span>
                                 <span className="font-bold flex-1 truncate">{l.value}</span>
-                                <span className="material-symbols-outlined text-xs text-white/40">{l.icon}</span>
+                                <span className="material-symbols-outlined text-xs opacity-40">{l.icon}</span>
                             </div>
                         ))}
                     </div>
@@ -87,7 +104,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
               </div>
 
               <div className="mt-auto">
-                <div className="w-full h-1 bg-white/10 rounded-full mb-4 relative overflow-hidden">
+                <div className={cn("w-full h-1 rounded-full mb-4 relative overflow-hidden", spotifyText === '#ffffff' ? 'bg-white/10' : 'bg-black/10')}>
                     <div className="absolute top-0 left-0 h-full bg-[#1DB954] w-[45%]"></div>
                 </div>
                 <div className="flex items-center justify-center gap-6 opacity-60">
@@ -106,11 +123,11 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       case 'instagram-v':
         return (
           <div className={cn(
-            "flex-1 bg-white flex flex-col p-8 relative overflow-hidden",
+            "flex-1 flex flex-col p-8 relative overflow-hidden",
             isVertical ? "items-center text-center" : "items-start"
-          )}>
+          )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
             <div className="absolute top-6 left-8 flex items-center gap-2">
-                <span className="material-symbols-outlined text-slate-900">photo_camera</span>
+                <span className="material-symbols-outlined">photo_camera</span>
                 <span className="text-[10px] font-black tracking-tight uppercase">InstaCard</span>
             </div>
 
@@ -126,29 +143,29 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 <div className="flex flex-col">
                     {physicalShowTitle ? (
                         <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer group/title">
-                            <h2 className="text-xl font-bold text-slate-900 leading-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h2>
-                            <p className="text-slate-500 text-[10px] font-medium uppercase tracking-wider">{jobTitle}</p>
+                            <h2 className="text-xl font-bold leading-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h2>
+                            <p className="opacity-60 text-[10px] font-medium uppercase tracking-wider">{jobTitle}</p>
                         </div>
                     ) : <EmptySlot label="Identidade Visual" tool="conteudo" className="h-10 w-full" />}
                     
                     <div className="flex gap-6 mt-4">
-                        <div className="text-center"><p className="text-sm font-black">1.2k</p><p className="text-[8px] text-slate-400 font-bold uppercase">Posts</p></div>
-                        <div className="text-center"><p className="text-sm font-black">25k</p><p className="text-[8px] text-slate-400 font-bold uppercase">Followers</p></div>
-                        <div className="text-center"><p className="text-sm font-black">842</p><p className="text-[8px] text-slate-400 font-bold uppercase">Following</p></div>
+                        <div className="text-center"><p className="text-sm font-black">1.2k</p><p className="text-[8px] opacity-40 font-bold uppercase">Posts</p></div>
+                        <div className="text-center"><p className="text-sm font-black">25k</p><p className="text-[8px] opacity-40 font-bold uppercase">Followers</p></div>
+                        <div className="text-center"><p className="text-sm font-black">842</p><p className="text-[8px] opacity-40 font-bold uppercase">Following</p></div>
                     </div>
                 </div>
             </div>
 
             {physicalShowLinks && (
                 <div onClick={() => setActiveTool('social')} className="mt-10 w-full">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-4">Highlights de Contato</p>
+                    <p className="text-[8px] font-black opacity-40 uppercase tracking-widest mb-4">Highlights de Contato</p>
                     <div className="flex flex-wrap gap-6 justify-center">
                         {links.slice(0, 4).map(l => (
                             <div key={l.id} className="flex flex-col items-center gap-2">
-                                <div className="size-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                <div className={cn("size-12 rounded-full border flex items-center justify-center", isDarkBg ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-100")}>
                                     <span className="material-symbols-outlined text-lg" style={{color: l.color || themeColor}}>{l.icon}</span>
                                 </div>
-                                <span className="text-[8px] font-bold text-slate-600 uppercase truncate max-w-[60px]">{l.label}</span>
+                                <span className="text-[8px] font-bold uppercase truncate max-w-[60px] opacity-80">{l.label}</span>
                             </div>
                         ))}
                     </div>
@@ -159,11 +176,13 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
       case 'twitch-h':
       case 'twitch-v':
+        const twitchBg = physicalBackgroundColor === '#ffffff' ? '#0e0e10' : physicalBackgroundColor;
+        const twitchText = getContrastColor(twitchBg);
         return (
-          <div className="flex-1 bg-[#0e0e10] flex flex-col p-8 text-white relative overflow-hidden">
+          <div className="flex-1 flex flex-col p-8 relative overflow-hidden" style={{ backgroundColor: twitchBg, color: twitchText }}>
             <div className="absolute top-6 right-8 flex items-center gap-2 bg-[#9146ff] px-3 py-1 rounded-full border border-white/20">
                 <div className="size-1.5 bg-white rounded-full animate-pulse"></div>
-                <span className="text-[8px] font-black uppercase tracking-widest">Live Now</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-white">Live Now</span>
             </div>
 
             <div className={cn("flex-1 flex", isVertical ? "flex-col items-center text-center gap-8 justify-center" : "flex-row items-center gap-10")}>
@@ -197,8 +216,10 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         );
 
       case 'linkedin':
+        const liBg = physicalBackgroundColor;
+        const liText = getContrastColor(liBg);
         return (
-          <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: liBg, color: liText }}>
             <div className="h-20 bg-gradient-to-r from-[#0a66c2] to-[#004182] relative">
                 <div className="absolute bottom-4 left-8 text-[8px] font-black text-white/40 uppercase tracking-widest">Professional Summary</div>
             </div>
@@ -220,17 +241,17 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 <div className="flex-1 flex flex-col">
                     {physicalShowTitle ? (
                         <div onClick={() => setActiveTool('conteudo')} className="mb-6 cursor-pointer group/title">
-                            <h2 className="text-2xl font-bold text-slate-900 leading-tight">{fullName}</h2>
-                            <p className="text-slate-600 text-xs font-medium mt-1 uppercase tracking-tight">{jobTitle}</p>
+                            <h2 className="text-2xl font-bold leading-tight">{fullName}</h2>
+                            <p className="opacity-60 text-xs font-medium mt-1 uppercase tracking-tight">{jobTitle}</p>
                         </div>
                     ) : <EmptySlot label="Headline" tool="conteudo" className="h-12 w-full mb-6" />}
 
                     {physicalShowLinks && (
                         <div onClick={() => setActiveTool('social')} className="space-y-3 cursor-pointer">
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Contact Portfolio</p>
+                            <p className="text-[8px] font-black opacity-40 uppercase tracking-[0.2em] mb-2">Contact Portfolio</p>
                             <div className="grid grid-cols-2 gap-4">
                                 {links.slice(0, 4).map(l => (
-                                    <div key={l.id} className="flex items-center gap-2 text-slate-600 py-1 border-b border-slate-50">
+                                    <div key={l.id} className={cn("flex items-center gap-2 py-1 border-b", liText === '#ffffff' ? 'border-white/10' : 'border-slate-50')}>
                                         <span className="material-symbols-outlined text-sm text-[#0a66c2]">{l.icon}</span>
                                         <span className="text-[9px] font-medium truncate">{l.value}</span>
                                     </div>
@@ -245,23 +266,25 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
       case 'youtube':
       case 'youtube-v':
+        const ytBg = physicalBackgroundColor === '#ffffff' ? '#FF0000' : physicalBackgroundColor;
+        const ytText = getContrastColor(ytBg);
         return (
-          <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
-            <div className="h-2 w-full bg-[#FF0000]"></div>
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: ytBg, color: ytText }}>
+            <div className="h-2 w-full bg-[#FF0000] opacity-50"></div>
             <div className={cn("flex-1 p-8 flex", isVertical ? "flex-col items-center gap-8" : "flex-row items-center justify-between")}>
                 <div className={cn("flex flex-col", isVertical ? "items-center text-center" : "items-start")}>
                     {physicalShowAvatar ? (
-                        <div onClick={() => setActiveTool('imagens')} className="size-32 rounded-full border-4 border-slate-50 shadow-xl overflow-hidden mb-6 cursor-pointer hover:scale-105 transition-transform">
+                        <div onClick={() => setActiveTool('imagens')} className="size-32 rounded-full border-4 border-white/20 shadow-xl overflow-hidden mb-6 cursor-pointer hover:scale-105 transition-transform">
                             <img src={avatarUrl} className="w-full h-full object-cover" alt="YT Profile" />
                         </div>
                     ) : <EmptySlot label="Foto do Canal" tool="imagens" className="size-32 rounded-full mb-6" />}
 
                     {physicalShowTitle ? (
                         <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer group/title">
-                            <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">{fullName}</h2>
+                            <h2 className="text-3xl font-black tracking-tighter uppercase leading-none">{fullName}</h2>
                             <div className="flex items-center gap-2 mt-2">
-                                <span className="material-symbols-outlined text-blue-500 fill-1 text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
-                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{jobTitle || 'YouTube Creator'}</span>
+                                <span className="material-symbols-outlined text-blue-400 fill-1 text-sm" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+                                <span className="text-[10px] font-bold opacity-60 uppercase tracking-widest">{jobTitle || 'YouTube Creator'}</span>
                             </div>
                         </div>
                     ) : <EmptySlot label="Identidade do Canal" tool="conteudo" className="h-16 w-full" />}
@@ -269,18 +292,18 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
                 <div className={cn("flex flex-col gap-4", isVertical ? "w-full" : "w-64")}>
                     {physicalShowStats ? (
-                        <div onClick={() => setActiveTool('conteudo')} className="bg-slate-50 p-4 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Estatísticas Reais</p>
+                        <div onClick={() => setActiveTool('conteudo')} className="bg-black/10 p-4 rounded-xl border border-white/10 cursor-pointer hover:bg-black/20 transition-colors">
+                            <p className="text-[8px] font-black opacity-40 uppercase tracking-[0.2em] mb-1">Estatísticas Reais</p>
                             <div className="flex justify-between items-end">
-                                <span className="text-2xl font-black text-[#FF0000]">{stats[0]?.value || '1.2M'}</span>
-                                <span className="text-[10px] font-bold text-slate-600 mb-1">{stats[0]?.label || 'Inscritos'}</span>
+                                <span className="text-2xl font-black">{stats[0]?.value || '1.2M'}</span>
+                                <span className="text-[10px] font-bold opacity-60 mb-1">{stats[0]?.label || 'Inscritos'}</span>
                             </div>
                         </div>
                     ) : <EmptySlot label="Métricas" tool="conteudo" className="h-16 w-full" />}
 
                     {physicalShowLinks ? (
                         <div onClick={() => setActiveTool('social')} className="space-y-2 cursor-pointer">
-                            <div className="w-full bg-[#FF0000] text-white py-3 rounded-full flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-200">
+                            <div className="w-full bg-[#FF0000] text-white py-3 rounded-full flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-900/20">
                                 <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>notifications_active</span>
                                 {links[0]?.value || 'Inscreva-se Agora'}
                             </div>
@@ -297,16 +320,16 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       default:
         return (
           <div className={cn(
-            "flex-1 bg-white flex p-12 relative overflow-hidden",
+            "flex-1 flex p-12 relative overflow-hidden",
             isVertical ? "flex-col items-center text-center justify-between" : "flex-row items-center justify-between"
-          )}>
+          )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
             <div className={cn("flex-1 flex flex-col", isVertical ? "items-center" : "items-start")}>
                 {physicalShowTitle ? (
                     <div onClick={() => setActiveTool('conteudo')} className="space-y-3 cursor-pointer hover:bg-primary/5 p-4 rounded-xl transition-colors group/title">
                         <div className="flex items-center gap-4">
                             <div className="rounded-full h-16 w-1.5" style={{ backgroundColor: themeColor }}></div>
                             <div className={isVertical ? "text-center" : "text-left"}>
-                                <h2 className="font-black text-slate-900 tracking-tight text-4xl">{fullName}</h2>
+                                <h2 className="font-black tracking-tight text-4xl">{fullName}</h2>
                                 <p className="text-base font-bold uppercase tracking-[0.3em] mt-1" style={{ color: themeColor }}>{jobTitle}</p>
                             </div>
                         </div>
@@ -317,29 +340,29 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                     <div onClick={() => setActiveTool('social')} className="flex flex-wrap gap-x-8 gap-y-4 cursor-pointer p-6 rounded-2xl hover:bg-primary/5 mt-4 justify-center">
                         {links.slice(0, 4).map(link => (
                             <div key={link.id} className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-slate-50">
+                                <div className={cn("p-2 rounded-lg", isDarkBg ? "bg-white/10" : "bg-slate-50")}>
                                     <span className="material-symbols-outlined text-xl" style={{ color: link.color || themeColor }}>{link.icon}</span>
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-600 truncate max-w-[120px]">{link.value}</span>
+                                <span className="text-[10px] font-bold opacity-80 truncate max-w-[120px]">{link.value}</span>
                             </div>
                         ))}
                     </div>
                 )}
 
                 {physicalShowFooter && (
-                    <div onClick={() => setActiveTool('conteudo')} className="mt-auto pt-8 border-t border-slate-100 w-full flex justify-between items-end cursor-pointer opacity-60">
-                        <div className="flex items-center gap-2 text-slate-500">
+                    <div onClick={() => setActiveTool('conteudo')} className="mt-auto pt-8 border-t border-slate-100/20 w-full flex justify-between items-end cursor-pointer opacity-60">
+                        <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-sm">language</span>
                             <span className="text-[9px] font-bold">{customWebsiteUrl || 'www.seusite.com'}</span>
                         </div>
-                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em]">{footerText || "DIGICARD STUDIO © 2024"}</p>
+                        <p className="text-[8px] font-bold uppercase tracking-[0.2em]">{footerText || "DIGICARD STUDIO © 2024"}</p>
                     </div>
                 )}
             </div>
 
             {physicalShowAvatar ? (
                 <div onClick={() => setActiveTool('imagens')} className={cn(
-                    "rounded-full border-4 border-slate-50 shadow-xl overflow-hidden bg-slate-100 cursor-pointer transition-transform hover:scale-105 shrink-0",
+                    "rounded-full border-4 border-white/20 shadow-xl overflow-hidden bg-slate-100 cursor-pointer transition-transform hover:scale-105 shrink-0",
                     isVertical ? "size-40 mb-12 order-first" : "size-48 ml-12"
                 )}>
                     <img src={avatarUrl} className="w-full h-full object-cover" alt="Avatar" />
@@ -353,13 +376,21 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
   };
 
   const RenderBack = () => {
-    const isDark = ['executive', 'instagram', 'instagram-v', 'youtube', 'youtube-v', 'twitch-h', 'twitch-v', 'spotify', 'spotify-v'].includes(template);
-    const bgColor = isDark ? (template === 'executive' ? '#0a0a0b' : (template.includes('twitch') ? '#0d0d17' : (template.includes('spotify') ? '#191414' : (template.includes('youtube') ? '#1a1a1a' : themeColor)))) : '#ffffff';
-    const textColor = isDark ? '#ffffff' : '#1e293b';
+    const isDarkTemplate = ['executive', 'instagram', 'instagram-v', 'youtube', 'youtube-v', 'twitch-h', 'twitch-v', 'spotify', 'spotify-v'].includes(template);
+    
+    // Se o usuário mudou a cor de fundo física para algo diferente de branco, usamos a escolha dele.
+    // Caso contrário, usamos a cor temática do template dark ou branco para os demais.
+    let finalBg = physicalBackgroundColor;
+    if (physicalBackgroundColor === '#ffffff' && isDarkTemplate) {
+        finalBg = (template === 'executive' ? '#0a0a0b' : (template.includes('twitch') ? '#0d0d17' : (template.includes('spotify') ? '#191414' : (template.includes('youtube') ? '#1a1a1a' : themeColor))));
+    }
+
+    const backTextColor = getContrastColor(finalBg);
+    const isDarkBack = backTextColor === '#ffffff';
 
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12 relative" style={{ backgroundColor: bgColor }}>
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `radial-gradient(${textColor} 1px, transparent 1px)`, backgroundSize: '32px 32px' }}></div>
+      <div className="flex-1 flex flex-col items-center justify-center p-12 relative" style={{ backgroundColor: finalBg }}>
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `radial-gradient(${backTextColor} 1px, transparent 1px)`, backgroundSize: '32px 32px' }}></div>
         
         {physicalShowQR ? (
             <div 
@@ -368,10 +399,10 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             >
             <div className={cn(
                 "p-8 rounded-[3rem] shadow-2xl scale-110 relative",
-                isDark ? "bg-white/5 border border-white/10" : "bg-white border border-slate-100"
+                isDarkBack ? "bg-white/5 border border-white/10" : "bg-white border border-slate-100"
             )}>
                 {qrCodeUrl ? (
-                <img src={qrCodeUrl} className={cn("size-48", isDark && template !== 'spotify' ? "invert brightness-200" : "")} alt="QR Code Large" />
+                <img src={qrCodeUrl} className={cn("size-48", isDarkBack && template !== 'spotify' ? "invert brightness-200" : "")} alt="QR Code Large" />
                 ) : (
                 <div className="size-48 flex items-center justify-center bg-slate-100 rounded-xl">
                     <span className="material-symbols-outlined text-6xl text-slate-300">qr_code_2</span>
@@ -379,13 +410,13 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 )}
             </div>
             <div className="text-center space-y-2">
-                <h3 className="text-2xl font-black tracking-tighter uppercase" style={{ color: textColor }}>{fullName}</h3>
-                <p className="text-[10px] font-bold tracking-[0.4em] uppercase opacity-60" style={{ color: textColor }}>Escaneie para salvar contato</p>
+                <h3 className="text-2xl font-black tracking-tighter uppercase" style={{ color: backTextColor }}>{fullName}</h3>
+                <p className="text-[10px] font-bold tracking-[0.4em] uppercase opacity-60" style={{ color: backTextColor }}>Escaneie para salvar contato</p>
             </div>
             </div>
         ) : <EmptySlot label="Adicionar QR Code" tool="qrcode" className="size-64 rounded-[3rem]" />}
 
-        <div className="absolute bottom-12 flex items-center gap-3 opacity-40" style={{ color: textColor }}>
+        <div className="absolute bottom-12 flex items-center gap-3 opacity-40" style={{ color: backTextColor }}>
           <span className="material-symbols-outlined text-lg">style</span>
           <span className="text-[8px] font-bold tracking-[0.5em] uppercase">DigiCard Studio Premium</span>
         </div>
@@ -430,7 +461,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           Gabarito Modular — {currentTemplate?.name}
         </h4>
         <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-          O layout físico herda a estética do modelo digital. Adicione ou remova elementos nas propriedades de conteúdo para personalizar sua impressão.
+          O layout físico herda a estética do modelo digital. Personalize a cor de fundo e adicione ou remova elementos nas propriedades de conteúdo.
         </p>
       </div>
 

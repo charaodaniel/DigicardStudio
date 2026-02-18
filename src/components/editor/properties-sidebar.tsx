@@ -90,7 +90,7 @@ export default function PropertiesSidebar({
                     )}
                     style={{
                         backgroundColor: color,
-                        boxShadow: currentColor.toLowerCase() === color.toLowerCase() 
+                        boxShadow: currentColor?.toLowerCase() === color.toLowerCase() 
                             ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` 
                             : ''
                     }}
@@ -154,27 +154,34 @@ export default function PropertiesSidebar({
 
                         <div className="space-y-4 pt-4 border-t bg-primary/5 -mx-6 px-6 py-6">
                             <label className="text-xs font-bold text-primary uppercase tracking-widest">Ajustes de Impressão (Físico)</label>
-                            <p className="text-[10px] text-slate-500 mb-4 leading-tight">Escolha quais elementos devem aparecer no cartão físico para manter a harmonia do template.</p>
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Foto/Capa</span>
-                                    <Switch checked={cardData.physicalShowAvatar} onCheckedChange={(v) => handleProfileChange('physicalShowAvatar', v)} />
+                            <p className="text-[10px] text-slate-500 mb-4 leading-tight">Escolha quais elementos e cores devem aparecer no cartão físico para manter a harmonia do template.</p>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <p className="text-[11px] font-bold text-slate-400 uppercase">Cor de Fundo (Físico)</p>
+                                    <ColorPickerGrid currentColor={cardData.physicalBackgroundColor || '#ffffff'} onSelect={(c) => handleProfileChange('physicalBackgroundColor', c)} />
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Identidade</span>
-                                    <Switch checked={cardData.physicalShowTitle} onCheckedChange={(v) => handleProfileChange('physicalShowTitle', v)} />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Métricas</span>
-                                    <Switch checked={cardData.physicalShowStats} onCheckedChange={(v) => handleProfileChange('physicalShowStats', v)} />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Playlist de Links</span>
-                                    <Switch checked={cardData.physicalShowLinks} onCheckedChange={(v) => handleProfileChange('physicalShowLinks', v)} />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Rodapé Técnico</span>
-                                    <Switch checked={cardData.physicalShowFooter} onCheckedChange={(v) => handleProfileChange('physicalShowFooter', v)} />
+                                
+                                <div className="space-y-3 pt-2 border-t border-primary/10">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Foto/Capa</span>
+                                        <Switch checked={cardData.physicalShowAvatar} onCheckedChange={(v) => handleProfileChange('physicalShowAvatar', v)} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Identidade</span>
+                                        <Switch checked={cardData.physicalShowTitle} onCheckedChange={(v) => handleProfileChange('physicalShowTitle', v)} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Métricas</span>
+                                        <Switch checked={cardData.physicalShowStats} onCheckedChange={(v) => handleProfileChange('physicalShowStats', v)} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Playlist de Links</span>
+                                        <Switch checked={cardData.physicalShowLinks} onCheckedChange={(v) => handleProfileChange('physicalShowLinks', v)} />
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Rodapé Técnico</span>
+                                        <Switch checked={cardData.physicalShowFooter} onCheckedChange={(v) => handleProfileChange('physicalShowFooter', v)} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +309,7 @@ export default function PropertiesSidebar({
                 )}
 
                 <div className="pt-8 border-t space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paleta do Tema</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paleta do Tema (Digital)</label>
                     <ColorPickerGrid currentColor={cardData.themeColor} onSelect={(c) => handleProfileChange('themeColor', c)} />
                 </div>
             </div>
