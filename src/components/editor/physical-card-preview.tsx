@@ -47,7 +47,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           )}>
             <div className="absolute top-6 right-8 text-[8px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
             
-            {/* Player Cover / Avatar */}
             <div className={cn("shrink-0", isVertical ? "w-full mb-6" : "w-48")}>
                 {physicalShowAvatar ? (
                     <div onClick={() => setActiveTool('imagens')} className="relative group cursor-pointer aspect-square w-full">
@@ -63,7 +62,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             </div>
 
             <div className={cn("flex-1 flex flex-col", isVertical ? "text-center w-full" : "text-left h-full")}>
-              {/* Identity */}
               <div className="mb-6">
                 {physicalShowTitle ? (
                     <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer group/title">
@@ -73,7 +71,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 ) : <EmptySlot label="Título do Player" tool="conteudo" className="h-12 w-full" />}
               </div>
               
-              {/* Playlist Section (Links) */}
               <div className="flex-1 space-y-2 mb-6">
                 {physicalShowLinks ? (
                     <div onClick={() => setActiveTool('social')} className="cursor-pointer group/links space-y-1.5">
@@ -81,7 +78,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                         {links.slice(0, 3).map((l, i) => (
                             <div key={l.id} className="flex items-center gap-3 text-[10px] py-1 border-b border-white/5 group-hover/links:border-white/20 transition-colors">
                                 <span className="text-white/30 font-mono">0{i+1}</span>
-                                <span className="font-bold flex-1">{l.label}</span>
+                                <span className="font-bold flex-1 truncate">{l.value}</span>
                                 <span className="material-symbols-outlined text-xs text-white/40">{l.icon}</span>
                             </div>
                         ))}
@@ -89,7 +86,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 ) : <EmptySlot label="Adicionar Músicas (Links)" tool="social" className="h-20 w-full" />}
               </div>
 
-              {/* Player Controls */}
               <div className="mt-auto">
                 <div className="w-full h-1 bg-white/10 rounded-full mb-4 relative overflow-hidden">
                     <div className="absolute top-0 left-0 h-full bg-[#1DB954] w-[45%]"></div>
@@ -145,7 +141,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                         <div onClick={() => setActiveTool('social')} className="space-y-2 cursor-pointer">
                             <div className="w-full bg-[#FF0000] text-white py-3 rounded-full flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-red-200">
                                 <span className="material-symbols-outlined text-sm" style={{fontVariationSettings: "'FILL' 1"}}>notifications_active</span>
-                                Inscreva-se Agora
+                                {links[0]?.value || 'Inscreva-se Agora'}
                             </div>
                         </div>
                     ) : <EmptySlot label="Botão de Ação" tool="social" className="h-12 w-full rounded-full" />}
@@ -258,7 +254,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
   const CardFace = ({ side }: { side: 'front' | 'back' }) => (
     <div className="relative group/face">
-      {/* Crop Marks Simulation */}
       <div className="absolute -top-10 -left-10 w-16 h-[1px] bg-slate-400"></div>
       <div className="absolute -top-10 -left-10 w-[1px] h-16 bg-slate-400"></div>
       <div className="absolute -top-10 -right-10 w-16 h-[1px] bg-slate-400"></div>
@@ -274,11 +269,8 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             isVertical ? "w-[490px] h-[840px]" : "w-[840px] h-[490px]"
         )}
       >
-        {/* Bleed Area (3mm) */}
         <div className="absolute inset-0 border-4 border-dashed border-red-400/30 pointer-events-none z-50"></div>
-        {/* Main Trim Area */}
         <div className="absolute inset-[20px] bg-white border border-slate-100 flex overflow-hidden">
-          {/* Safe Zone Margin (5mm internal) */}
           <div className="absolute inset-6 border border-dashed border-primary/20 pointer-events-none z-50 rounded"></div>
           {side === 'front' ? <RenderFront /> : <RenderBack />}
         </div>
@@ -303,7 +295,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
       <div className={cn(
           "flex items-start justify-center gap-20",
-          isVertical ? "flex-row" : "flex-col"
+          "flex-col"
       )}>
         <CardFace side="front" />
         <CardFace side="back" />
