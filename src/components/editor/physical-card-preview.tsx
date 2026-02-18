@@ -1,3 +1,4 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 
@@ -102,29 +103,27 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
           )}
         </div>
       </div>
-      <p className="text-center mt-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
+      <p className="text-center mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
         {side === 'front' ? 'Frente (Anverso)' : 'Verso (Reverso)'}
       </p>
     </div>
   );
 
   return (
-    <div className="flex flex-col items-center gap-12 py-12">
+    <div className="flex flex-col items-center gap-8">
       {/* Cabeçalho de Instruções */}
-      <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl max-w-[800px] text-center">
-        <h4 className="text-base font-bold text-primary flex items-center justify-center gap-2 mb-2">
-          <span className="material-symbols-outlined text-xl">print</span>
-          Gabarito Técnico de Impressão (90x50mm)
+      <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl max-w-[800px] text-center">
+        <h4 className="text-sm font-bold text-primary flex items-center justify-center gap-2 mb-1">
+          <span className="material-symbols-outlined text-lg">print</span>
+          Gabarito Técnico (90x50mm)
         </h4>
-        <p className="text-xs text-slate-500 leading-relaxed max-w-[600px] mx-auto">
-          As linhas externas indicam a <strong className="text-red-400">Sangria (Bleed)</strong> para evitar bordas brancas. 
-          O tracejado azul é a <strong className="text-primary">Margem de Segurança</strong>. 
-          Mantenha informações importantes dentro desta área.
+        <p className="text-[10px] text-slate-500 leading-tight">
+          As linhas vermelhas são a <strong>Sangria</strong>. O tracejado azul é a <strong>Margem de Segurança</strong>.
         </p>
       </div>
 
-      {/* Grid de Visualização das Duas Faces - Empilhadas Verticalmente */}
-      <div className="flex flex-col gap-24 items-center justify-center">
+      {/* Grid de Visualização das Duas Faces */}
+      <div className="flex flex-col gap-12 items-center justify-center">
         <CardFace side="front" />
         <CardFace side="back" />
       </div>
