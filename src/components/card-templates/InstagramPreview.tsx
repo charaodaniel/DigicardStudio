@@ -4,7 +4,7 @@ import { formatHref } from '@/lib/utils';
 import React from 'react';
 
 export default function InstagramPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, themeColor, stats, links } = cardData;
+    const { fullName, fullNameLink, bio, isVerified, avatarUrl, avatarLink, themeColor, stats, links } = cardData;
     
     const instagramLink = links.find(l => l.type === 'instagram' || l.type === 'website');
     const actionHref = instagramLink ? formatHref(instagramLink.type, instagramLink.value) : '#';
@@ -19,13 +19,24 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full blur opacity-75"></div>
                         <div className="relative bg-[#121121] rounded-full p-1">
-                            <div className="size-28 rounded-full bg-cover bg-center border-2 border-white/20" style={{ backgroundImage: `url('${avatarUrl}')` }}>
-                            </div>
+                            {avatarLink ? (
+                                <a href={formatHref('website', avatarLink)} target="_blank" rel="noopener noreferrer" className="block">
+                                    <div className="size-28 rounded-full bg-cover bg-center border-2 border-white/20 hover:scale-105 transition-transform" style={{ backgroundImage: `url('${avatarUrl}')` }}></div>
+                                </a>
+                            ) : (
+                                <div className="size-28 rounded-full bg-cover bg-center border-2 border-white/20" style={{ backgroundImage: `url('${avatarUrl}')` }}></div>
+                            )}
                         </div>
                     </div>
                     <div className="mt-4 text-center">
                         <div className="flex items-center justify-center gap-1">
-                            <h1 className="text-xl font-bold tracking-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h1>
+                            {fullNameLink ? (
+                                <a href={formatHref('website', fullNameLink)} target="_blank" rel="noopener noreferrer">
+                                    <h1 className="text-xl font-bold tracking-tight hover:text-primary transition-colors">@{fullName.toLowerCase().replace(/\s/g, '_')}</h1>
+                                </a>
+                            ) : (
+                                <h1 className="text-xl font-bold tracking-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h1>
+                            )}
                             {isVerified && <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>}
                         </div>
                         <p className="text-white/80 text-sm mt-1 max-w-[280px]">{bio}</p>
@@ -35,8 +46,17 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                         {stats && stats.slice(0, 3).map((stat, i) => (
                             <React.Fragment key={i}>
                                 <div className="text-center">
-                                    <p className="text-lg font-bold text-white leading-none">{stat.value}</p>
-                                    <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">{stat.label}</p>
+                                    {stat.url ? (
+                                        <a href={formatHref('website', stat.url)} target="_blank" rel="noopener noreferrer" className="block group/stat">
+                                            <p className="text-lg font-bold text-white leading-none group-hover/stat:text-primary transition-colors">{stat.value}</p>
+                                            <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">{stat.label}</p>
+                                        </a>
+                                    ) : (
+                                        <>
+                                            <p className="text-lg font-bold text-white leading-none">{stat.value}</p>
+                                            <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">{stat.label}</p>
+                                        </>
+                                    )}
                                 </div>
                                 {i < Math.min(stats.length, 3) - 1 && <div className="w-px h-8 bg-white/10"></div>}
                             </React.Fragment>

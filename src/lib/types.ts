@@ -10,15 +10,20 @@ export type SocialLink = {
 export type StatItem = {
   label: string;
   value: string;
+  url?: string;
 };
 
 export type CardData = {
   template: string;
   fullName: string;
+  fullNameLink?: string;
   jobTitle: string;
+  jobTitleLink?: string;
   bio: string;
   avatarUrl: string;
+  avatarLink?: string;
   bannerUrl?: string;
+  bannerLink?: string;
   vCardUrl?: string;
   isVerified: boolean;
   themeColor: string;

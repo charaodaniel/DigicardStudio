@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor, links, stats } = cardData;
+    const { fullName, fullNameLink, jobTitle, jobTitleLink, bio, isVerified, avatarUrl, avatarLink, themeColor, links, stats, bannerUrl, bannerLink } = cardData;
     
     const linkedinLink = links.find(l => l.type === 'linkedin' || l.type === 'website');
     const actionHref = linkedinLink ? formatHref(linkedinLink.type, linkedinLink.value) : '#';
@@ -29,7 +29,13 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                         <div className="relative mb-6">
                             <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-[#BF953F] via-[#FCF6BA] to-[#AA771C] animate-pulse"></div>
                             <div className="relative h-32 w-32 rounded-full overflow-hidden border-2 border-[#0a0a0b]">
-                                <img alt={fullName} className="h-full w-full object-cover" src={avatarUrl} />
+                                {avatarLink ? (
+                                    <a href={formatHref('website', avatarLink)} target="_blank" rel="noopener noreferrer">
+                                        <img alt={fullName} className="h-full w-full object-cover" src={avatarUrl} />
+                                    </a>
+                                ) : (
+                                    <img alt={fullName} className="h-full w-full object-cover" src={avatarUrl} />
+                                )}
                             </div>
                             {isVerified && (
                                 <div className="absolute bottom-1 right-1 bg-white rounded-full p-0.5 shadow-lg flex items-center justify-center">
@@ -38,16 +44,40 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                             )}
                         </div>
                         <div className="text-center space-y-2">
-                            <h2 className="text-2xl font-bold tracking-tight text-white">{fullName}</h2>
-                            <p className="text-sm font-medium uppercase tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#AA771C] bg-clip-text text-transparent">
-                                {jobTitle}
-                            </p>
+                            {fullNameLink ? (
+                                <a href={formatHref('website', fullNameLink)} target="_blank" rel="noopener noreferrer">
+                                    <h2 className="text-2xl font-bold tracking-tight text-white hover:text-[#BF953F] transition-colors">{fullName}</h2>
+                                </a>
+                            ) : (
+                                <h2 className="text-2xl font-bold tracking-tight text-white">{fullName}</h2>
+                            )}
+                            
+                            {jobTitleLink ? (
+                                <a href={formatHref('website', jobTitleLink)} target="_blank" rel="noopener noreferrer" className="block">
+                                    <p className="text-sm font-medium uppercase tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#AA771C] bg-clip-text text-transparent hover:brightness-125 transition-all">
+                                        {jobTitle}
+                                    </p>
+                                </a>
+                            ) : (
+                                <p className="text-sm font-medium uppercase tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#AA771C] bg-clip-text text-transparent">
+                                    {jobTitle}
+                                </p>
+                            )}
                         </div>
                         <div className="my-8 flex w-full justify-between border-y border-white/10 py-4 px-2">
                             {stats && stats.slice(0, 3).map((stat, i) => (
                                 <div key={i} className={`text-center flex-1 ${i === 1 ? 'border-x border-white/10 px-4' : ''}`}>
-                                    <p className="text-[8px] uppercase tracking-widest text-slate-500 truncate">{stat.label}</p>
-                                    <p className="text-base font-bold text-white truncate">{stat.value}</p>
+                                    {stat.url ? (
+                                        <a href={formatHref('website', stat.url)} target="_blank" rel="noopener noreferrer" className="block group/stat">
+                                            <p className="text-[8px] uppercase tracking-widest text-slate-500 truncate group-hover/stat:text-[#BF953F] transition-colors">{stat.label}</p>
+                                            <p className="text-base font-bold text-white truncate group-hover/stat:scale-105 transition-transform">{stat.value}</p>
+                                        </a>
+                                    ) : (
+                                        <>
+                                            <p className="text-[8px] uppercase tracking-widest text-slate-500 truncate">{stat.label}</p>
+                                            <p className="text-base font-bold text-white truncate">{stat.value}</p>
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         </div>
