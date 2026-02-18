@@ -103,36 +103,87 @@ export const downloadPlotterSVG = (cardData: CardData) => {
   const h = 55; // mm
   const gap = 5; // mm
   
-  // Gerar SVG técnico para plotter
+  // Detecção de cor de contraste para o SVG
+  const getContrastColor = (hexcolor: string) => {
+    if (!hexcolor) return '#000000';
+    const r = parseInt(hexcolor.slice(1, 3), 16);
+    const g = parseInt(hexcolor.slice(3, 5), 16);
+    const b = parseInt(hexcolor.slice(5, 7), 16);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#000000' : '#ffffff';
+  };
+
+  const textColor = getContrastColor(cardData.physicalBackgroundColor || '#ffffff');
+
+  // Gerar SVG técnico completo para plotter e impressão
   // Vermelho (#FF0000) = Corte
-  // Preto (#000000) = Desenho/Gravação
   const svg = `
-<svg width="${(w * 2) + gap}mm" height="${h}mm" viewBox="0 0 ${(w * 2) + gap} ${h}" xmlns="http://www.w3.org/2000/svg">
+<svg width="${(w * 2) + gap}mm" height="${h}mm" viewBox="0 0 ${(w * 2) + gap} ${h}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <clipPath id="avatar-clip">
+      <circle cx="65" cy="20" r="12" />
+    </clipPath>
+  </defs>
   <style>
     .cut { fill: none; stroke: #FF0000; stroke-width: 0.1; }
-    .draw { fill: none; stroke: #000000; stroke-width: 0.1; }
-    .text { fill: #000000; font-family: ${cardData.fontFamily}, sans-serif; font-weight: bold; }
+    .text { fill: ${textColor}; font-family: ${cardData.fontFamily}, sans-serif; }
+    .label { fill: ${cardData.themeColor}; font-weight: bold; }
   </style>
 
-  <!-- FRENTE (Esquerda) -->
+  <!-- FRENTE (Anverso) -->
   <g id="front">
+    <!-- Fundo Colorido -->
+    <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
+    <!-- Marca de Corte -->
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
-    <text x="5" y="10" class="text" font-size="5">${cardData.fullName.toUpperCase()}</text>
-    <text x="5" y="16" class="text" font-size="3" opacity="0.6">${cardData.jobTitle}</text>
     
-    <!-- Placeholder de Elementos do Template -->
-    <rect class="draw" x="5" y="25" width="40" height="0.1" />
-    ${cardData.links.slice(0, 3).map((l, i) => `
-      <text x="5" y="${32 + (i * 5)}" class="text" font-size="2.5">${l.value}</text>
-    `).join('')}
+    ${cardData.physicalShowAvatar ? `
+    <image xlink:href="${cardData.avatarUrl}" x="53" y="8" width="24" height="24" clip-path="url(#avatar-clip)" />
+    <circle cx="65" cy="20" r="12.5" fill="none" stroke="${textColor}" stroke-width="0.5" opacity="0.2" />
+    ` : ''}
+
+    ${cardData.physicalShowTitle ? `
+    <text x="6" y="12" class="text" font-size="5" font-weight="900">${cardData.fullName.toUpperCase()}</text>
+    <text x="6" y="17" class="label" font-size="2.5" letter-spacing="0.5">${cardData.jobTitle.toUpperCase()}</text>
+    ` : ''}
+
+    ${cardData.physicalShowLinks ? `
+    <g transform="translate(6, 26)">
+      ${cardData.links.slice(0, 4).map((l, i) => `
+        <text x="0" y="${i * 5}" class="text" font-size="2" font-weight="bold" opacity="0.4">${l.label.toUpperCase()}</text>
+        <text x="0" y="${(i * 5) + 2.5}" class="text" font-size="2.5" font-weight="bold">${l.value}</text>
+      `).join('')}
+    </g>
+    ` : ''}
+
+    ${cardData.physicalShowFooter ? `
+    <text x="${w / 2}" y="${h - 4}" class="text" font-size="1.5" text-anchor="middle" opacity="0.3" font-weight="bold" letter-spacing="1">
+      ${cardData.customWebsiteUrl?.toUpperCase() || 'DIGICARD.STUDIO'} | ${cardData.footerText?.toUpperCase() || 'PRODUCED BY DIGICARD'}
+    </text>
+    ` : ''}
   </g>
 
-  <!-- VERSO (Direita) -->
+  <!-- VERSO (Reverso) -->
   <g id="back" transform="translate(${w + gap}, 0)">
+    <!-- Fundo Colorido -->
+    <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
+    <!-- Marca de Corte -->
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
-    <!-- Guia do QR Code -->
-    <rect class="draw" x="${(w / 2) - 10}" y="${(h / 2) - 10}" width="20" height="20" />
-    <text x="${w / 2}" y="${(h / 2) + 15}" class="text" font-size="2" text-anchor="middle">SCAN TO CONNECT</text>
+    
+    ${cardData.physicalShowQR ? `
+    <g transform="translate(${(w / 2) - 15}, ${(h / 2) - 18})">
+      <rect x="-2" y="-2" width="34" height="34" rx="3" fill="white" />
+      <image xlink:href="${cardData.qrCodeUrl}" x="0" y="0" width="30" height="30" />
+    </g>
+    <text x="${w / 2}" y="${(h / 2) + 22}" class="text" font-size="3" font-weight="900" text-anchor="middle" letter-spacing="0.5">
+      ${cardData.fullName.toUpperCase()}
+    </text>
+    <text x="${w / 2}" y="${(h / 2) + 25}" class="text" font-size="1.5" font-weight="bold" text-anchor="middle" opacity="0.4" letter-spacing="2">
+      SCAN TO SAVE CONTACT
+    </text>
+    ` : `
+    <text x="${w / 2}" y="${h / 2}" class="text" font-size="4" font-weight="900" text-anchor="middle">${cardData.fullName.toUpperCase()}</text>
+    `}
   </g>
 </svg>
   `.trim();
