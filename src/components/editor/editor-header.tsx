@@ -1,3 +1,4 @@
+
 'use client';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -71,7 +72,7 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
   return (
     <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 z-30 shrink-0 print:hidden">
         <div className="flex items-center gap-6">
-            <Link href="/meus-cartoes" className="flex items-center gap-2 text-primary">
+            <Link href="/" className="flex items-center gap-2 text-primary">
                 <span className="material-symbols-outlined text-3xl font-bold">style</span>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DigiCard Studio</h1>
             </Link>

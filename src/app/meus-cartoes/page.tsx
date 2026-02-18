@@ -17,7 +17,7 @@ const Sidebar = () => {
     const userAvatar = PlaceHolderImages.find(p => p.id === 'meus-cartoes-avatar-1');
     return (
         <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col fixed h-full z-10">
-            <div className="p-6 flex items-center gap-3">
+            <Link href="/" className="p-6 flex items-center gap-3">
                 <div className="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
                     <span className="material-symbols-outlined">style</span>
                 </div>
@@ -25,9 +25,9 @@ const Sidebar = () => {
                     <h1 className="text-lg font-bold leading-none tracking-tight">DigiCard</h1>
                     <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">SaaS Dashboard</p>
                 </div>
-            </div>
+            </Link>
             <nav className="flex-1 px-4 space-y-1">
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/meus-cartoes">
                     <span className="material-symbols-outlined">dashboard</span>
                     <span className="text-sm font-medium">Dashboard</span>
                 </Link>
@@ -35,13 +35,13 @@ const Sidebar = () => {
                     <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>credit_card</span>
                     <span className="text-sm font-medium">Meus Cartões</span>
                 </Link>
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/editor">
+                    <span className="material-symbols-outlined">edit_note</span>
+                    <span className="text-sm font-medium">Abrir Editor</span>
+                </Link>
                 <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
                     <span className="material-symbols-outlined">layers</span>
                     <span className="text-sm font-medium">Modelos</span>
-                </Link>
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="#">
-                    <span className="material-symbols-outlined">group</span>
-                    <span className="text-sm font-medium">Contatos</span>
                 </Link>
                 <div className="pt-4 pb-2">
                     <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</p>
@@ -58,7 +58,7 @@ const Sidebar = () => {
                         <p className="text-sm font-semibold truncate">Ricardo Silva</p>
                         <p className="text-xs text-slate-500 truncate">Plano Pro</p>
                     </div>
-                    <span className="material-symbols-outlined text-slate-400 text-lg">logout</span>
+                    <Link href="/" className="material-symbols-outlined text-slate-400 text-lg">logout</Link>
                 </div>
             </div>
         </aside>
@@ -104,7 +104,7 @@ const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) =
                 </p>
                 <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <button 
-                        onClick={() => router.push(`/?id=${card.id}`)}
+                        onClick={() => router.push(`/editor?id=${card.id}`)}
                         className="flex items-center justify-center gap-2 p-2 rounded-lg bg-primary text-white font-bold text-xs hover:bg-primary/90 transition-colors"
                     >
                         <span className="material-symbols-outlined text-sm">edit</span>
@@ -142,7 +142,7 @@ export default function MeusCartoesPage() {
 
     const handleCreateNew = async () => {
         const newCard = await supabaseService.createNewCard();
-        router.push(`/?id=${newCard.id}`);
+        router.push(`/editor?id=${newCard.id}`);
     };
 
     const handleDelete = async (id: string) => {
