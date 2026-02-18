@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { CardData } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -9,7 +10,6 @@ export function formatHref(type: string, value: string) {
   if (!value) return '#';
   const cleanValue = value.trim();
   
-  // Se já for um link completo, retorna ele mesmo
   if (cleanValue.startsWith('http') || cleanValue.startsWith('mailto:') || cleanValue.startsWith('tel:')) {
     return cleanValue;
   }
@@ -68,4 +68,30 @@ export const shareCard = async (title: string, text: string, url: string) => {
       return { success: false };
     }
   }
+};
+
+export const downloadVCard = (cardData: CardData) => {
+  const vcard = [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${cardData.fullName}`,
+    `ORG:${cardData.jobTitle}`,
+    `TITLE:${cardData.jobTitle}`,
+    `NOTE:${cardData.bio.replace(/\n/g, ' ')}`,
+    ...cardData.links.map(l => {
+      if (l.type === 'phone' || l.type === 'whatsapp') return `TEL;TYPE=CELL:${l.value}`;
+      if (l.type === 'email') return `EMAIL;TYPE=INTERNET:${l.value}`;
+      return `URL:${formatHref(l.type, l.value)}`;
+    }),
+    'END:VCARD'
+  ].join('\n');
+
+  const blob = new Blob([vcard], { type: 'text/vcard' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${cardData.fullName.toLowerCase().replace(/\s/g, '-')}.vcf`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };

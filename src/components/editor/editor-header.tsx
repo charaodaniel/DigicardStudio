@@ -1,4 +1,3 @@
-
 'use client';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -13,8 +12,16 @@ type EditorHeaderProps = {
 export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
 
+  const handlePrint = () => {
+    if (mode !== 'physical') {
+      alert("Por favor, mude para o modo 'Físico' para exportar o PDF de impressão.");
+      return;
+    }
+    window.print();
+  };
+
   return (
-    <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 z-30 shrink-0">
+    <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-6 z-30 shrink-0 print:hidden">
         <div className="flex items-center gap-6">
             <Link href="/meus-cartoes" className="flex items-center gap-2 text-primary">
                 <span className="material-symbols-outlined text-3xl font-bold">style</span>
@@ -60,8 +67,11 @@ export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHe
                 <span className="material-symbols-outlined text-lg">visibility</span>
                 Preview
             </button>
-            <button className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all">
-                Publicar
+            <button 
+                onClick={handlePrint}
+                className="bg-primary text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all"
+            >
+                Exportar PDF
             </button>
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700 mx-2"></div>
             <div className="flex items-center gap-3">

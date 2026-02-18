@@ -6,9 +6,10 @@ import { formatHref } from '@/lib/utils';
 type DefaultPreviewProps = {
   cardData: CardData;
   onShare: () => void;
+  onSaveContact: () => void;
 };
 
-export default function DefaultPreview({ cardData, onShare }: DefaultPreviewProps) {
+export default function DefaultPreview({ cardData, onShare, onSaveContact }: DefaultPreviewProps) {
   const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
 
   return (
@@ -88,6 +89,7 @@ export default function DefaultPreview({ cardData, onShare }: DefaultPreviewProp
           ))}
         </div>
         <button
+          onClick={onSaveContact}
           className="mt-10 w-full rounded-xl py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98] transition-all"
           style={{ backgroundColor: themeColor, boxShadow: `0 8px 20px -4px ${themeColor}66` }}
         >

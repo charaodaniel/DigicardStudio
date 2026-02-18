@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
+import { downloadVCard } from '@/lib/utils';
 import ShareModal from './share-modal';
 import DefaultPreview from './card-templates/DefaultPreview';
 import ProfessionalsPreview from './card-templates/ProfessionalsPreview';
@@ -31,11 +32,11 @@ export default function DigitalCardPreview({
   }, []);
 
   const handleShare = () => setIsShareModalOpen(true);
+  const handleSaveContact = () => downloadVCard(cardData);
 
   const PreviewComponent = () => {
-    // Tratamento dinâmico para variações horizontais/verticais selecionarem o template base correto
     const baseTemplate = cardData.template.split('-')[0];
-    const props = { cardData, onShare: handleShare };
+    const props = { cardData, onShare: handleShare, onSaveContact: handleSaveContact };
 
     switch (baseTemplate) {
       case 'professionals':
@@ -59,7 +60,7 @@ export default function DigitalCardPreview({
       case 'tiktok':
         return <TiktokPreview {...props} />;
       case 'twitch':
-        return <TiktokPreview {...props} />; // Reutiliza TikTok como base gamer se não houver um específico
+        return <TiktokPreview {...props} />;
       case 'digicard':
         return <DigicardWebPreview {...props} />;
       case 'discord':
