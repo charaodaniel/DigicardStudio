@@ -10,7 +10,7 @@ type PhysicalCardPreviewProps = {
 
 export default function PhysicalCardPreview({ cardData, setActiveTool }: PhysicalCardPreviewProps) {
   const { 
-    template, themeColor, fullName, jobTitle, avatarUrl, links, qrCodeUrl, 
+    template, themeColor, fullName, jobTitle, bio, avatarUrl, links, qrCodeUrl, 
     customWebsiteUrl, footerText, stats, 
     physicalShowAvatar = true,
     physicalShowTitle = true,
@@ -98,6 +98,147 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                     <span className="material-symbols-outlined text-sm">repeat</span>
                 </div>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'instagram':
+      case 'instagram-v':
+        return (
+          <div className={cn(
+            "flex-1 bg-white flex flex-col p-8 relative overflow-hidden",
+            isVertical ? "items-center text-center" : "items-start"
+          )}>
+            <div className="absolute top-6 left-8 flex items-center gap-2">
+                <span className="material-symbols-outlined text-slate-900">photo_camera</span>
+                <span className="text-[10px] font-black tracking-tight uppercase">InstaCard</span>
+            </div>
+
+            <div className={cn("mt-10 flex", isVertical ? "flex-col items-center gap-6" : "flex-row items-center gap-10")}>
+                {physicalShowAvatar ? (
+                    <div onClick={() => setActiveTool('imagens')} className="p-[3px] rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] cursor-pointer hover:scale-105 transition-transform">
+                        <div className="p-1 bg-white rounded-full">
+                            <img src={avatarUrl} className="size-24 rounded-full object-cover" alt="Insta Avatar" />
+                        </div>
+                    </div>
+                ) : <EmptySlot label="Foto de Perfil" tool="imagens" className="size-24 rounded-full" />}
+
+                <div className="flex flex-col">
+                    {physicalShowTitle ? (
+                        <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer group/title">
+                            <h2 className="text-xl font-bold text-slate-900 leading-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h2>
+                            <p className="text-slate-500 text-[10px] font-medium uppercase tracking-wider">{jobTitle}</p>
+                        </div>
+                    ) : <EmptySlot label="Identidade Visual" tool="conteudo" className="h-10 w-full" />}
+                    
+                    <div className="flex gap-6 mt-4">
+                        <div className="text-center"><p className="text-sm font-black">1.2k</p><p className="text-[8px] text-slate-400 font-bold uppercase">Posts</p></div>
+                        <div className="text-center"><p className="text-sm font-black">25k</p><p className="text-[8px] text-slate-400 font-bold uppercase">Followers</p></div>
+                        <div className="text-center"><p className="text-sm font-black">842</p><p className="text-[8px] text-slate-400 font-bold uppercase">Following</p></div>
+                    </div>
+                </div>
+            </div>
+
+            {physicalShowLinks && (
+                <div onClick={() => setActiveTool('social')} className="mt-10 w-full">
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-4">Highlights de Contato</p>
+                    <div className="flex flex-wrap gap-6 justify-center">
+                        {links.slice(0, 4).map(l => (
+                            <div key={l.id} className="flex flex-col items-center gap-2">
+                                <div className="size-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                                    <span className="material-symbols-outlined text-lg" style={{color: l.color || themeColor}}>{l.icon}</span>
+                                </div>
+                                <span className="text-[8px] font-bold text-slate-600 uppercase truncate max-w-[60px]">{l.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+          </div>
+        );
+
+      case 'twitch-h':
+      case 'twitch-v':
+        return (
+          <div className="flex-1 bg-[#0e0e10] flex flex-col p-8 text-white relative overflow-hidden">
+            <div className="absolute top-6 right-8 flex items-center gap-2 bg-[#9146ff] px-3 py-1 rounded-full border border-white/20">
+                <div className="size-1.5 bg-white rounded-full animate-pulse"></div>
+                <span className="text-[8px] font-black uppercase tracking-widest">Live Now</span>
+            </div>
+
+            <div className={cn("flex-1 flex", isVertical ? "flex-col items-center text-center gap-8 justify-center" : "flex-row items-center gap-10")}>
+                {physicalShowAvatar ? (
+                    <div onClick={() => setActiveTool('imagens')} className="size-28 rounded-full border-4 border-[#9146ff] p-1 cursor-pointer hover:scale-105 transition-transform shadow-[0_0_20px_rgba(145,70,255,0.3)]">
+                        <img src={avatarUrl} className="size-full rounded-full object-cover" alt="Twitch Profile" />
+                    </div>
+                ) : <EmptySlot label="Streamer Avatar" tool="imagens" className="size-28 rounded-full" />}
+
+                <div>
+                    {physicalShowTitle ? (
+                        <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer group/title">
+                            <h2 className="text-4xl font-black italic tracking-tighter uppercase leading-none mb-2 shadow-purple-500/20">{fullName}</h2>
+                            <p className="text-[#bf94ff] text-[10px] font-bold uppercase tracking-[0.2em]">{jobTitle || 'Variety Streamer'}</p>
+                        </div>
+                    ) : <EmptySlot label="Canal Title" tool="conteudo" className="h-16 w-full" />}
+                </div>
+            </div>
+
+            {physicalShowLinks && (
+                <div onClick={() => setActiveTool('social')} className="mt-auto grid grid-cols-2 gap-3 cursor-pointer">
+                    {links.slice(0, 2).map(l => (
+                        <div key={l.id} className="bg-white/5 border border-white/10 p-3 rounded-lg flex items-center gap-3 hover:bg-white/10 transition-colors">
+                            <span className="material-symbols-outlined text-[#bf94ff] text-base">{l.icon}</span>
+                            <span className="text-[9px] font-bold truncate">{l.value}</span>
+                        </div>
+                    ))}
+                </div>
+            )}
+          </div>
+        );
+
+      case 'linkedin':
+        return (
+          <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
+            <div className="h-20 bg-gradient-to-r from-[#0a66c2] to-[#004182] relative">
+                <div className="absolute bottom-4 left-8 text-[8px] font-black text-white/40 uppercase tracking-widest">Professional Summary</div>
+            </div>
+            
+            <div className="px-8 -mt-10 flex flex-col flex-1 pb-8">
+                <div className="flex justify-between items-end mb-6">
+                    {physicalShowAvatar ? (
+                        <div onClick={() => setActiveTool('imagens')} className="size-24 rounded-full border-4 border-white shadow-lg overflow-hidden cursor-pointer bg-slate-100 hover:scale-105 transition-transform">
+                            <img src={avatarUrl} className="size-full object-cover" alt="LI Profile" />
+                        </div>
+                    ) : <EmptySlot label="Professional Photo" tool="imagens" className="size-24 rounded-full" />}
+                    
+                    <div className="flex items-center gap-1.5 text-[#0a66c2] mb-2">
+                        <span className="material-symbols-outlined text-lg" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
+                        <span className="text-[10px] font-bold uppercase">Verified Identity</span>
+                    </div>
+                </div>
+
+                <div className="flex-1 flex flex-col">
+                    {physicalShowTitle ? (
+                        <div onClick={() => setActiveTool('conteudo')} className="mb-6 cursor-pointer group/title">
+                            <h2 className="text-2xl font-bold text-slate-900 leading-tight">{fullName}</h2>
+                            <p className="text-slate-600 text-xs font-medium mt-1 uppercase tracking-tight">{jobTitle}</p>
+                        </div>
+                    ) : <EmptySlot label="Headline" tool="conteudo" className="h-12 w-full mb-6" />}
+
+                    {physicalShowLinks && (
+                        <div onClick={() => setActiveTool('social')} className="space-y-3 cursor-pointer">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Contact Portfolio</p>
+                            <div className="grid grid-cols-2 gap-4">
+                                {links.slice(0, 4).map(l => (
+                                    <div key={l.id} className="flex items-center gap-2 text-slate-600 py-1 border-b border-slate-50">
+                                        <span className="material-symbols-outlined text-sm text-[#0a66c2]">{l.icon}</span>
+                                        <span className="text-[9px] font-medium truncate">{l.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
           </div>
         );
