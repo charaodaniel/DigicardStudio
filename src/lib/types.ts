@@ -27,4 +27,6 @@ export type CardData = {
   stats: StatItem[];
   saveContactLabel: string;
   qrCodeUrl?: string;
+  customWebsiteUrl?: string;
+  footerText?: string;
 };

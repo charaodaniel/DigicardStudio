@@ -219,6 +219,31 @@ export default function PropertiesSidebar({
                             </div>
                         </div>
 
+                        {/* Configuração do Rodapé (Físico) */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Rodapé do Cartão Físico</label>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">URL do Site no Cartão</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.customWebsiteUrl || ''}
+                                    onChange={(e) => handleProfileChange('customWebsiteUrl', e.target.value)}
+                                    placeholder="www.seusite.com"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Texto de Copyright / Rodapé</p>
+                                <Input 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm" 
+                                    type="text" 
+                                    value={cardData.footerText || ''}
+                                    onChange={(e) => handleProfileChange('footerText', e.target.value)}
+                                    placeholder="DESIGNED BY VOCÊ © 2024"
+                                />
+                            </div>
+                        </div>
+
                         {/* Seção de Métricas / Stats */}
                         <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas e Atributos</label>

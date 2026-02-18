@@ -1,4 +1,3 @@
-
 'use client';
 import type { CardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -9,7 +8,7 @@ type PhysicalCardPreviewProps = {
 };
 
 export default function PhysicalCardPreview({ cardData, setActiveTool }: PhysicalCardPreviewProps) {
-  const { fullName, jobTitle, themeColor, qrCodeUrl, avatarUrl, links } = cardData;
+  const { fullName, jobTitle, themeColor, qrCodeUrl, avatarUrl, links, customWebsiteUrl, footerText } = cardData;
 
   const CardFace = ({ side }: { side: 'front' | 'back' }) => (
     <div className="relative group/face">
@@ -87,15 +86,19 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
               </div>
 
               <div className="flex justify-between items-end">
-                <div className="space-y-3">
+                <div 
+                  className="space-y-3 cursor-pointer hover:bg-primary/5 p-2 rounded-lg transition-colors group/edit-footer relative"
+                  onClick={(e) => { e.stopPropagation(); setActiveTool('conteudo'); }}
+                >
                   <div className="flex items-center gap-2 text-slate-500">
                     <span className="material-symbols-outlined text-sm">language</span>
-                    <span className="text-[10px] font-bold">www.digicard.studio/{fullName.toLowerCase().replace(/\s/g, '')}</span>
+                    <span className="text-[10px] font-bold">{customWebsiteUrl || `www.digicard.studio/${fullName.toLowerCase().replace(/\s/g, '')}`}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-400">
                      <span className="material-symbols-outlined text-sm">verified_user</span>
-                     <span className="text-[9px] font-medium tracking-wide">DESIGNED WITH DIGICARD STUDIO © 2024</span>
+                     <span className="text-[9px] font-medium tracking-wide uppercase">{footerText || "DESIGNED WITH DIGICARD STUDIO © 2024"}</span>
                   </div>
+                  <div className="absolute -top-6 left-0 bg-primary text-white text-[8px] font-bold px-2 py-1 rounded-full opacity-0 group-hover/edit-footer:opacity-100 transition-opacity whitespace-nowrap">EDITAR RODAPÉ</div>
                 </div>
                 <div className="flex flex-col items-center gap-1">
                    <span className="text-[7px] font-black text-slate-300 uppercase tracking-widest">Face Principal</span>
