@@ -52,7 +52,7 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </div>
                 {/* Links Section */}
-                <div className="mt-8 px-6 space-y-3 pb-8">
+                <div className="mt-8 px-6 space-y-3 pb-8 flex-1">
                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Links Profissionais</h3>
                     {links.map(link => (
                         <a key={link.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all" href="#">
@@ -65,8 +65,8 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
                     ))}
                 </div>
                 
-                {/* Bottom Nav */}
-                <div className="mt-auto bg-white dark:bg-[#1a192e] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center shrink-0">
+                {/* Bottom Nav - LOCKED */}
+                <div className="sticky bottom-0 bg-white dark:bg-[#1a192e] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center shrink-0 z-30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                     {['home', 'group', 'person', 'work', 'chat'].map((icon, i) => (
                         <a key={icon} className={`flex flex-col items-center gap-1 ${i === 2 ? 'text-primary' : 'text-gray-400'}`} href="#">
                             <span className="material-symbols-outlined" style={{fontVariationSettings: i === 2 ? "'FILL' 1" : ""}}>{icon}</span>
