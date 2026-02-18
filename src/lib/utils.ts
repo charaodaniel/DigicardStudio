@@ -178,7 +178,7 @@ export async function generatePhysicalCardSVG(cardData: CardData): Promise<strin
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
     
     ${cardData.physicalShowAvatar && avatarBase64 ? `
-    <image xlink:href="${avatarBase64}" x="53" y="8" width="24" height="24" clip-path="url(#avatar-clip)" />
+    <image xlink:href="${avatarBase64}" x="53" y="8" width="24" height="24" clip-path="url(#avatar-clip)" preserveAspectRatio="xMidYMid slice" />
     <circle cx="65" cy="20" r="12.2" fill="none" stroke="${textColor}" stroke-width="0.3" opacity="0.2" />
     ` : ''}
 
@@ -211,7 +211,7 @@ export async function generatePhysicalCardSVG(cardData: CardData): Promise<strin
     ${cardData.physicalShowQR && qrBase64 ? `
     <g transform="translate(${(w / 2) - 15}, ${(h / 2) - 18})">
       <rect x="-2" y="-2" width="34" height="34" rx="3" fill="white" />
-      <image xlink:href="${qrBase64}" x="0" y="0" width="30" height="30" />
+      <image xlink:href="${qrBase64}" x="0" y="0" width="30" height="30" preserveAspectRatio="xMidYMid meet" />
     </g>
     <text x="${w / 2}" y="${(h / 2) + 22}" class="text" font-size="3" font-weight="900" text-anchor="middle" letter-spacing="0.5">
       ${cardData.fullName.toUpperCase()}
