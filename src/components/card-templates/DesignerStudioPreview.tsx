@@ -1,22 +1,8 @@
 'use client';
 import type { CardData } from '@/lib/types';
-import { shareCard } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
 
-export default function DesignerStudioPreview({ cardData }: { cardData: CardData }) {
+export default function DesignerStudioPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
-    const { toast } = useToast();
-
-    const handleShare = async () => {
-        const result = await shareCard(
-            `Cartão Digital - ${fullName}`,
-            `Confira o cartão digital de ${fullName}`,
-            window.location.href
-        );
-        if (result.success && result.method === 'clipboard') {
-            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
-        }
-    };
 
     return (
         <div className="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 h-full flex flex-col relative overflow-hidden">
@@ -27,7 +13,7 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                     <h1 className="font-bold text-lg tracking-tight">Designer Studio</h1>
                 </div>
                 <button 
-                    onClick={handleShare}
+                    onClick={onShare}
                     className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
                     <span className="material-symbols-outlined text-slate-600">share</span>

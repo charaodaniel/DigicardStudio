@@ -1,6 +1,7 @@
-
 'use client';
+import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
+import ShareModal from './share-modal';
 import DefaultPreview from './card-templates/DefaultPreview';
 import ProfessionalsPreview from './card-templates/ProfessionalsPreview';
 import LinkedinPreview from './card-templates/LinkedinPreview';
@@ -22,47 +23,64 @@ type DigitalCardPreviewProps = {
 export default function DigitalCardPreview({
   cardData,
 }: DigitalCardPreviewProps) {
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
+
+  const handleShare = () => setIsShareModalOpen(true);
+
   const PreviewComponent = () => {
     // Tratamento dinâmico para variações horizontais/verticais selecionarem o template base correto
     const baseTemplate = cardData.template.split('-')[0];
+    const props = { cardData, onShare: handleShare };
 
     switch (baseTemplate) {
       case 'professionals':
-        return <ProfessionalsPreview cardData={cardData} />;
+        return <ProfessionalsPreview {...props} />;
       case 'linkedin':
-        return <LinkedinPreview cardData={cardData} />;
+        return <LinkedinPreview {...props} />;
       case 'instagram':
-        return <InstagramPreview cardData={cardData} />;
+        return <InstagramPreview {...props} />;
       case 'whatsapp':
-        return <WhatsappPreview cardData={cardData} />;
+        return <WhatsappPreview {...props} />;
       case 'designer':
-        return <DesignerStudioPreview cardData={cardData} />;
+        return <DesignerStudioPreview {...props} />;
       case 'executive':
-        return <ExecutivePreview cardData={cardData} />;
+        return <ExecutivePreview {...props} />;
       case 'facebook':
-        return <FacebookPreview cardData={cardData} />;
+        return <FacebookPreview {...props} />;
       case 'spotify':
-        return <SpotifyPreview cardData={cardData} />;
+        return <SpotifyPreview {...props} />;
       case 'youtube':
-        return <YoutubePreview cardData={cardData} />;
+        return <YoutubePreview {...props} />;
       case 'tiktok':
-        return <TiktokPreview cardData={cardData} />;
+        return <TiktokPreview {...props} />;
       case 'twitch':
-        return <TiktokPreview cardData={cardData} />; // Reutiliza TikTok como base gamer se não houver um específico
+        return <TiktokPreview {...props} />; // Reutiliza TikTok como base gamer se não houver um específico
       case 'digicard':
-        return <DigicardWebPreview cardData={cardData} />;
+        return <DigicardWebPreview {...props} />;
       case 'discord':
-        return <DiscordPreview cardData={cardData} />;
+        return <DiscordPreview {...props} />;
       default:
-        return <DefaultPreview cardData={cardData} />;
+        return <DefaultPreview {...props} />;
     }
   };
+
   return (
     <div
       style={{ fontFamily: `'${cardData.fontFamily}', sans-serif` }}
       className="h-full w-full"
     >
       <PreviewComponent />
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onOpenChange={setIsShareModalOpen} 
+        url={currentUrl} 
+        title={`Cartão Digital - ${cardData.fullName}`}
+      />
     </div>
   );
 }

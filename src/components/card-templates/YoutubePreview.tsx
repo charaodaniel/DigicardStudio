@@ -1,25 +1,12 @@
 'use client';
 import type { CardData } from '@/lib/types';
-import { formatHref, shareCard } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { formatHref } from '@/lib/utils';
 
-export default function YoutubePreview({ cardData }: { cardData: CardData }) {
+export default function YoutubePreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, isVerified, avatarUrl, stats, themeColor, links, bannerUrl } = cardData;
-    const { toast } = useToast();
     
     const youtubeLink = links.find(l => l.type === 'youtube') || links.find(l => l.type === 'website');
     const actionHref = youtubeLink ? formatHref(youtubeLink.type, youtubeLink.value) : '#';
-
-    const handleShare = async () => {
-        const result = await shareCard(
-            `Assista agora: ${fullName}`,
-            `Confira o canal de ${fullName} no YouTube`,
-            window.location.href
-        );
-        if (result.success && result.method === 'clipboard') {
-            toast({ title: "Link copiado!", description: "O link do cartão foi copiado para sua área de transferência." });
-        }
-    };
 
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display antialiased h-full flex flex-col overflow-hidden relative">
@@ -27,7 +14,7 @@ export default function YoutubePreview({ cardData }: { cardData: CardData }) {
             <div className="absolute top-0 left-0 right-0 z-50 flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 justify-between border-b border-gray-100 dark:border-slate-800 shrink-0">
                 <span className="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
                 <h2 className="text-base font-bold flex-1 text-center">Perfil Oficial</h2>
-                <button onClick={handleShare} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <button onClick={onShare} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                     <span className="material-symbols-outlined text-slate-900 dark:text-white">share</span>
                 </button>
             </div>

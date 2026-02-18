@@ -5,17 +5,24 @@ import { formatHref } from '@/lib/utils';
 
 type DefaultPreviewProps = {
   cardData: CardData;
+  onShare: () => void;
 };
 
-export default function DefaultPreview({ cardData }: DefaultPreviewProps) {
+export default function DefaultPreview({ cardData, onShare }: DefaultPreviewProps) {
   const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
 
   return (
-    <div className="flex min-h-full w-full flex-col bg-white overflow-y-auto no-scrollbar pb-20">
+    <div className="flex min-h-full w-full flex-col bg-white overflow-y-auto no-scrollbar pb-20 relative">
       <div
         className="relative h-48 shrink-0"
         style={{ backgroundColor: themeColor }}
       >
+        <button 
+          onClick={onShare}
+          className="absolute top-4 right-4 z-20 bg-white/20 backdrop-blur-md p-2 rounded-full border border-white/20 hover:bg-white/30 transition-colors"
+        >
+          <span className="material-symbols-outlined text-white text-xl">share</span>
+        </button>
         <div
           className="absolute inset-0 bg-[length:20px_20px] opacity-20"
           style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, white 1px, transparent 1px)' }}

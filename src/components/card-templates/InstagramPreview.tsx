@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 import React from 'react';
 
-export default function InstagramPreview({ cardData }: { cardData: CardData }) {
+export default function InstagramPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, fullNameLink, bio, isVerified, avatarUrl, avatarLink, themeColor, stats, links } = cardData;
     
     const instagramLink = links.find(l => l.type === 'instagram' || l.type === 'website');
@@ -15,6 +15,13 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
             <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: "radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)" }}></div>
             
             <div className="flex-1 overflow-y-auto no-scrollbar pb-24 relative z-10">
+                <button 
+                    onClick={onShare}
+                    className="absolute top-4 right-4 z-30 bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/10 hover:bg-white/20 transition-colors"
+                >
+                    <span className="material-symbols-outlined text-white text-xl">share</span>
+                </button>
+
                 <header className="relative pt-12 px-6 pb-6 flex flex-col items-center">
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full blur opacity-75"></div>
@@ -64,7 +71,6 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </header>
 
-                {/* Nova Seção de Conteúdo sobre o Blur */}
                 <div className="relative mt-4">
                     {/* Grid de Fotos com Blur (Fundo) */}
                     <div className="absolute inset-0 px-1 opacity-40 blur-[3px] pointer-events-none">
