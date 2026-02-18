@@ -28,6 +28,7 @@ export type CardData = {
   isVerified: boolean;
   themeColor: string;
   fontFamily: string;
+  baseFontSize: number;
   links: SocialLink[];
   stats: StatItem[];
   saveContactLabel: string;

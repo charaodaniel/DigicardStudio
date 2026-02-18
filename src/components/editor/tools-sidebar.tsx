@@ -9,6 +9,7 @@ export default function ToolsSidebar({ activeTool, onToolClick }: ToolsSidebarPr
     const tools = [
         { id: 'modelos', label: 'Modelos', icon: 'dashboard_customize' },
         { id: 'conteudo', label: 'Conteúdo', icon: 'text_fields' },
+        { id: 'estilo', label: 'Estilo', icon: 'palette' },
         { id: 'imagens', label: 'Imagens', icon: 'image' },
         { id: 'social', label: 'Social', icon: 'share' },
         { id: 'qrcode', label: 'QR Code', icon: 'qr_code_2' },
@@ -42,7 +43,7 @@ export default function ToolsSidebar({ activeTool, onToolClick }: ToolsSidebarPr
                 <div className="h-[1px] bg-slate-100 dark:bg-slate-800 my-4"></div>
                 <div className="hidden lg:block px-3 py-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
                     <p className="text-xs font-semibold text-slate-500 mb-2">Dica Pro</p>
-                    <p className="text-[11px] leading-relaxed text-slate-400">Arraste e solte os elementos diretamente no celular para reordenar.</p>
+                    <p className="text-[11px] leading-relaxed text-slate-400">Personalize a tipografia global para dar uma personalidade única ao seu cartão.</p>
                 </div>
             </div>
             <div className="p-4 border-t border-slate-200 dark:border-slate-800">

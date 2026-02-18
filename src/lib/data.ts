@@ -19,6 +19,7 @@ export const initialCardData: CardData = {
   isVerified: true,
   themeColor: '#5048e5',
   fontFamily: 'Inter',
+  baseFontSize: 16,
   links: [
     { id: '1', type: 'whatsapp', label: 'WhatsApp', value: '5511999999999', icon: 'chat', color: '#25D366' },
     { id: '2', type: 'instagram', label: 'Instagram', value: 'joao.silva', icon: 'photo_camera', color: '#E1306C' },

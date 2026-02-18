@@ -11,7 +11,7 @@ type PhysicalCardPreviewProps = {
 export default function PhysicalCardPreview({ cardData, setActiveTool }: PhysicalCardPreviewProps) {
   const { 
     template, themeColor, fullName, jobTitle, bio, avatarUrl, links, qrCodeUrl, 
-    customWebsiteUrl, footerText, stats, 
+    customWebsiteUrl, footerText, stats, fontFamily, baseFontSize,
     physicalShowAvatar = true,
     physicalShowTitle = true,
     physicalShowStats = true,
@@ -37,6 +37,11 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
   const textColor = getContrastColor(physicalBackgroundColor);
   const isDarkBg = textColor === '#ffffff';
 
+  const globalStyle = {
+    fontFamily: `'${fontFamily}', sans-serif`,
+    fontSize: `${baseFontSize}px`
+  };
+
   const EmptySlot = ({ label, tool, className }: { label: string, tool: string, className?: string }) => (
     <div 
         onClick={(e) => { e.stopPropagation(); setActiveTool(tool); }}
@@ -60,7 +65,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           <div className={cn(
             "flex-1 flex p-8 relative overflow-hidden",
             isVertical ? "flex-col items-center" : "flex-row items-start gap-8"
-          )} style={{ backgroundColor: physicalBackgroundColor, color: spotifyText }}>
+          )} style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: spotifyText }}>
             <div className="absolute top-6 right-8 text-[8px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
             
             <div className={cn("shrink-0", isVertical ? "w-full mb-6" : "w-48")}>
@@ -124,7 +129,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           <div className={cn(
             "flex-1 flex flex-col p-8 relative overflow-hidden",
             isVertical ? "items-center text-center" : "items-start"
-          )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
+          )} style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: textColor }}>
             <div className="absolute top-6 left-8 flex items-center gap-2">
                 <span className="material-symbols-outlined">photo_camera</span>
                 <span className="text-[10px] font-black tracking-tight uppercase">InstaCard</span>
@@ -177,7 +182,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       case 'twitch-v':
         const twitchText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col p-8 relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: twitchText }}>
+          <div className="flex-1 flex flex-col p-8 relative overflow-hidden" style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: twitchText }}>
             <div className="absolute top-6 right-8 flex items-center gap-2 bg-[#9146ff] px-3 py-1 rounded-full border border-white/20">
                 <div className="size-1.5 bg-white rounded-full animate-pulse"></div>
                 <span className="text-[8px] font-black uppercase tracking-widest text-white">Live Now</span>
@@ -216,7 +221,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       case 'linkedin':
         const liText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: liText }}>
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: liText }}>
             <div className="h-20 bg-gradient-to-r from-[#0a66c2] to-[#004182] relative">
                 <div className="absolute bottom-4 left-8 text-[8px] font-black text-white/40 uppercase tracking-widest">Professional Summary</div>
             </div>
@@ -265,7 +270,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       case 'youtube-v':
         const ytText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: ytText }}>
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: ytText }}>
             <div className="h-2 w-full bg-[#FF0000] opacity-50"></div>
             <div className={cn("flex-1 p-8 flex", isVertical ? "flex-col items-center gap-8" : "flex-row items-center justify-between")}>
                 <div className={cn("flex flex-col", isVertical ? "items-center text-center" : "items-start")}>
@@ -318,7 +323,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           <div className={cn(
             "flex-1 flex p-12 relative overflow-hidden",
             isVertical ? "flex-col items-center text-center justify-between" : "flex-row items-center justify-between"
-          )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
+          )} style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: textColor }}>
             <div className={cn("flex-1 flex flex-col", isVertical ? "items-center" : "items-start")}>
                 {physicalShowTitle ? (
                     <div onClick={() => setActiveTool('conteudo')} className="space-y-3 cursor-pointer hover:bg-primary/5 p-4 rounded-xl transition-colors group/title">
@@ -397,15 +402,15 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
                 )}
             </div>
             <div className="text-center space-y-2">
-                <h3 className="text-2xl font-black tracking-tighter uppercase" style={{ color: backTextColor }}>{fullName}</h3>
-                <p className="text-[10px] font-bold tracking-[0.4em] uppercase opacity-60" style={{ color: backTextColor }}>Escaneie para salvar contato</p>
+                <h3 className="text-2xl font-black tracking-tighter uppercase" style={{ ...globalStyle, color: backTextColor }}>{fullName}</h3>
+                <p className="text-[10px] font-bold tracking-[0.4em] uppercase opacity-60" style={{ ...globalStyle, color: backTextColor }}>Escaneie para salvar contato</p>
             </div>
             </div>
         ) : <EmptySlot label="Adicionar QR Code" tool="qrcode" className="size-64 rounded-[3rem]" />}
 
         <div className="absolute bottom-12 flex items-center gap-3 opacity-40" style={{ color: backTextColor }}>
           <span className="material-symbols-outlined text-lg">style</span>
-          <span className="text-[8px] font-bold tracking-[0.5em] uppercase">DigiCard Studio Premium</span>
+          <span className="text-[8px] font-bold tracking-[0.5em] uppercase" style={globalStyle}>DigiCard Studio Premium</span>
         </div>
       </div>
     );
@@ -448,7 +453,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           Gabarito Modular — {currentTemplate?.name}
         </h4>
         <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-          O layout físico herda a estética do modelo digital. Personalize a cor de fundo e adicione ou remova elementos nas propriedades de conteúdo.
+          O layout físico herda a estética e tipografia global. Personalize a fonte e escala de texto na nova ferramenta de Estilo.
         </p>
       </div>
 

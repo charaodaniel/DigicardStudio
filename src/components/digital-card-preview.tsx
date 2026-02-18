@@ -71,7 +71,10 @@ export default function DigitalCardPreview({
 
   return (
     <div
-      style={{ fontFamily: `'${cardData.fontFamily}', sans-serif` }}
+      style={{ 
+        fontFamily: `'${cardData.fontFamily}', sans-serif`,
+        fontSize: `${cardData.baseFontSize}px`
+      }}
       className="h-full w-full"
     >
       <PreviewComponent />

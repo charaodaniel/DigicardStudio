@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -32,6 +33,14 @@ export default function PropertiesSidebar({
         '#eab308', '#84cc16', '#22c55e', '#10b981', 
         '#06b6d4', '#0ea5e9', '#3b82f6', '#1d4ed8',
         '#000000', '#475569', '#94a3b8', '#ffffff'
+    ];
+
+    const fontFamilies = [
+        { name: 'Inter', value: 'Inter', description: 'Moderna e Legível' },
+        { name: 'Space Grotesk', value: 'Space Grotesk', description: 'Tech e Futurista' },
+        { name: 'Roboto', value: 'Roboto', description: 'Versátil e Limpa' },
+        { name: 'Lora', value: 'Lora', description: 'Serifada Elegante' },
+        { name: 'Playfair Display', value: 'Playfair Display', description: 'Luxuosa e Clássica' },
     ];
 
     const iconCategories = [
@@ -71,6 +80,7 @@ export default function PropertiesSidebar({
     const getToolLabel = () => {
         switch (activeTool) {
             case 'conteudo': return 'Perfil & Métricas';
+            case 'estilo': return 'Estilo & Tipografia';
             case 'social': return 'Playlist de Links';
             case 'imagens': return 'Mídia & Capa';
             case 'qrcode': return 'QR Code';
@@ -202,6 +212,51 @@ export default function PropertiesSidebar({
                     </div>
                 )}
 
+                {activeTool === 'estilo' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-4">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tipografia Global</label>
+                            <div className="grid grid-cols-1 gap-2">
+                                {fontFamilies.map(font => (
+                                    <button 
+                                        key={font.value}
+                                        onClick={() => handleProfileChange('fontFamily', font.value)}
+                                        className={cn(
+                                            "flex flex-col items-start p-3 rounded-xl border-2 transition-all text-left",
+                                            cardData.fontFamily === font.value 
+                                                ? "border-primary bg-primary/5 shadow-sm" 
+                                                : "border-slate-100 dark:border-slate-800 hover:border-primary/30"
+                                        )}
+                                    >
+                                        <span className="text-sm font-bold" style={{ fontFamily: `'${font.value}', sans-serif` }}>{font.name}</span>
+                                        <span className="text-[10px] text-slate-400">{font.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 pt-6 border-t">
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Tamanho do Texto</label>
+                                <span className="text-xs font-bold text-primary">{cardData.baseFontSize}px</span>
+                            </div>
+                            <Slider 
+                                value={[cardData.baseFontSize]} 
+                                min={12} 
+                                max={24} 
+                                step={1} 
+                                onValueChange={([val]) => handleProfileChange('baseFontSize', val)} 
+                            />
+                            <p className="text-[10px] text-slate-400 italic">Isso ajustará a escala de todos os elementos textuais do cartão.</p>
+                        </div>
+
+                        <div className="pt-6 border-t space-y-4">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paleta do Tema (Digital)</label>
+                            <ColorPickerGrid currentColor={cardData.themeColor} onSelect={(c) => handleProfileChange('themeColor', c)} />
+                        </div>
+                    </div>
+                )}
+
                 {activeTool === 'imagens' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="space-y-4">
@@ -307,11 +362,6 @@ export default function PropertiesSidebar({
                         </div>
                     </div>
                 )}
-
-                <div className="pt-8 border-t space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paleta do Tema (Digital)</label>
-                    <ColorPickerGrid currentColor={cardData.themeColor} onSelect={(c) => handleProfileChange('themeColor', c)} />
-                </div>
             </div>
         </div>
     );
