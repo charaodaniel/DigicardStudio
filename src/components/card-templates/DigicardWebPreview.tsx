@@ -2,6 +2,7 @@
 import type { CardData } from '@/lib/types';
 import { shareCard } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import SocialIcon from '@/components/social-icon';
 
 export default function DigicardWebPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, saveContactLabel } = cardData;
@@ -64,7 +65,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                 {links.map(link => (
                     <a key={link.id} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${link.color || themeColor}15`, color: link.color || themeColor }}>
-                            <span className="material-symbols-outlined">{link.icon}</span>
+                            <SocialIcon type={link.type} icon={link.icon} className="text-lg" />
                         </div>
                         <span className="flex-1 font-medium text-slate-700 dark:text-slate-200">{link.label}</span>
                         <span className="material-symbols-outlined text-slate-400 group-hover:translate-x-1 transition-transform">chevron_right</span>

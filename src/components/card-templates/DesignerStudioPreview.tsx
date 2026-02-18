@@ -1,5 +1,6 @@
 'use client';
 import type { CardData } from '@/lib/types';
+import SocialIcon from '@/components/social-icon';
 
 export default function DesignerStudioPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
@@ -50,10 +51,10 @@ export default function DesignerStudioPreview({ cardData, onShare }: { cardData:
                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4 px-1">Meus Links</h3>
                     <div className="grid grid-cols-1 gap-3">
                         {links.map(link => (
-                            <a key={link.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between hover:border-primary/40 transition-colors" href="#">
+                            <a key={link.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:border-primary/40 transition-colors" href="#">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 rounded-lg" style={{ backgroundColor: `${link.color || themeColor}15` }}>
-                                        <span className="material-symbols-outlined" style={{ color: link.color || themeColor }}>{link.icon}</span>
+                                        <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
                                     </div>
                                     <div>
                                         <p className="font-bold text-sm">{link.label}</p>

@@ -1,6 +1,7 @@
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
+import SocialIcon from '@/components/social-icon';
 
 export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor } = cardData;
@@ -66,7 +67,7 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
                             className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all"
                         >
                             <div className="flex items-center gap-3">
-                                <span className="material-symbols-outlined" style={{color: link.color || themeColor}}>{link.icon}</span>
+                                <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{link.label}</span>
                             </div>
                             <span className="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>

@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
 import DigitalCardPreview from '@/components/digital-card-preview';
 import { cn } from '@/lib/utils';
+import SocialIcon from '@/components/social-icon';
 
 type EditableCardPreviewProps = {
     cardData: CardData;
@@ -80,7 +81,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
         );
     }
 
-    // Template Padrão com edição direta e visual no canvas (Mantendo lógica original por ser mais precisa)
+    // Template Padrão com edição direta e visual no canvas
     return (
         <div className="w-full h-full flex flex-col items-center pt-12 pb-8 px-6 overflow-y-auto no-scrollbar">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
@@ -152,7 +153,7 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                                 boxShadow: selectedLinkId === link.id ? `0 4px 12px ${link.color || themeColor}44` : ''
                             }}
                         >
-                            <span className="material-symbols-outlined">{link.icon}</span>
+                            <SocialIcon type={link.type} icon={link.icon} className="text-xl" />
                         </div>
                         <span className="font-bold text-slate-800 dark:text-slate-200">{link.label}</span>
                         <span className="material-symbols-outlined ml-auto text-slate-400">chevron_right</span>

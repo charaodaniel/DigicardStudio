@@ -1,6 +1,7 @@
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
+import SocialIcon from '@/components/social-icon';
 
 export default function ExecutivePreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, fullNameLink, jobTitle, jobTitleLink, bio, isVerified, avatarUrl, avatarLink, themeColor, links, stats, bannerUrl } = cardData;
@@ -114,11 +115,11 @@ export default function ExecutivePreview({ cardData, onShare }: { cardData: Card
                             href={formatHref(link.type, link.value)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:border-primary/50 transition-colors group"
+                            className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-primary/50 transition-colors group"
                         >
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg" style={{ backgroundColor: `${link.color || themeColor}15` }}>
-                                    <span className="material-symbols-outlined text-lg" style={{ color: link.color || themeColor }}>{link.icon}</span>
+                                    <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
                                 </div>
                                 <span className="font-bold text-sm">{link.label}</span>
                             </div>

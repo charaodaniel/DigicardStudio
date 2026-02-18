@@ -3,6 +3,7 @@ import type { CardData } from '@/lib/types';
 import React from 'react';
 import { formatHref, shareCard } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import SocialIcon from '@/components/social-icon';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor, vCardUrl } = cardData;
@@ -118,7 +119,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                             className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-primary/50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <span className="material-symbols-outlined" style={{color: link.color || themeColor}}>{link.icon}</span>
+                                <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
                                 <span className="text-sm font-semibold">{link.label}</span>
                             </div>
                             <span className="material-symbols-outlined text-slate-300 text-sm">chevron_right</span>

@@ -1,6 +1,7 @@
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
+import SocialIcon from '@/components/social-icon';
 
 export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
@@ -64,7 +65,7 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
                                     className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:bg-slate-50 transition-colors"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <span className="material-symbols-outlined" style={{color: link.color || themeColor}}>{link.icon}</span>
+                                        <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
                                         <span className="text-sm font-medium">{link.label}</span>
                                     </div>
                                     <span className="material-symbols-outlined text-slate-300 text-sm">chevron_right</span>
