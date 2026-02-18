@@ -70,10 +70,11 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </div>
 
+                {/* Grid de Fotos com Blur */}
                 <div className="mt-8 bg-white/5 backdrop-blur-xl rounded-t-[2.5rem] pt-8 px-1 pb-10 relative z-10">
                     <div className="grid grid-cols-3 gap-1">
                     {[...Array(9)].map((_, i) => (
-                        <div key={i} className="aspect-square bg-cover bg-center bg-slate-800" style={{ backgroundImage: `url('https://picsum.photos/seed/insta${i}/200')` }}></div>
+                        <div key={i} className="aspect-square bg-cover bg-center bg-slate-800 blur-[2px] opacity-40 hover:opacity-70 transition-opacity cursor-pointer" style={{ backgroundImage: `url('https://picsum.photos/seed/insta${i}/200')` }}></div>
                     ))}
                     </div>
                 </div>
