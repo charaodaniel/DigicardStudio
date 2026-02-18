@@ -1,7 +1,9 @@
+
 'use client';
 import Image from 'next/image';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
+import SocialIcon from '@/components/social-icon';
 
 type DefaultPreviewProps = {
   cardData: CardData;
@@ -64,7 +66,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100 transition-colors"
             >
-              <span className="material-symbols-outlined" style={{color: link.color || themeColor}}>{link.icon}</span>
+              <SocialIcon type={link.type} icon={link.icon} style={{color: link.color || themeColor}} className="text-2xl" />
               <span className="text-[10px] font-bold text-slate-700">{link.label}</span>
             </a>
           ))}
@@ -80,7 +82,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg text-white" style={{backgroundColor: link.color || themeColor}}>
-                  <span className="material-symbols-outlined text-lg">{link.icon}</span>
+                  <SocialIcon type={link.type} icon={link.icon} className="text-lg" />
                 </div>
                 <span className="text-xs font-bold text-slate-700">{link.label}</span>
               </div>

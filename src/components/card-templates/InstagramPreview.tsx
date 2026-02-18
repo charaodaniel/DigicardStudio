@@ -1,7 +1,9 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 import React from 'react';
+import SocialIcon from '@/components/social-icon';
 
 export default function InstagramPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
     const { fullName, fullNameLink, bio, isVerified, avatarUrl, avatarLink, themeColor, stats, links } = cardData;
@@ -103,7 +105,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                                     className="flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white font-semibold border border-white/10 transition-all group"
                                 >
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${link.color || themeColor}22` }}>
-                                        <span className="material-symbols-outlined text-xl" style={{ color: link.color || themeColor }}>{link.icon}</span>
+                                        <SocialIcon type={link.type} icon={link.icon} style={{ color: link.color || themeColor }} className="text-xl" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-bold truncate">{link.label}</p>

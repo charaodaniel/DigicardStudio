@@ -1,7 +1,9 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref, shareCard } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import SocialIcon from '@/components/social-icon';
 
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
@@ -77,7 +79,7 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                                         <p className="text-xs text-gray-400 truncate max-w-[200px]">{link.value}</p>
                                     </div>
                                 </div>
-                                <span className="material-symbols-outlined text-gray-400 group-hover:text-white">{link.icon}</span>
+                                <SocialIcon type={link.type} icon={link.icon} className="text-gray-400 group-hover:text-white" />
                             </a>
                         ))}
                     </div>
