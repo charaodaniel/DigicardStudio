@@ -19,6 +19,7 @@ const templates = [
     { id: 'youtube', name: 'YouTube', imageId: 'template-youtube', category: 'Social' },
     { id: 'tiktok', name: 'TikTok', imageId: 'template-tiktok', category: 'Social' },
     { id: 'digicard-web', name: 'DigiCard Web', imageId: 'template-digicard-web', category: 'Corp' },
+    { id: 'discord', name: 'Discord Style', imageId: 'template-discord', category: 'Social' },
 ];
 
 const templatePresets: Record<string, Partial<CardData>> = {
@@ -34,6 +35,7 @@ const templatePresets: Record<string, Partial<CardData>> = {
     'youtube': { themeColor: '#FF0000'},
     'tiktok': { themeColor: '#ff0050'},
     'digicard-web': { themeColor: '#5048e5'},
+    'discord': { themeColor: '#5865F2'},
 }
 
 type TemplateLibraryPanelProps = {
@@ -86,7 +88,7 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
             return (
                 <div key={template.id} className="group cursor-pointer" onClick={() => applyTemplate(template.id)}>
                     <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 transition-all group-hover:border-primary group-hover:shadow-md">
-                        {image && (
+                        {image ? (
                             <Image
                                 src={image.imageUrl}
                                 alt={template.name}
@@ -95,6 +97,10 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
                                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                 data-ai-hint={image.imageHint}
                             />
+                        ) : (
+                            <div className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-slate-300 text-4xl">style</span>
+                            </div>
                         )}
                         <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
                     </div>

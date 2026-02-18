@@ -12,6 +12,7 @@ import SpotifyPreview from './card-templates/SpotifyPreview';
 import YoutubePreview from './card-templates/YoutubePreview';
 import TiktokPreview from './card-templates/TiktokPreview';
 import DigicardWebPreview from './card-templates/DigicardWebPreview';
+import DiscordPreview from './card-templates/DiscordPreview';
 
 type DigitalCardPreviewProps = {
   cardData: CardData;
@@ -44,6 +45,8 @@ export default function DigitalCardPreview({
         return <TiktokPreview cardData={cardData} />;
       case 'digicard-web':
         return <DigicardWebPreview cardData={cardData} />;
+      case 'discord':
+        return <DiscordPreview cardData={cardData} />;
       default:
         return <DefaultPreview cardData={cardData} />;
     }

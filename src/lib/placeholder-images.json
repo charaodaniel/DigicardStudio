@@ -91,6 +91,12 @@
       "imageHint": "digital card"
     },
     {
+      "id": "template-discord",
+      "description": "Discord Style Template Preview",
+      "imageUrl": "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxkaXNjb3JkJTIwYmFja2dyb3VuZHxlbnwwfHx8fDE3NzE0Mjg2MTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "discord style"
+    },
+    {
       "id": "meus-cartoes-avatar-1",
       "description": "User profile picture of a male professional",
       "imageUrl": "https://picsum.photos/seed/mc-avatar1/128/128",
