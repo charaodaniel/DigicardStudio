@@ -4,8 +4,8 @@ import type { CardData } from '@/lib/types';
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
     return (
-        <div className="bg-[#121121] text-white min-h-full font-display overflow-y-auto no-scrollbar">
-            <div className="max-w-md mx-auto min-h-full flex flex-col pb-24">
+        <div className="bg-[#121121] text-white h-full flex flex-col relative overflow-hidden font-display">
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
                 <header className="relative w-full aspect-square overflow-hidden shadow-2xl shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121121] via-transparent to-transparent z-10"></div>
                     <img alt="Artist Profile" className="w-full h-full object-cover" src={avatarUrl} />
@@ -19,8 +19,7 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </header>
 
-                {/* Now Playing Widget Mockup */}
-                <div className="px-4 -mt-4 z-30">
+                <div className="px-4 -mt-4 z-30 relative">
                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-xl">
                         <div className="flex items-center justify-between mb-3 text-[#1DB954]">
                             <div className="flex items-center gap-2">
@@ -42,7 +41,7 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </div>
 
-                <main className="px-4 mt-8 flex-1">
+                <main className="px-4 mt-8">
                     <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4 px-1">Links &amp; Lançamentos</h3>
                     <div className="space-y-3">
                         {links.map((link, i) => (
@@ -59,17 +58,17 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                         ))}
                     </div>
                 </main>
-
-                <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-sm z-50">
-                    <div className="bg-black/80 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-2xl flex items-center justify-between">
-                        <div className="flex items-center gap-1 pl-2">
-                            <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
-                            <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
-                        </div>
-                        <button className="bg-[#1DB954] text-black font-black px-8 py-3 rounded-full text-sm uppercase tracking-wider active:scale-95">Seguir</button>
-                    </div>
-                </nav>
             </div>
+
+            <nav className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-30">
+                <div className="bg-black/80 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-2xl flex items-center justify-between">
+                    <div className="flex items-center gap-1 pl-2">
+                        <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
+                        <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
+                    </div>
+                    <button className="bg-[#1DB954] text-black font-black px-8 py-3 rounded-full text-sm uppercase tracking-wider active:scale-95 transition-transform" style={{backgroundColor: themeColor}}>Seguir</button>
+                </div>
+            </nav>
         </div>
     )
 }

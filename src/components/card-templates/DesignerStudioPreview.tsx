@@ -4,19 +4,20 @@ import type { CardData } from '@/lib/types';
 export default function DesignerStudioPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
     return (
-        <div className="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-full overflow-y-auto no-scrollbar">
-            <div className="max-w-md mx-auto flex flex-col relative pb-24">
-                {/* Header */}
-                <header className="flex items-center justify-between p-6 sticky top-0 bg-slate-50/80 dark:bg-background-dark/80 backdrop-blur-md z-30">
-                    <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-primary">auto_awesome</span>
-                        <h1 className="font-bold text-lg tracking-tight">Designer Studio</h1>
-                    </div>
-                    <button className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm">
-                        <span className="material-symbols-outlined text-slate-600">share</span>
-                    </button>
-                </header>
+        <div className="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 h-full flex flex-col relative overflow-hidden">
+            {/* Header */}
+            <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 bg-slate-50/80 dark:bg-background-dark/80 backdrop-blur-md z-20 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">auto_awesome</span>
+                    <h1 className="font-bold text-lg tracking-tight">Designer Studio</h1>
+                </div>
+                <button className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm">
+                    <span className="material-symbols-outlined text-slate-600">share</span>
+                </button>
+            </header>
 
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar pt-20 pb-24">
                 <section className="flex flex-col items-center px-6 pt-4 pb-8">
                     <div className="relative mb-6">
                         <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1">
@@ -61,7 +62,6 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                     </div>
                 </section>
 
-                {/* Portfolio Horizontal */}
                 <section className="mb-8">
                     <div className="flex items-center justify-between px-6 mb-4">
                         <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Trabalhos</h3>
@@ -76,17 +76,17 @@ export default function DesignerStudioPreview({ cardData }: { cardData: CardData
                         ))}
                     </div>
                 </section>
-
-                {/* Fixed Bottom Nav */}
-                <nav className="fixed bottom-6 left-0 right-0 max-w-md mx-auto z-50 px-6">
-                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-full shadow-2xl p-2 flex items-center justify-around">
-                        <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
-                        <span className="material-symbols-outlined text-slate-400">auto_awesome_motion</span>
-                        <span className="material-symbols-outlined text-slate-400">chat_bubble</span>
-                        <span className="material-symbols-outlined text-slate-400">person</span>
-                    </div>
-                </nav>
             </div>
+
+            {/* Bottom Nav */}
+            <nav className="absolute bottom-6 left-0 right-0 z-30 px-6">
+                <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-full shadow-2xl p-2 flex items-center justify-around">
+                    <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
+                    <span className="material-symbols-outlined text-slate-400">auto_awesome_motion</span>
+                    <span className="material-symbols-outlined text-slate-400">chat_bubble</span>
+                    <span className="material-symbols-outlined text-slate-400">person</span>
+                </div>
+            </nav>
         </div>
     );
 }
