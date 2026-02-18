@@ -4,6 +4,7 @@ import type { CardData, SocialLink } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type PropertiesSidebarProps = {
     cardData: CardData;
@@ -23,8 +24,12 @@ export default function PropertiesSidebar({
 
     const activeLink = cardData.links.find(l => l.id === selectedLinkId);
 
-    const colors = [
-        '#5048e5', '#e11d48', '#10b981', '#f59e0b', '#3b82f6', '#000000', '#ffffff'
+    const colorPalette = [
+        '#5048e5', '#6366f1', '#8b5cf6', '#ec4899', 
+        '#f43f5e', '#ef4444', '#f97316', '#f59e0b', 
+        '#eab308', '#84cc16', '#22c55e', '#10b981', 
+        '#06b6d4', '#0ea5e9', '#3b82f6', '#1d4ed8',
+        '#000000', '#475569', '#94a3b8', '#ffffff'
     ];
 
     const handleProfileChange = (field: keyof CardData, value: any) => {
@@ -71,6 +76,31 @@ export default function PropertiesSidebar({
             default: return 'Geral';
         }
     }
+
+    const ColorPickerGrid = ({ currentColor, onSelect }: { currentColor: string, onSelect: (color: string) => void }) => (
+        <div className="grid grid-cols-5 gap-2">
+            {colorPalette.map(color => (
+                <button 
+                    key={color} 
+                    onClick={() => onSelect(color)}
+                    className={cn(
+                        "w-8 h-8 rounded-full transition-all border shrink-0",
+                        color === '#ffffff' ? 'border-slate-200' : 'border-transparent'
+                    )}
+                    style={{
+                        backgroundColor: color,
+                        boxShadow: currentColor.toLowerCase() === color.toLowerCase() 
+                            ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` 
+                            : ''
+                    }}
+                    title={color}
+                />
+            ))}
+            <button className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-200 transition-colors">
+                <span className="material-symbols-outlined text-xs text-slate-500">add</span>
+            </button>
+        </div>
+    );
 
     return (
         <div className="flex flex-col h-full overflow-hidden">
@@ -246,20 +276,11 @@ export default function PropertiesSidebar({
                                 </div>
                             </div>
                             <div className="space-y-1.5">
-                                <p className="text-[11px] font-medium text-slate-400 ml-1">Cor do Botão</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {colors.map(color => (
-                                        <button 
-                                            key={color} 
-                                            onClick={() => handleLinkChange(activeLink.id, 'color', color)}
-                                            className={`w-6 h-6 rounded-full transition-all border ${color === '#ffffff' ? 'border-slate-200' : 'border-transparent'}`}
-                                            style={{
-                                                backgroundColor: color,
-                                                boxShadow: activeLink.color === color ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` : ''
-                                            }}
-                                        />
-                                    ))}
-                                </div>
+                                <p className="text-[11px] font-medium text-slate-400 ml-1">Paleta de Cores do Botão</p>
+                                <ColorPickerGrid 
+                                    currentColor={activeLink.color || cardData.themeColor} 
+                                    onSelect={(color) => handleLinkChange(activeLink.id, 'color', color)} 
+                                />
                             </div>
                         </div>
                     </div>
@@ -308,23 +329,11 @@ export default function PropertiesSidebar({
                 <div className="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Estilo Visual do Tema</label>
                     <div className="space-y-3">
-                        <p className="text-[11px] font-medium text-slate-400 ml-1">Cor Primária do Tema</p>
-                        <div className="flex flex-wrap gap-2">
-                            {colors.filter(c => c !== '#ffffff').map(color => (
-                                <button 
-                                    key={color} 
-                                    onClick={() => handleProfileChange('themeColor', color)}
-                                    className={`w-8 h-8 rounded-full transition-all border ${color === '#000000' ? 'border-slate-700' : 'border-transparent'}`}
-                                    style={{
-                                        backgroundColor: color,
-                                        boxShadow: cardData.themeColor === color ? `0 0 0 2px hsl(var(--background)), 0 0 0 4px ${color}` : ''
-                                    }}
-                                />
-                            ))}
-                            <button className="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center hover:bg-slate-700 transition-colors">
-                                <span className="material-symbols-outlined text-xs text-white">add</span>
-                            </button>
-                        </div>
+                        <p className="text-[11px] font-medium text-slate-400 ml-1">Paleta de Cores do Tema</p>
+                        <ColorPickerGrid 
+                            currentColor={cardData.themeColor} 
+                            onSelect={(color) => handleProfileChange('themeColor', color)} 
+                        />
                     </div>
                 </div>
             </div>
