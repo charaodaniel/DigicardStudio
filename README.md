@@ -35,11 +35,29 @@ O **DigiCard Studio** é uma plataforma SaaS moderna para criação de identidad
 - **Genkit 1.x**: Framework da Google para integração de fluxos de IA.
 - **Google Generative AI (Gemini)**: Modelo utilizado para sugestões de design.
 
-### Utilitários & Dados
-- **Zod**: Validação de esquemas e contratos de dados.
-- **React Hook Form**: Gestão eficiente de formulários no editor.
-- **Recharts**: Estrutura pronta para exibição de métricas e analytics.
-- **Firebase Client SDK**: Preparado para integração de autenticação e Firestore.
+---
+
+## 📐 Exportação & Manipulação de Arquivos
+
+Para garantir a maior qualidade possível (350 DPI) e compatibilidade industrial sem sobrecarregar o bundle da aplicação, utilizamos padrões nativos modernos:
+
+### 1. Manipulação de Vetores (SVG)
+- **Padrão**: XML/SVG 1.1 nativo.
+- **Processamento**: Geração dinâmica via Template Literals em TypeScript.
+- **Imagens**: Conversão de URLs remotas para **Base64 (Data URI)** em tempo de execução para garantir que o SVG seja auto-contido em softwares como Inkscape, Illustrator e softwares de Plotters (Cricut/Silhouette).
+
+### 2. Geração de PDF (A4 Técnico)
+- **Padrão**: CSS Paged Media (@media print).
+- **Processamento**: Motor de renderização nativo do navegador (`window.print()`).
+- **Layout**: CSS Grid especializado para alinhamento milimétrico em folhas A4, garantindo frentes e versos emparelhados (Layout "Aberto").
+
+### 3. Alta Resolução (PNG 350 DPI)
+- **Biblioteca**: HTML5 Canvas API.
+- **Processamento**: Renderização de planos vetoriais em buffer de memória com cálculo de densidade de pixels (DPI) para saída de alta fidelidade gráfica.
+
+### 4. Identidade Digital (VCard)
+- **Padrão**: vCard 3.0.
+- **Processamento**: Serialização de objetos de dados para arquivos `.vcf` via Blobs binários.
 
 ---
 
@@ -50,6 +68,7 @@ O **DigiCard Studio** é uma plataforma SaaS moderna para criação de identidad
 - `framer-motion`: Animações fluidas na interface.
 - `react-day-picker`: Seletores de data customizados.
 - `tailwind-merge`: Utilizado para composição dinâmica de classes CSS.
+- `recharts`: Estrutura pronta para exibição de métricas e analytics.
 
 ---
 
@@ -71,24 +90,6 @@ O **DigiCard Studio** é uma plataforma SaaS moderna para criação de identidad
    npm run dev
    ```
    Acesse o editor em `http://localhost:9002`.
-
----
-
-## 📐 Estrutura de Design
-
-O projeto segue princípios de **Design System** rigorosos:
-- **Cores Primárias**: Deep Blue (#4263EB) para confiança.
-- **Acento**: Teal (#2DD4CF) para interatividade.
-- **Tipografia**: 'Space Grotesk' para headings e 'Inter' para corpo de texto.
-- **Acessibilidade**: Foco em ARIA attributes e contraste de cores dinâmico nos gabaritos físicos.
-
----
-
-## 📈 Roadmap Front-end
-- [x] Rota dinâmica de visualização pública (`/c/[slug]`).
-- [x] Exportação de SVG Vetorial com Base64 embutido.
-- [x] Conversão de design para PNG 350 DPI.
-- [x] Lógica de "Print and Cut" para gráficas.
 
 ---
 *Desenvolvido com ❤️ no DigiCard Studio.*
