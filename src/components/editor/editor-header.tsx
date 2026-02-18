@@ -3,7 +3,11 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function EditorHeader() {
+type EditorHeaderProps = {
+  onPreviewClick: () => void;
+};
+
+export default function EditorHeader({ onPreviewClick }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
 
   return (
@@ -28,7 +32,10 @@ export default function EditorHeader() {
                     <span className="material-symbols-outlined text-xl">redo</span>
                 </button>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+            <button 
+                onClick={onPreviewClick}
+                className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
                 <span className="material-symbols-outlined text-lg">visibility</span>
                 Preview
             </button>
