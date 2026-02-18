@@ -34,13 +34,12 @@ export default function PropertiesSidebar({
         '#000000', '#475569', '#94a3b8', '#ffffff'
     ];
 
-    const icons = [
-        'chat', 'call', 'mail', 'alternate_email', 'send', 'forum', 'sms', 'contact_page',
-        'language', 'public', 'share', 'groups', 'hub', 'connect_without_contact', 'diversity_3',
-        'photo_camera', 'camera_alt', 'play_circle', 'subscriptions', 'video_library', 'music_note', 'headphones', 'mic',
-        'work', 'shopping_cart', 'shopping_bag', 'storefront', 'payments', 'wallet', 'card_membership', 'campaign',
-        'person', 'person_add', 'notifications', 'event', 'calendar_month', 'location_on', 'map', 'star', 'favorite', 'verified',
-        'code', 'terminal', 'article', 'description', 'attach_file', 'cloud_download', 'qr_code_2', 'auto_awesome'
+    const iconCategories = [
+        { label: 'Comunicação', icons: ['chat', 'call', 'mail', 'alternate_email', 'send', 'forum', 'sms', 'contact_page', 'whatsapp'] },
+        { label: 'Redes Sociais', icons: ['share', 'groups', 'hub', 'connect_without_contact', 'diversity_3', 'linkedin', 'facebook', 'instagram', 'tiktok', 'youtube', 'twitter', 'discord', 'spotify'] },
+        { label: 'Mídia & Tech', icons: ['photo_camera', 'camera_alt', 'play_circle', 'subscriptions', 'video_library', 'music_note', 'headphones', 'mic', 'code', 'terminal', 'qr_code_2'] },
+        { label: 'Negócios', icons: ['work', 'shopping_cart', 'shopping_bag', 'storefront', 'payments', 'wallet', 'card_membership', 'campaign', 'language', 'public'] },
+        { label: 'Utilidades', icons: ['person', 'person_add', 'notifications', 'event', 'calendar_month', 'location_on', 'map', 'star', 'favorite', 'verified', 'article', 'description', 'attach_file', 'cloud_download', 'auto_awesome'] }
     ];
 
     const handleProfileChange = (field: keyof CardData, value: any) => {
@@ -71,8 +70,8 @@ export default function PropertiesSidebar({
 
     const getToolLabel = () => {
         switch (activeTool) {
-            case 'conteudo': return 'Perfil & Links';
-            case 'social': return 'Redes Sociais';
+            case 'conteudo': return 'Perfil & Métricas';
+            case 'social': return 'Playlist de Links';
             case 'imagens': return 'Mídia & Capa';
             case 'qrcode': return 'QR Code';
             default: return 'Geral';
@@ -119,12 +118,18 @@ export default function PropertiesSidebar({
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Identidade Digital</label>
                             <div className="space-y-3">
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Nome Completo</p>
-                                    <Input className="text-sm" value={cardData.fullName} onChange={(e) => handleProfileChange('fullName', e.target.value)} />
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Nome (ou Link do Nome)</p>
+                                    <div className="flex gap-2">
+                                        <Input className="text-sm flex-1" value={cardData.fullName} onChange={(e) => handleProfileChange('fullName', e.target.value)} />
+                                        <Input className="text-sm w-24" placeholder="URL..." value={cardData.fullNameLink || ''} onChange={(e) => handleProfileChange('fullNameLink', e.target.value)} />
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Cargo / Profissão</p>
-                                    <Input className="text-sm" value={cardData.jobTitle} onChange={(e) => handleProfileChange('jobTitle', e.target.value)} />
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Cargo (ou Link do Cargo)</p>
+                                    <div className="flex gap-2">
+                                        <Input className="text-sm flex-1" value={cardData.jobTitle} onChange={(e) => handleProfileChange('jobTitle', e.target.value)} />
+                                        <Input className="text-sm w-24" placeholder="URL..." value={cardData.jobTitleLink || ''} onChange={(e) => handleProfileChange('jobTitleLink', e.target.value)} />
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-[11px] font-medium text-slate-400 ml-1">Bio</p>
@@ -135,39 +140,40 @@ export default function PropertiesSidebar({
 
                         <div className="space-y-4 pt-4 border-t">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas Autônomas</label>
+                            <p className="text-[10px] text-slate-400 -mt-2">Cada métrica pode ter sua própria URL de destino.</p>
                             {cardData.stats.map((stat, index) => (
-                                <div key={index} className="space-y-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                <div key={index} className="space-y-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
                                     <div className="grid grid-cols-2 gap-2">
                                         <Input className="h-8 text-xs" value={stat.label} onChange={(e) => handleStatChange(index, 'label', e.target.value)} />
-                                        <Input className="h-8 text-xs" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} />
+                                        <Input className="h-8 text-xs font-bold" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} />
                                     </div>
-                                    <Input className="h-7 text-[10px] bg-white" placeholder="Link da métrica..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
+                                    <Input className="h-7 text-[10px] bg-white dark:bg-slate-900" placeholder="Link da métrica (ex: portfólio, certificado)..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
                                 </div>
                             ))}
                         </div>
 
                         <div className="space-y-4 pt-4 border-t bg-primary/5 -mx-6 px-6 py-6">
                             <label className="text-xs font-bold text-primary uppercase tracking-widest">Ajustes de Impressão (Físico)</label>
-                            <p className="text-[10px] text-slate-500 mb-4">Escolha quais elementos devem aparecer no cartão físico.</p>
+                            <p className="text-[10px] text-slate-500 mb-4 leading-tight">Escolha quais elementos devem aparecer no cartão físico para manter a harmonia do template.</p>
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700">Exibir Foto de Perfil</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Foto/Capa</span>
                                     <Switch checked={cardData.physicalShowAvatar} onCheckedChange={(v) => handleProfileChange('physicalShowAvatar', v)} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700">Exibir Nome e Cargo</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Identidade</span>
                                     <Switch checked={cardData.physicalShowTitle} onCheckedChange={(v) => handleProfileChange('physicalShowTitle', v)} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700">Exibir Métricas</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Métricas</span>
                                     <Switch checked={cardData.physicalShowStats} onCheckedChange={(v) => handleProfileChange('physicalShowStats', v)} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700">Exibir Links Sociais</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Playlist de Links</span>
                                     <Switch checked={cardData.physicalShowLinks} onCheckedChange={(v) => handleProfileChange('physicalShowLinks', v)} />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs font-medium text-slate-700">Exibir Rodapé Técnico</span>
+                                    <span className="text-xs font-medium text-slate-700 dark:text-slate-200">Exibir Rodapé Técnico</span>
                                     <Switch checked={cardData.physicalShowFooter} onCheckedChange={(v) => handleProfileChange('physicalShowFooter', v)} />
                                 </div>
                             </div>
@@ -177,12 +183,12 @@ export default function PropertiesSidebar({
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Rodapé do Cartão Físico</label>
                             <div className="space-y-3">
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Website exibido (Rodapé)</p>
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Website exibido</p>
                                     <Input className="text-sm" placeholder="www.seusite.com" value={cardData.customWebsiteUrl || ''} onChange={(e) => handleProfileChange('customWebsiteUrl', e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Texto de Copyright / Info</p>
-                                    <Input className="text-sm" placeholder="DESIGNED BY..." value={cardData.footerText || ''} onChange={(e) => handleProfileChange('footerText', e.target.value)} />
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Copyright / Info</p>
+                                    <Input className="text-sm" placeholder="DIGICARD STUDIO © 2024" value={cardData.footerText || ''} onChange={(e) => handleProfileChange('footerText', e.target.value)} />
                                 </div>
                             </div>
                         </div>
@@ -193,28 +199,35 @@ export default function PropertiesSidebar({
                     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                         <div className="space-y-4">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Foto de Perfil</label>
-                            <div className="size-24 rounded-full border-2 border-primary/20 p-1 mx-auto">
+                            <div className="size-24 rounded-full border-2 border-primary/20 p-1 mx-auto relative group">
                                 <img src={cardData.avatarUrl} className="w-full h-full rounded-full object-cover" alt="Avatar" />
                             </div>
-                            <Input className="text-sm" placeholder="URL da Foto..." value={cardData.avatarUrl} onChange={(e) => handleProfileChange('avatarUrl', e.target.value)} />
+                            <div className="space-y-2">
+                                <Input className="text-sm" placeholder="URL da Foto..." value={cardData.avatarUrl} onChange={(e) => handleProfileChange('avatarUrl', e.target.value)} />
+                                <Input className="text-sm" placeholder="Link do Clique na Foto..." value={cardData.avatarLink || ''} onChange={(e) => handleProfileChange('avatarLink', e.target.value)} />
+                            </div>
                         </div>
 
                         <div className="space-y-4 pt-6 border-t">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Banner / Capa</label>
-                            <div className="aspect-video w-full rounded-lg bg-slate-100 overflow-hidden border">
+                            <div className="aspect-video w-full rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden border">
                                 {cardData.bannerUrl && <img src={cardData.bannerUrl} className="w-full h-full object-cover" alt="Banner" />}
                             </div>
-                            <Input className="text-sm" placeholder="URL do Banner..." value={cardData.bannerUrl || ''} onChange={(e) => handleProfileChange('bannerUrl', e.target.value)} />
+                            <div className="space-y-2">
+                                <Input className="text-sm" placeholder="URL do Banner..." value={cardData.bannerUrl || ''} onChange={(e) => handleProfileChange('bannerUrl', e.target.value)} />
+                                <Input className="text-sm" placeholder="Link do Clique no Banner..." value={cardData.bannerLink || ''} onChange={(e) => handleProfileChange('bannerLink', e.target.value)} />
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {activeTool === 'social' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gestão de Links</label>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Playlist de Conexões</label>
+                        <p className="text-[10px] text-slate-400 -mt-2">Gerencie seus links sociais como componentes autônomos.</p>
                         <Accordion type="single" collapsible className="w-full space-y-2" value={selectedLinkId || undefined} onValueChange={setSelectedLinkId}>
                             {cardData.links.map((link) => (
-                                <AccordionItem key={link.id} value={link.id} className="border rounded-xl px-4 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                                <AccordionItem key={link.id} value={link.id} className="border rounded-xl px-4 bg-white dark:bg-slate-900 shadow-sm overflow-hidden border-slate-100 dark:border-slate-800">
                                     <AccordionTrigger className="hover:no-underline py-4">
                                         <div className="flex items-center gap-3 text-left">
                                             <div className="size-8 rounded-lg flex items-center justify-center text-white shrink-0" style={{backgroundColor: link.color || cardData.themeColor}}>
@@ -225,30 +238,37 @@ export default function PropertiesSidebar({
                                     </AccordionTrigger>
                                     <AccordionContent className="pb-6 space-y-4 border-t pt-4">
                                         <div className="space-y-1.5">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Título</p>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Rótulo do Link</p>
                                             <Input className="h-9 text-sm" value={link.label} onChange={(e) => handleLinkChange(link.id, 'label', e.target.value)} />
                                         </div>
                                         <div className="space-y-1.5">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase">Destino (URL/Handle)</p>
                                             <Input className="h-9 text-sm" value={link.value} onChange={(e) => handleLinkChange(link.id, 'value', e.target.value)} />
                                         </div>
-                                        <div className="space-y-1.5">
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Ícone</p>
-                                            <div className="grid grid-cols-6 gap-1 max-h-32 overflow-y-auto p-1 border rounded-lg bg-slate-50">
-                                                {icons.map(icon => (
-                                                    <button key={icon} onClick={() => handleLinkChange(link.id, 'icon', icon)} className={cn("p-1.5 rounded transition-all", link.icon === icon ? "bg-primary text-white" : "text-slate-400 hover:bg-slate-200")}>
-                                                        <span className="material-symbols-outlined text-base">{icon}</span>
-                                                    </button>
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Ícone do Componente</p>
+                                            <div className="border rounded-lg bg-slate-50 dark:bg-slate-950 p-2 space-y-4 max-h-48 overflow-y-auto no-scrollbar">
+                                                {iconCategories.map(cat => (
+                                                    <div key={cat.label} className="space-y-2">
+                                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 px-1">{cat.label}</p>
+                                                        <div className="grid grid-cols-6 gap-1">
+                                                            {cat.icons.map(icon => (
+                                                                <button key={icon} onClick={() => handleLinkChange(link.id, 'icon', icon)} className={cn("p-1.5 rounded transition-all flex items-center justify-center", link.icon === icon ? "bg-primary text-white" : "text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800")}>
+                                                                    <span className="material-symbols-outlined text-base">{icon}</span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between pt-2">
-                                            <Button variant="ghost" className="text-red-500 text-xs h-8 px-2 hover:bg-red-50" onClick={() => deleteLink(link.id)}>
-                                                Remover Link
+                                            <Button variant="ghost" className="text-red-500 text-xs h-8 px-2 hover:bg-red-50 dark:hover:bg-red-950" onClick={() => deleteLink(link.id)}>
+                                                Remover Componente
                                             </Button>
                                             <div className="flex gap-1">
                                                 {colorPalette.slice(0, 5).map(c => (
-                                                    <button key={c} onClick={() => handleLinkChange(link.id, 'color', c)} className="size-5 rounded-full border" style={{backgroundColor: c}} />
+                                                    <button key={c} onClick={() => handleLinkChange(link.id, 'color', c)} className="size-5 rounded-full border border-white/20" style={{backgroundColor: c}} />
                                                 ))}
                                             </div>
                                         </div>
@@ -259,12 +279,12 @@ export default function PropertiesSidebar({
                         
                         <Button className="w-full h-12 rounded-xl gap-2 mt-4" variant="outline" onClick={() => {
                             const newId = `link-${Date.now()}`;
-                            const newLink: SocialLink = { id: newId, type: 'website', label: 'Novo Link', value: '', icon: 'link', color: cardData.themeColor };
+                            const newLink: SocialLink = { id: newId, type: 'website', label: 'Novo Componente', value: '', icon: 'link', color: cardData.themeColor };
                             setCardData(prev => ({ ...prev, links: [...prev.links, newLink] }));
                             setSelectedLinkId(newId);
                         }}>
                             <span className="material-symbols-outlined text-lg">add_circle</span>
-                            Adicionar Novo Link
+                            Adicionar Novo Link Autônomo
                         </Button>
                     </div>
                 )}
@@ -276,7 +296,7 @@ export default function PropertiesSidebar({
                             <div className="p-6 bg-white border rounded-2xl mx-auto inline-block shadow-sm">
                                 {cardData.qrCodeUrl ? <img src={cardData.qrCodeUrl} className="size-32" alt="QR" /> : <span className="material-symbols-outlined text-4xl opacity-20">qr_code_2</span>}
                             </div>
-                            <Input className="text-sm mt-4" placeholder="https://meu-link-global.com" value={cardData.qrCodeUrl || ''} onChange={(e) => handleProfileChange('qrCodeUrl', e.target.value)} />
+                            <Input className="text-sm mt-4" placeholder="Vincule ao seu Linktree ou perfil..." value={cardData.qrCodeUrl || ''} onChange={(e) => handleProfileChange('qrCodeUrl', e.target.value)} />
                         </div>
                     </div>
                 )}
