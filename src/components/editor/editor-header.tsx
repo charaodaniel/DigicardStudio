@@ -20,9 +20,22 @@ type EditorHeaderProps = {
   mode: 'digital' | 'physical';
   setMode: (mode: 'digital' | 'physical') => void;
   cardData: CardData;
+  undo?: () => void;
+  redo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 };
 
-export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }: EditorHeaderProps) {
+export default function EditorHeader({ 
+  onPreviewClick, 
+  mode, 
+  setMode, 
+  cardData,
+  undo,
+  redo,
+  canUndo = false,
+  canRedo = false
+}: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
@@ -113,10 +126,20 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
         </div>
         <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mr-2">
-                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
+                <button 
+                  onClick={undo}
+                  disabled={!canUndo}
+                  className={`p-1.5 rounded transition-colors ${canUndo ? 'hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' : 'text-slate-300 dark:text-slate-600 cursor-not-allowed'}`}
+                  title="Desfazer (Ctrl+Z)"
+                >
                     <span className="material-symbols-outlined text-xl">undo</span>
                 </button>
-                <button className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded transition-colors">
+                <button 
+                  onClick={redo}
+                  disabled={!canRedo}
+                  className={`p-1.5 rounded transition-colors ${canRedo ? 'hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' : 'text-slate-300 dark:text-slate-600 cursor-not-allowed'}`}
+                  title="Refazer (Ctrl+Y)"
+                >
                     <span className="material-symbols-outlined text-xl">redo</span>
                 </button>
             </div>
