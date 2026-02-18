@@ -34,4 +34,11 @@ export type CardData = {
   qrCodeUrl?: string;
   customWebsiteUrl?: string;
   footerText?: string;
+  // Physical Card Preferences
+  physicalShowAvatar?: boolean;
+  physicalShowTitle?: boolean;
+  physicalShowStats?: boolean;
+  physicalShowLinks?: boolean;
+  physicalShowQR?: boolean;
+  physicalShowFooter?: boolean;
 };

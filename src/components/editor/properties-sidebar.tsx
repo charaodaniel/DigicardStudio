@@ -4,6 +4,7 @@ import type { CardData, SocialLink, StatItem } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
@@ -34,17 +35,11 @@ export default function PropertiesSidebar({
     ];
 
     const icons = [
-        // Comunicação
         'chat', 'call', 'mail', 'alternate_email', 'send', 'forum', 'sms', 'contact_page',
-        // Redes Sociais & Web
         'language', 'public', 'share', 'groups', 'hub', 'connect_without_contact', 'diversity_3',
-        // Mídia & Entretenimento
         'photo_camera', 'camera_alt', 'play_circle', 'subscriptions', 'video_library', 'music_note', 'headphones', 'mic',
-        // Negócios & Utilidades
         'work', 'shopping_cart', 'shopping_bag', 'storefront', 'payments', 'wallet', 'card_membership', 'campaign',
-        // Identidade & Status
         'person', 'person_add', 'notifications', 'event', 'calendar_month', 'location_on', 'map', 'star', 'favorite', 'verified',
-        // Desenvolvimento & Documentos
         'code', 'terminal', 'article', 'description', 'attach_file', 'cloud_download', 'qr_code_2', 'auto_awesome'
     ];
 
@@ -124,14 +119,12 @@ export default function PropertiesSidebar({
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Identidade Digital</label>
                             <div className="space-y-3">
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Nome e Link do Nome</p>
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Nome Completo</p>
                                     <Input className="text-sm" value={cardData.fullName} onChange={(e) => handleProfileChange('fullName', e.target.value)} />
-                                    <Input className="text-xs bg-slate-50" placeholder="https://link-no-nome.com" value={cardData.fullNameLink || ''} onChange={(e) => handleProfileChange('fullNameLink', e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Cargo e Link do Cargo</p>
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Cargo / Profissão</p>
                                     <Input className="text-sm" value={cardData.jobTitle} onChange={(e) => handleProfileChange('jobTitle', e.target.value)} />
-                                    <Input className="text-xs bg-slate-50" placeholder="https://link-no-cargo.com" value={cardData.jobTitleLink || ''} onChange={(e) => handleProfileChange('jobTitleLink', e.target.value)} />
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-[11px] font-medium text-slate-400 ml-1">Bio</p>
@@ -151,6 +144,33 @@ export default function PropertiesSidebar({
                                     <Input className="h-7 text-[10px] bg-white" placeholder="Link da métrica..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
                                 </div>
                             ))}
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t bg-primary/5 -mx-6 px-6 py-6">
+                            <label className="text-xs font-bold text-primary uppercase tracking-widest">Ajustes de Impressão (Físico)</label>
+                            <p className="text-[10px] text-slate-500 mb-4">Escolha quais elementos devem aparecer no cartão físico.</p>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-slate-700">Exibir Foto de Perfil</span>
+                                    <Switch checked={cardData.physicalShowAvatar} onCheckedChange={(v) => handleProfileChange('physicalShowAvatar', v)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-slate-700">Exibir Nome e Cargo</span>
+                                    <Switch checked={cardData.physicalShowTitle} onCheckedChange={(v) => handleProfileChange('physicalShowTitle', v)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-slate-700">Exibir Métricas</span>
+                                    <Switch checked={cardData.physicalShowStats} onCheckedChange={(v) => handleProfileChange('physicalShowStats', v)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-slate-700">Exibir Links Sociais</span>
+                                    <Switch checked={cardData.physicalShowLinks} onCheckedChange={(v) => handleProfileChange('physicalShowLinks', v)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs font-medium text-slate-700">Exibir Rodapé Técnico</span>
+                                    <Switch checked={cardData.physicalShowFooter} onCheckedChange={(v) => handleProfileChange('physicalShowFooter', v)} />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="space-y-4 pt-4 border-t">
@@ -177,7 +197,6 @@ export default function PropertiesSidebar({
                                 <img src={cardData.avatarUrl} className="w-full h-full rounded-full object-cover" alt="Avatar" />
                             </div>
                             <Input className="text-sm" placeholder="URL da Foto..." value={cardData.avatarUrl} onChange={(e) => handleProfileChange('avatarUrl', e.target.value)} />
-                            <Input className="text-xs bg-slate-50" placeholder="https://link-ao-clicar-na-foto.com" value={cardData.avatarLink || ''} onChange={(e) => handleProfileChange('avatarLink', e.target.value)} />
                         </div>
 
                         <div className="space-y-4 pt-6 border-t">
@@ -186,7 +205,6 @@ export default function PropertiesSidebar({
                                 {cardData.bannerUrl && <img src={cardData.bannerUrl} className="w-full h-full object-cover" alt="Banner" />}
                             </div>
                             <Input className="text-sm" placeholder="URL do Banner..." value={cardData.bannerUrl || ''} onChange={(e) => handleProfileChange('bannerUrl', e.target.value)} />
-                            <Input className="text-xs bg-slate-50" placeholder="https://link-ao-clicar-no-banner.com" value={cardData.bannerLink || ''} onChange={(e) => handleProfileChange('bannerLink', e.target.value)} />
                         </div>
                     </div>
                 )}

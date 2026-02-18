@@ -33,5 +33,11 @@ export const initialCardData: CardData = {
   saveContactLabel: 'Salvar Contato',
   qrCodeUrl: qrImage?.imageUrl ?? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=example',
   customWebsiteUrl: 'www.digicard.studio/joaosilva',
-  footerText: 'DESIGNED WITH DIGICARD STUDIO © 2024'
+  footerText: 'DESIGNED WITH DIGICARD STUDIO © 2024',
+  physicalShowAvatar: true,
+  physicalShowTitle: true,
+  physicalShowStats: true,
+  physicalShowLinks: true,
+  physicalShowQR: true,
+  physicalShowFooter: true,
 };
