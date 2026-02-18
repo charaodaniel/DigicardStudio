@@ -31,7 +31,7 @@ export default function StandalonePreviewPage() {
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Fallback para quando o localStorage.setItem não dispara 'storage' na mesma janela (para navegadores específicos)
+    // Fallback para quando o localStorage.setItem não dispara 'storage' na mesma janela
     const interval = setInterval(loadData, 1000);
 
     return () => {
@@ -52,8 +52,12 @@ export default function StandalonePreviewPage() {
   }
 
   return (
-    <div className="h-screen w-screen bg-slate-100 dark:bg-slate-950 flex justify-center items-start sm:items-center overflow-hidden">
-      <div className="relative w-full max-w-[480px] h-full sm:h-[85vh] sm:max-h-[900px] shadow-2xl overflow-hidden sm:rounded-[2.5rem] bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-800">
+    <div className="min-h-screen w-full bg-white dark:bg-slate-950 flex justify-center">
+      {/* 
+        Ajustado para ocupar toda a largura em mobile e ter largura máxima em desktop (max-500px), 
+        removendo a moldura de smartphone para exibir o design completo (edge-to-edge).
+      */}
+      <div className="relative w-full max-w-[500px] h-screen bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
         <DigitalCardPreview cardData={cardData} />
       </div>
     </div>
