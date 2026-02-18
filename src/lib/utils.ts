@@ -77,11 +77,13 @@ export const downloadVCard = (cardData: CardData) => {
     `FN:${cardData.fullName}`,
     `ORG:${cardData.jobTitle}`,
     `TITLE:${cardData.jobTitle}`,
+    `PHOTO;VALUE=URI:${cardData.avatarUrl}`,
     `NOTE:${cardData.bio.replace(/\n/g, ' ')}`,
     ...cardData.links.map(l => {
+      const href = formatHref(l.type, l.value);
       if (l.type === 'phone' || l.type === 'whatsapp') return `TEL;TYPE=CELL:${l.value}`;
       if (l.type === 'email') return `EMAIL;TYPE=INTERNET:${l.value}`;
-      return `URL:${formatHref(l.type, l.value)}`;
+      return `URL;TYPE=${l.label.toUpperCase()}:${href}`;
     }),
     'END:VCARD'
   ].join('\n');

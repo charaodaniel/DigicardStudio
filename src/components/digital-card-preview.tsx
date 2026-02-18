@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
 import { downloadVCard } from '@/lib/utils';
+import { trackEvent } from '@/lib/analytics';
 import ShareModal from './share-modal';
 import DefaultPreview from './card-templates/DefaultPreview';
 import ProfessionalsPreview from './card-templates/ProfessionalsPreview';
@@ -31,8 +32,15 @@ export default function DigitalCardPreview({
     setCurrentUrl(window.location.href);
   }, []);
 
-  const handleShare = () => setIsShareModalOpen(true);
-  const handleSaveContact = () => downloadVCard(cardData);
+  const handleShare = () => {
+    setIsShareModalOpen(true);
+    trackEvent('share_card', { template: cardData.template });
+  };
+
+  const handleSaveContact = () => {
+    downloadVCard(cardData);
+    trackEvent('save_contact', { name: cardData.fullName });
+  };
 
   const PreviewComponent = () => {
     const baseTemplate = cardData.template.split('-')[0];
