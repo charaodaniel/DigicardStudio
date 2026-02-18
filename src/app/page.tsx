@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
@@ -12,6 +13,7 @@ import TemplateLibrary from '@/components/editor/template-library';
 export default function EditorPage() {
   const [cardData, setCardData] = useState<CardData>(initialCardData);
   const [activeTool, setActiveTool] = useState('conteudo');
+  const [mode, setMode] = useState<'digital' | 'physical'>('digital');
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(cardData.links[0]?.id || null);
 
   // Sincroniza os dados com o localStorage para que a janela de preview possa ler
@@ -29,7 +31,11 @@ export default function EditorPage() {
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
-      <EditorHeader onPreviewClick={handlePreviewClick} />
+      <EditorHeader 
+        onPreviewClick={handlePreviewClick} 
+        mode={mode}
+        setMode={setMode}
+      />
       
       <main className="flex-1 flex overflow-hidden">
         <ToolsSidebar
@@ -42,6 +48,7 @@ export default function EditorPage() {
           selectedLinkId={selectedLinkId} 
           setSelectedLinkId={setSelectedLinkId}
           setActiveTool={setActiveTool}
+          mode={mode}
         />
 
         <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden">

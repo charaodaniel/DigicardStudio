@@ -1,3 +1,4 @@
+
 'use client';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -5,9 +6,11 @@ import Link from 'next/link';
 
 type EditorHeaderProps = {
   onPreviewClick: () => void;
+  mode: 'digital' | 'physical';
+  setMode: (mode: 'digital' | 'physical') => void;
 };
 
-export default function EditorHeader({ onPreviewClick }: EditorHeaderProps) {
+export default function EditorHeader({ onPreviewClick, mode, setMode }: EditorHeaderProps) {
   const avatar = PlaceHolderImages.find(img => img.id === 'avatar-1');
 
   return (
@@ -19,8 +22,26 @@ export default function EditorHeader({ onPreviewClick }: EditorHeaderProps) {
             </Link>
             <div className="h-6 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
             <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                <button className="px-4 py-1.5 text-sm font-semibold rounded bg-white dark:bg-slate-700 shadow-sm text-primary">Digital</button>
-                <button className="px-4 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Físico</button>
+                <button 
+                  onClick={() => setMode('digital')}
+                  className={`px-4 py-1.5 text-sm font-semibold rounded transition-all ${
+                    mode === 'digital' 
+                    ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' 
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  Digital
+                </button>
+                <button 
+                  onClick={() => setMode('physical')}
+                  className={`px-4 py-1.5 text-sm font-semibold rounded transition-all ${
+                    mode === 'physical' 
+                    ? 'bg-white dark:bg-slate-700 shadow-sm text-primary' 
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  }`}
+                >
+                  Físico
+                </button>
             </div>
         </div>
         <div className="flex items-center gap-4">
