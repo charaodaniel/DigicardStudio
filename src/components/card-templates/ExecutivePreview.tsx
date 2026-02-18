@@ -1,24 +1,26 @@
 'use client';
 import type { CardData } from '@/lib/types';
+import { formatHref } from '@/lib/utils';
 
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor, links } = cardData;
     
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
-            {/* Top Nav - Usando Absolute para fixar dentro do frame do celular */}
-            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between bg-white/90 dark:bg-background-dark/90 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-                <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+            {/* Top Navigation */}
+            <header className="flex items-center justify-between bg-white/90 dark:bg-background-dark/90 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 z-20">
+                <button className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
                     <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
                     <span className="text-sm font-medium">Voltar</span>
-                </div>
+                </button>
                 <h1 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Perfil Verificado</h1>
                 <span className="material-symbols-outlined text-xl text-slate-400">share</span>
-            </div>
+            </header>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pt-16 pb-24 px-4 flex flex-col items-center">
-                <div className="w-full max-w-md overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl mt-4">
+            <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-6 pb-8">
+                {/* Main Executive Black Card */}
+                <div className="w-full max-w-md mx-auto overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl">
                     <div className="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     <div className="relative p-8 flex flex-col items-center">
                         <div className="relative mb-6">
@@ -26,13 +28,17 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                             <div className="relative h-32 w-32 rounded-full overflow-hidden border-2 border-[#0a0a0b]">
                                 <img alt={fullName} className="h-full w-full object-cover" src={avatarUrl} />
                             </div>
-                            {isVerified && <div className="absolute bottom-1 right-1 bg-white rounded-full p-0.5 shadow-lg flex items-center justify-center">
-                                <span className="material-symbols-outlined text-primary text-xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                            </div>}
+                            {isVerified && (
+                                <div className="absolute bottom-1 right-1 bg-white rounded-full p-0.5 shadow-lg flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-primary text-xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+                                </div>
+                            )}
                         </div>
                         <div className="text-center space-y-2">
                             <h2 className="text-2xl font-bold tracking-tight text-white">{fullName}</h2>
-                            <p className="text-sm font-medium uppercase tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#AA771C] bg-clip-text text-transparent">{jobTitle}</p>
+                            <p className="text-sm font-medium uppercase tracking-[0.2em] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#AA771C] bg-clip-text text-transparent">
+                                {jobTitle}
+                            </p>
                         </div>
                         <div className="my-8 flex w-full justify-between border-y border-white/10 py-4 px-2">
                             <div className="text-center">
@@ -65,10 +71,17 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </div>
 
-                {/* Additional Content - Links as Buttons */}
+                {/* Additional Links Section */}
                 <div className="w-full mt-8 space-y-3 pb-12">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center mb-4">Canais de Contato</h4>
                     {links.map(link => (
-                        <a key={link.id} href="#" className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:border-primary/50 transition-colors group">
+                        <a 
+                            key={link.id} 
+                            href={formatHref(link.type, link.value)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:border-primary/50 transition-colors group"
+                        >
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg" style={{ backgroundColor: `${link.color || themeColor}15` }}>
                                     <span className="material-symbols-outlined text-lg" style={{ color: link.color || themeColor }}>{link.icon}</span>
@@ -81,8 +94,8 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                 </div>
             </div>
             
-            {/* Fixed Bottom Navbar - Usando Absolute */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 pb-6 pt-3 flex justify-around items-center z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            {/* Fixed Bottom Navbar */}
+            <nav className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 pb-6 pt-3 flex justify-around items-center shrink-0 z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
                 <span className="material-symbols-outlined text-slate-400">group</span>
                 <div className="relative -top-10">
@@ -92,7 +105,7 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                 </div>
                 <span className="material-symbols-outlined text-slate-400">chat_bubble</span>
                 <span className="material-symbols-outlined text-slate-400">account_circle</span>
-            </div>
+            </nav>
         </div>
     );
 }
