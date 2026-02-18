@@ -2,6 +2,7 @@
 import type { CardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { templates } from './template-library';
+import React from 'react';
 
 type PhysicalCardPreviewProps = {
   cardData: CardData;
@@ -134,14 +135,14 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl max-w-[800px] text-center shadow-sm">
           <h4 className="text-base font-bold text-primary flex items-center justify-center gap-2 mb-2">
             <span className="material-symbols-outlined text-2xl">print</span>
-            Gabarito Técnico "Aberto" (Título de Eleitor)
+            Gabarito Técnico "Aberto" (A4)
           </h4>
           <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-            O PDF será gerado com os pares (Frente e Verso) lado a lado em uma folha A4, ideal para cartões dobráveis ou conferência de alinhamento.
+            O PDF será gerado com frentes e versos organizados com espaçamento (gap) para facilitar o corte.
           </p>
         </div>
 
-        <div className={cn("flex items-start justify-center gap-20", "flex-col")}>
+        <div className={cn("flex items-start justify-center gap-12", "flex-col")}>
           <div className="relative group/face">
             <div className={cn("relative bg-white shadow-2xl overflow-hidden rounded-sm", isVertical ? "w-[340px] h-[580px]" : "w-[580px] h-[340px]")}>
               <div className="absolute inset-0 flex overflow-hidden"><RenderFrontContent /></div>
@@ -158,7 +159,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         </div>
       </div>
 
-      {/* Print Layout (A4 Grid - 5 pares por página, Frente + Verso lado a lado) */}
+      {/* Print Layout (A4 Grid - 5 pares por página, Frente + Verso lado a lado com gap) */}
       <div className="hidden print:block">
         <div className="print-layout-a4">
           {[...Array(5)].map((_, i) => (
@@ -182,5 +183,3 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     </>
   );
 }
-
-import React from 'react';

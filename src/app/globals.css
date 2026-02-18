@@ -68,7 +68,7 @@ body {
 /* Configurações de Impressão Profissional (A4) */
 @media print {
   @page {
-    size: A4;
+    size: A4 portrait;
     margin: 0;
   }
   
@@ -89,18 +89,21 @@ body {
   nav,
   button,
   .fixed,
-  .absolute:not(.print-element) {
+  .absolute:not(.print-element),
+  .no-print {
     display: none !important;
   }
 
   /* Container da Grade A4 - Layout "Aberto" (Frente + Verso lado a lado) */
   .print-layout-a4 {
     display: grid !important;
-    /* Grid de pares: Frente (85mm) + Verso (85mm) = 170mm de largura total por par */
+    /* Grid de pares: Frente (85mm) + Verso (85mm) = 170mm */
     grid-template-columns: 85mm 85mm !important;
     grid-auto-rows: 55mm !important;
-    gap: 0 !important;
-    padding: 10mm 20mm !important; /* Margem para centralizar na largura (210mm - 170mm = 40mm / 2 = 20mm cada lado) */
+    /* Espaçamento técnico entre cartões */
+    column-gap: 5mm !important;
+    row-gap: 3mm !important;
+    padding: 10mm 15mm !important; /* Margem de segurança para centralizar */
     width: 210mm !important;
     height: 297mm !important;
     background: white !important;
@@ -113,7 +116,7 @@ body {
   .print-card-item {
     width: 85mm !important;
     height: 55mm !important;
-    border: 0.1mm solid #ddd !important; /* Marca de corte suave para guilhotina */
+    border: 0.05mm solid #eee !important; /* Marca de corte ultra suave */
     position: relative !important;
     overflow: hidden !important;
     background: white !important;
