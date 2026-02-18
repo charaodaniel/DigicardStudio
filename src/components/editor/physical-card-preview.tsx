@@ -123,10 +123,9 @@ export default function PhysicalCardPreview({ cardData }: PhysicalCardPreviewPro
         </p>
       </div>
 
-      {/* Grid de Visualização das Duas Faces */}
-      <div className="flex flex-col xl:flex-row gap-20 items-center justify-center">
+      {/* Grid de Visualização das Duas Faces - Empilhadas Verticalmente */}
+      <div className="flex flex-col gap-24 items-center justify-center">
         <CardFace side="front" />
-        <div className="hidden xl:block h-64 w-[1px] bg-slate-200 dark:bg-slate-800 self-center"></div>
         <CardFace side="back" />
       </div>
     </div>
