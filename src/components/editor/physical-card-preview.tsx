@@ -24,7 +24,9 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, #D4AF37 0%, transparent 40%)' }}></div>
             <div className="flex justify-between items-start z-10">
               <div onClick={() => setActiveTool('conteudo')} className="h-12 w-12 border-2 border-[#D4AF37] rounded-full flex items-center justify-center cursor-pointer">
-                <span className="font-serif text-2xl" style={{background: 'linear-gradient(135deg, #D4AF37 0%, #F5E0A3 50%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>RA</span>
+                <span className="font-serif text-2xl" style={{background: 'linear-gradient(135deg, #D4AF37 0%, #F5E0A3 50%, #D4AF37 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>
+                  {fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
               </div>
               <div className="text-right">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-[#D4AF37]/60 font-bold">Executive Elite</p>
@@ -49,154 +51,135 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             </div>
           </div>
         );
-      case 'linkedin':
+
+      case 'spotify':
+      case 'spotify-v':
         return (
-          <div className="flex-1 bg-white flex flex-col p-0 text-slate-900 relative overflow-hidden">
-            <div className="h-1/5 w-full bg-linkedin-blue bg-cover bg-center" style={{ backgroundImage: `url('${bannerUrl || 'https://images.unsplash.com/photo-1497215842964-222b430dc094?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb3Jwb3JhdGUlMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3MTM1Mjg1N3ww&ixlib=rb-4.1.0&q=80&w=1080'}')` }}></div>
-            <div className="px-10 flex-1 flex flex-col items-center -mt-12 z-10">
-                <div onClick={() => setActiveTool('imagens')} className="relative cursor-pointer">
-                    <div className="size-32 rounded-full border-4 border-white bg-white shadow-sm overflow-hidden">
-                        <img src={avatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                    </div>
-                    {cardData.isVerified && (
-                        <div className="absolute bottom-2 right-2 bg-[#0a66c2] text-white rounded-full p-1 border-2 border-white flex items-center justify-center">
-                            <span className="material-symbols-outlined text-xs font-bold">verified</span>
-                        </div>
-                    )}
-                </div>
-                <div className="mt-6 text-center" onClick={() => setActiveTool('conteudo')}>
-                    <h1 className="text-3xl font-bold leading-tight text-slate-900">{fullName}</h1>
-                    <p className="text-lg text-slate-600 font-medium mt-1">{jobTitle}</p>
-                    <p className="text-sm text-slate-400 mt-1">{footerText || 'TechNova Solutions'}</p>
-                </div>
-                <div className="mt-8 flex flex-col items-center w-full gap-4" onClick={() => setActiveTool('social')}>
-                    <div className="w-full h-px bg-slate-100"></div>
-                    <div className="flex items-center gap-2 text-slate-500">
-                        <span className="material-symbols-outlined text-xl">groups</span>
-                        <span className="text-xs font-bold uppercase tracking-widest">500+ conexões profissionais</span>
-                    </div>
-                    <div className="w-full h-px bg-slate-100"></div>
-                </div>
-            </div>
-            <div className="h-3 bg-[#0a66c2] w-full"></div>
-          </div>
-        );
-      case 'instagram':
-        return (
-          <div className="flex-1 bg-white flex flex-col p-0 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] opacity-10 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-            <div className="relative h-full flex flex-col p-12">
-                <div className="flex justify-between items-start mb-10">
-                    <div onClick={() => setActiveTool('imagens')} className="p-[4px] rounded-full bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] cursor-pointer">
-                        <div className="bg-white p-1 rounded-full">
-                            <div className="size-28 rounded-full overflow-hidden shadow-lg">
-                                <img src={avatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <span className="material-symbols-outlined text-slate-200 text-5xl">more_horiz</span>
-                    </div>
-                </div>
-                <div className="space-y-2 mb-8" onClick={() => setActiveTool('conteudo')}>
-                    <h4 className="text-3xl font-bold text-slate-900 leading-tight tracking-tight">@{fullName.toLowerCase().replace(/\s/g, '_')}</h4>
-                    <p className="text-[#bc1888] font-bold text-lg uppercase tracking-widest">{jobTitle}</p>
-                </div>
-                <p className="text-slate-600 text-base max-w-[350px] leading-relaxed mb-auto" onClick={() => setActiveTool('conteudo')}>
-                    {cardData.bio}
-                </p>
-                <div className="flex gap-3 mt-8" onClick={() => setActiveTool('social')}>
-                    <div className="flex-1 bg-slate-100 rounded-xl h-14 flex items-center justify-center text-sm font-black uppercase text-slate-800 tracking-widest">Seguir</div>
-                    <div className="flex-1 bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] text-white rounded-xl h-14 flex items-center justify-center text-sm font-black uppercase tracking-widest shadow-lg">Mensagem</div>
-                    <div className="w-16 bg-slate-100 rounded-xl h-14 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-slate-700 text-2xl">person_add</span>
-                    </div>
-                </div>
-            </div>
-          </div>
-        );
-      case 'youtube':
-        return (
-          <div className="flex-1 bg-[#FF0000] flex flex-col justify-center items-center p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-4 border border-dashed border-white/30 pointer-events-none rounded"></div>
-            <div className="flex flex-col items-center text-center z-10">
-                <div onClick={() => setActiveTool('imagens')} className="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-2xl bg-white mb-8 cursor-pointer hover:scale-105 transition-transform">
-                    <img src={avatarUrl} className="w-full h-full object-cover" alt="Profile" />
-                </div>
-                <div className="flex items-center gap-3 mb-4" onClick={() => setActiveTool('conteudo')}>
-                    <h4 className="text-4xl font-black uppercase tracking-tighter leading-none">{fullName}</h4>
-                    <span className="material-symbols-outlined !text-3xl fill-1">verified</span>
-                </div>
-                <div className="bg-black/20 backdrop-blur-md px-6 py-2 rounded-full border border-white/10" onClick={() => setActiveTool('conteudo')}>
-                    <p className="text-lg font-bold tracking-wide">{stats[0]?.value || '1.2M'} INSCRITOS</p>
-                </div>
-            </div>
-            <div className="absolute bottom-8 right-10 flex items-center gap-2 opacity-30">
-                <span className="material-symbols-outlined !text-3xl">play_circle</span>
-                <span className="text-[10px] font-bold tracking-[0.4em] uppercase">YouTube Channel</span>
-            </div>
-          </div>
-        );
-      case 'whatsapp':
-        return (
-          <div className="flex-1 bg-white flex relative overflow-hidden">
-            <div className="w-8 h-full bg-[#25D366]"></div>
-            <div className="flex-1 p-16 flex flex-col justify-between">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-4 text-[#25D366]">
-                  <span className="material-symbols-outlined text-6xl">chat</span>
-                  <span className="text-3xl font-black tracking-tight text-slate-800">DigiCard <span className="text-[#075E54]">Web</span></span>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">Comunicação Instantânea</p>
+          <div className={cn(
+            "flex-1 bg-[#121212] flex p-8 text-white relative overflow-hidden",
+            isVertical ? "flex-col items-center justify-between" : "flex-row items-center gap-8"
+          )}>
+            <div className="absolute top-6 right-8 text-[8px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Web</div>
+            <div onClick={() => setActiveTool('imagens')} className={cn(
+              "relative group cursor-pointer shrink-0",
+              isVertical ? "w-48 h-48 mb-6" : "w-40 h-40"
+            )}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 rounded-lg"></div>
+              <img src={avatarUrl} className="w-full h-full object-cover rounded-lg border border-white/10" alt="Spotify Profile" />
+              <div className="absolute bottom-3 left-3 z-20">
+                <div className="size-8 bg-[#1DB954] rounded-full flex items-center justify-center shadow-lg">
+                  <span className="material-symbols-outlined text-white text-lg fill-1" style={{fontVariationSettings: "'FILL' 1"}}>play_arrow</span>
                 </div>
               </div>
-              <div onClick={() => setActiveTool('conteudo')} className="cursor-pointer">
-                <h1 className="text-6xl font-black text-slate-900 leading-tight">{fullName}</h1>
-                <p className="text-3xl text-slate-500 font-medium mt-2">{jobTitle}</p>
+            </div>
+            <div className={cn("flex-1", isVertical ? "text-center w-full" : "text-left")}>
+              <h2 className="text-3xl font-black uppercase tracking-tight mb-1">{fullName}</h2>
+              <p className="text-[#1DB954] text-xs font-bold tracking-widest uppercase mb-6">Verified Artist</p>
+              
+              <div className="w-full h-1 bg-white/10 rounded-full mb-4 relative overflow-hidden">
+                <div className="absolute top-0 left-0 h-full bg-[#1DB954] w-[45%]"></div>
               </div>
-              <div className="space-y-6" onClick={() => setActiveTool('social')}>
-                {links.slice(0, 2).map(l => (
-                  <div key={l.id} className="flex items-center gap-6">
-                    <div className="p-3 rounded-full bg-green-50 text-[#25D366]">
-                      <span className="material-symbols-outlined text-3xl">{l.icon}</span>
-                    </div>
-                    <span className="text-3xl font-bold text-slate-700">{l.value}</span>
+              
+              <div className="flex items-center justify-center gap-6 opacity-60">
+                <span className="material-symbols-outlined text-sm">shuffle</span>
+                <span className="material-symbols-outlined text-2xl">skip_previous</span>
+                <span className="material-symbols-outlined text-3xl">play_circle</span>
+                <span className="material-symbols-outlined text-2xl">skip_next</span>
+                <span className="material-symbols-outlined text-sm">repeat</span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'facebook':
+      case 'facebook-v':
+        return (
+          <div className="flex-1 bg-white flex flex-col relative overflow-hidden">
+            <div className="h-1/3 w-full bg-[#1877F2] relative">
+              <div className="absolute top-4 left-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+                </svg>
+                <div className="h-4 w-32 bg-white/20 rounded-full"></div>
+              </div>
+            </div>
+            <div className={cn(
+              "px-10 flex-1 flex relative z-10",
+              isVertical ? "flex-col items-center -mt-12" : "flex-row items-end gap-6 -mt-12 pb-10"
+            )}>
+              <div onClick={() => setActiveTool('imagens')} className="size-28 rounded-full border-4 border-white bg-slate-200 overflow-hidden shadow-sm shrink-0">
+                <img src={avatarUrl} className="w-full h-full object-cover" alt="FB" />
+              </div>
+              <div className={cn("flex-1", isVertical ? "text-center mt-4" : "text-left mb-2")}>
+                <h2 className="text-2xl font-bold text-slate-900 leading-tight">{fullName}</h2>
+                <p className="text-[#1877F2] font-semibold text-sm">{jobTitle}</p>
+                {!isVertical && (
+                  <div className="flex gap-2 mt-4">
+                    <div className="bg-[#1877F2] text-white px-4 py-1.5 rounded-lg text-[10px] font-bold">Seguir</div>
+                    <div className="bg-slate-100 text-slate-900 px-4 py-1.5 rounded-lg text-[10px] font-bold">Mensagem</div>
                   </div>
-                ))}
-              </div>
-              <div className="flex justify-between items-end border-t border-slate-100 pt-8 text-slate-400">
-                <p className="text-xl">Fale conosco agora pelo WhatsApp</p>
-                <div className="flex gap-3">
-                    <div className="w-3 h-3 rounded-full bg-[#25D366]"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#25D366] opacity-50"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#25D366] opacity-25"></div>
-                </div>
+                )}
               </div>
             </div>
+            <div className="h-1.5 bg-[#1877F2] w-full mt-auto"></div>
           </div>
         );
-      case 'twitch-h':
+
+      case 'youtube':
+      case 'youtube-v':
         return (
-          <div className="flex-1 bg-[#0d0d17] flex flex-col justify-center px-16 relative overflow-hidden text-white">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#9146FF]/20 blur-[80px] rounded-full"></div>
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#9146FF] via-[#bf94ff] to-[#9146FF]"></div>
-            <div className="z-10" onClick={() => setActiveTool('imagens')}>
-                <div className="size-24 bg-[#9146FF]/10 rounded-2xl border-2 border-[#9146FF]/50 flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(145,70,255,0.4)] overflow-hidden">
-                    <img src={avatarUrl} className="w-full h-full object-cover" alt="Twitch Avatar" />
+          <div className={cn(
+            "flex-1 bg-[#FF0000] flex flex-col p-12 text-white relative overflow-hidden",
+            isVertical ? "items-center text-center justify-center" : "justify-between"
+          )}>
+            <div className="absolute inset-4 border border-dashed border-white/20 pointer-events-none rounded"></div>
+            <div className={cn("flex items-center gap-6 z-10", isVertical ? "flex-col" : "flex-row")}>
+              <div onClick={() => setActiveTool('imagens')} className="w-28 h-28 rounded-full border-4 border-white overflow-hidden shadow-2xl bg-white shrink-0 cursor-pointer">
+                <img src={avatarUrl} className="w-full h-full object-cover" alt="YT" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h2 className="text-3xl font-black uppercase tracking-tighter leading-none">{fullName}</h2>
+                  <span className="material-symbols-outlined !text-xl fill-1" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>
                 </div>
+                <div className="bg-black/20 backdrop-blur-md px-4 py-1 rounded-full inline-block">
+                  <p className="text-xs font-bold tracking-wide uppercase">{stats[0]?.value || '1.2M'} INSCRITOS</p>
+                </div>
+              </div>
             </div>
-            <div className="z-10" onClick={() => setActiveTool('conteudo')}>
-                <h2 className="text-5xl font-black italic tracking-tighter" style={{textShadow: '0 0 10px rgba(145,70,255,0.8)'}}>{fullName.toUpperCase()}</h2>
-                <div className="h-1.5 w-16 bg-[#9146FF] mt-3 mb-4"></div>
-                <p className="text-[#9146FF] font-bold uppercase tracking-[0.3em] text-lg">{jobTitle}</p>
-            </div>
-            <div className="absolute bottom-8 right-12 flex items-center gap-3 bg-black/40 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
-                <div className="size-3 bg-[#9146FF] rounded-full animate-pulse"></div>
-                <span className="text-xs text-slate-400 font-black uppercase tracking-widest">Twitch Partner</span>
+            <div className={cn(
+              "z-10 flex items-center gap-2 opacity-40 uppercase tracking-[0.4em] text-[8px] font-black",
+              isVertical ? "mt-12" : "absolute bottom-10 right-12"
+            )}>
+              <span className="material-symbols-outlined !text-2xl">play_circle</span>
+              YouTube CHANNEL
             </div>
           </div>
         );
+
+      case 'professionals':
+        return (
+          <div className={cn(
+            "flex-1 bg-white flex p-12 relative overflow-hidden",
+            isVertical ? "flex-col items-center text-center justify-center" : "flex-col justify-center"
+          )}>
+            <div className={cn("mb-12", isVertical ? "mx-auto" : "")}>
+              <div className="w-12 h-12 border-t-2 border-l-2 border-slate-900 relative">
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-slate-300"></div>
+              </div>
+            </div>
+            <div onClick={() => setActiveTool('conteudo')}>
+              <h2 className="font-serif text-5xl tracking-tight text-slate-900 leading-none mb-4">{fullName}</h2>
+              <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-light">{jobTitle}</p>
+            </div>
+            <div className="mt-12 flex items-center gap-4">
+              <div className="h-[1px] w-12 bg-slate-200"></div>
+              <span className="text-[9px] text-slate-300 tracking-[0.3em] uppercase">CAU/CREA CERTIFIED</span>
+              <div className="h-[1px] w-12 bg-slate-200"></div>
+            </div>
+          </div>
+        );
+
       default:
         // Layout Padrão Genérico (Fallback)
         return (
@@ -246,8 +229,8 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
   const RenderBack = () => {
     // Estilos comuns para o verso
-    const isDark = ['executive', 'instagram', 'youtube', 'twitch-h', 'twitch-v', 'spotify-v'].includes(template);
-    const bgColor = isDark ? (template === 'executive' ? '#0a0a0b' : (template.includes('twitch') ? '#0d0d17' : themeColor)) : '#ffffff';
+    const isDark = ['executive', 'instagram', 'instagram-v', 'youtube', 'youtube-v', 'twitch-h', 'twitch-v', 'spotify', 'spotify-v'].includes(template);
+    const bgColor = isDark ? (template === 'executive' ? '#0a0a0b' : (template.includes('twitch') ? '#0d0d17' : (template.includes('spotify') ? '#191414' : (template.includes('youtube') ? '#1a1a1a' : themeColor)))) : '#ffffff';
     const textColor = isDark ? '#ffffff' : '#1e293b';
 
     return (
