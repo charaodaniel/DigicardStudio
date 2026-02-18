@@ -34,12 +34,6 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
   };
 
   const textColor = getContrastColor(physicalBackgroundColor);
-  const isDarkBg = textColor === '#ffffff';
-
-  const globalStyle = {
-    fontFamily: `'${fontFamily}', sans-serif`,
-    fontSize: `${baseFontSize}px`
-  };
 
   const RenderFrontContent = () => {
     const baseTemplate = template.split('-')[0];
@@ -48,7 +42,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     if (baseTemplate === 'spotify') {
       return (
         <div className={cn(
-          "flex-1 flex p-6 relative overflow-hidden",
+          "flex-1 flex p-6 relative overflow-hidden h-full",
           isVertical ? "flex-col items-center" : "flex-row items-start gap-4"
         )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
           <div className="absolute top-4 right-4 text-[6px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
@@ -65,7 +59,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             {physicalShowLinks && (
               <div className="space-y-1">
                 {links.slice(0, 3).map((l, i) => (
-                  <div key={l.id} className="flex items-center gap-2 text-[8px] border-b border-white/5 py-0.5">
+                  <div key={l.id} className="flex items-center gap-2 text-[8px] border-b border-black/5 dark:border-white/5 py-0.5">
                     <span className="opacity-30">0{i+1}</span>
                     <span className="font-bold truncate">{l.value}</span>
                   </div>
@@ -80,7 +74,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     // Default Layout
     return (
       <div className={cn(
-        "flex-1 flex p-8 relative overflow-hidden",
+        "flex-1 flex p-8 relative overflow-hidden h-full",
         isVertical ? "flex-col items-center text-center" : "flex-row items-center justify-between gap-6"
       )} style={{ backgroundColor: physicalBackgroundColor, color: textColor }}>
         <div className="flex flex-col flex-1">
@@ -117,7 +111,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
   };
 
   const RenderBackContent = () => (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 relative" style={{ backgroundColor: physicalBackgroundColor }}>
+    <div className="flex-1 flex flex-col items-center justify-center p-8 relative h-full" style={{ backgroundColor: physicalBackgroundColor }}>
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${textColor} 1px, transparent 1px)`, backgroundSize: '24px 24px' }}></div>
       {physicalShowQR && (
         <div className="flex flex-col items-center gap-4">
@@ -140,10 +134,10 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         <div className="bg-primary/5 border border-primary/20 p-6 rounded-2xl max-w-[800px] text-center shadow-sm">
           <h4 className="text-base font-bold text-primary flex items-center justify-center gap-2 mb-2">
             <span className="material-symbols-outlined text-2xl">print</span>
-            Gabarito Técnico de Produção
+            Gabarito Técnico "Aberto" (Título de Eleitor)
           </h4>
           <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-            Ao exportar para PDF, os cartões serão automaticamente organizados em uma folha A4 no tamanho real (85x55mm) para impressão.
+            O PDF será gerado com os pares (Frente e Verso) lado a lado em uma folha A4, ideal para cartões dobráveis ou conferência de alinhamento.
           </p>
         </div>
 
@@ -164,29 +158,29 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         </div>
       </div>
 
-      {/* Print Layout (A4 Grid - Visible Only on Export) */}
+      {/* Print Layout (A4 Grid - 5 pares por página, Frente + Verso lado a lado) */}
       <div className="hidden print:block">
-        {/* Page 1: 10 Fronts */}
         <div className="print-layout-a4">
-          {[...Array(10)].map((_, i) => (
-            <div key={`front-${i}`} className="print-card-item">
-              <div className="w-full h-full flex transform origin-top-left" style={{ width: '85mm', height: '55mm' }}>
-                <RenderFrontContent />
+          {[...Array(5)].map((_, i) => (
+            <React.Fragment key={`pair-${i}`}>
+              {/* Frente */}
+              <div className="print-card-item">
+                <div className="w-full h-full flex" style={{ width: '85mm', height: '55mm' }}>
+                  <RenderFrontContent />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {/* Page 2: 10 Backs (Aligned to match fronts) */}
-        <div className="print-layout-a4">
-          {[...Array(10)].map((_, i) => (
-            <div key={`back-${i}`} className="print-card-item">
-              <div className="w-full h-full flex transform origin-top-left" style={{ width: '85mm', height: '55mm' }}>
-                <RenderBackContent />
+              {/* Verso */}
+              <div className="print-card-item">
+                <div className="w-full h-full flex" style={{ width: '85mm', height: '55mm' }}>
+                  <RenderBackContent />
+                </div>
               </div>
-            </div>
+            </React.Fragment>
           ))}
         </div>
       </div>
     </>
   );
 }
+
+import React from 'react';
