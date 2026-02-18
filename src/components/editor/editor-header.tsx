@@ -138,7 +138,7 @@ export default function EditorHeader({ onPreviewClick, mode, setMode, cardData }
                     >
                       <span className="material-symbols-outlined text-primary">vector_library</span>
                       <div className="flex flex-col">
-                        <span className="font-bold text-sm">Vetor (SVG)</span>
+                        <span className="font-bold text-sm">Salvar SVG</span>
                         <span className="text-[10px] text-slate-400">Para plotters e recorte</span>
                       </div>
                     </DropdownMenuItem>
