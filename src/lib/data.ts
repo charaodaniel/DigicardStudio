@@ -21,7 +21,7 @@ export const initialCardData: CardData = {
   fontFamily: 'Inter',
   baseFontSize: 16,
   links: [
-    { id: '1', type: 'whatsapp', label: 'WhatsApp', value: '5511999999999', icon: 'chat', color: '#25D366' },
+    { id: '1', type: 'whatsapp', label: 'WhatsApp', value: '5511999999999', icon: 'forum', color: '#25D366' },
     { id: '2', type: 'instagram', label: 'Instagram', value: 'joao.silva', icon: 'photo_camera', color: '#E1306C' },
     { id: '3', type: 'linkedin', label: 'LinkedIn', value: 'joao-silva', icon: 'work', color: '#0077b5' },
     { id: '4', type: 'website', label: 'Portfólio', value: 'https://joaosilva.design', icon: 'language', color: '#5048e5' },

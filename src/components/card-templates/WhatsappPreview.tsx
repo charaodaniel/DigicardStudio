@@ -46,7 +46,7 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
                         className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl h-14 text-white shadow-lg transition-all active:scale-95" 
                         style={{backgroundColor: themeColor}}
                     >
-                        <span className="material-symbols-outlined">chat</span>
+                        <span className="material-symbols-outlined">forum</span>
                         <span className="text-base font-bold tracking-wide">Conversar no WhatsApp</span>
                     </a>
                 </div>
