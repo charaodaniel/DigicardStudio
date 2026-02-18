@@ -1,8 +1,13 @@
 'use client';
 import type { CardData } from '@/lib/types';
+import { formatHref } from '@/lib/utils';
 
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
+    
+    const spotifyLink = links.find(l => l.type === 'spotify' || l.type === 'website');
+    const actionHref = spotifyLink ? formatHref(spotifyLink.type, spotifyLink.value) : '#';
+
     return (
         <div className="bg-[#121121] text-white h-full flex flex-col relative overflow-hidden font-display">
             <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
@@ -45,7 +50,13 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                     <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4 px-1">Links &amp; Lançamentos</h3>
                     <div className="space-y-3">
                         {links.map((link, i) => (
-                            <a key={link.id} className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all group" href="#">
+                            <a 
+                                key={link.id} 
+                                href={formatHref(link.type, link.value)} 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all group"
+                            >
                                 <div className="flex items-center gap-4">
                                     <div className="text-gray-500 font-mono text-sm">0{i+1}</div>
                                     <div>
@@ -60,14 +71,20 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                 </main>
             </div>
 
-            <nav className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] z-30">
-                <div className="bg-black/80 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-2xl flex items-center justify-between">
-                    <div className="flex items-center gap-1 pl-2">
-                        <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
-                        <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
-                    </div>
-                    <button className="bg-[#1DB954] text-black font-black px-8 py-3 rounded-full text-sm uppercase tracking-wider active:scale-95 transition-transform" style={{backgroundColor: themeColor}}>Seguir</button>
+            <nav className="bg-black/80 backdrop-blur-xl border-t border-white/10 p-4 flex items-center justify-between z-30 shrink-0">
+                <div className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">home</span>
+                    <span className="material-symbols-outlined text-gray-400 size-10 flex items-center justify-center">share</span>
                 </div>
+                <a 
+                    href={actionHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#1DB954] text-black font-black px-8 py-3 rounded-full text-sm uppercase tracking-wider active:scale-95 transition-transform text-center" 
+                    style={{backgroundColor: themeColor}}
+                >
+                    Seguir
+                </a>
             </nav>
         </div>
     )

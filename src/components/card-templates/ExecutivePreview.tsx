@@ -5,6 +5,9 @@ import { formatHref } from '@/lib/utils';
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor, links, stats } = cardData;
     
+    const linkedinLink = links.find(l => l.type === 'linkedin' || l.type === 'website');
+    const actionHref = linkedinLink ? formatHref(linkedinLink.type, linkedinLink.value) : '#';
+
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
             {/* Top Navigation */}
@@ -55,9 +58,14 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                             </p>
                         </div>
                         <div className="w-full space-y-3">
-                            <button className="w-full py-3.5 rounded-lg bg-white text-black font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95 transition-transform">
+                            <a 
+                                href={actionHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-3.5 rounded-lg bg-white text-black font-bold text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95 transition-transform flex items-center justify-center text-center"
+                            >
                                 Conectar Agora
-                            </button>
+                            </a>
                             <button className="w-full py-3.5 rounded-lg border border-white/20 text-white font-medium text-xs uppercase tracking-widest active:scale-95 transition-transform">
                                 Salvar VCF
                             </button>

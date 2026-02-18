@@ -37,6 +37,12 @@ export function formatHref(type: string, value: string) {
     case 'spotify':
       if (cleanValue.includes('spotify.com')) return `https://${cleanValue.replace(/^https?:\/\//, '')}`;
       return `https://open.spotify.com/artist/${cleanValue}`;
+    case 'facebook':
+      if (cleanValue.includes('facebook.com')) return `https://${cleanValue.replace(/^https?:\/\//, '')}`;
+      return `https://facebook.com/${cleanValue}`;
+    case 'discord':
+      if (cleanValue.startsWith('https://discord')) return cleanValue;
+      return `https://discord.com/users/${cleanValue}`;
     default: 
       return cleanValue.includes('.') ? `https://${cleanValue}` : '#';
   }

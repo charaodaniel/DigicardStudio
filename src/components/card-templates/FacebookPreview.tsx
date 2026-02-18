@@ -4,17 +4,21 @@ import { formatHref } from '@/lib/utils';
 
 export default function FacebookPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    
+    const fbLink = links.find(l => l.type === 'facebook' || l.type === 'website');
+    const actionHref = fbLink ? formatHref(fbLink.type, fbLink.value) : '#';
+
     return (
         <div className="bg-white dark:bg-[#1c1b2b] h-full flex flex-col overflow-hidden relative">
             {/* Header / Navigation - LOCKED TOP */}
-            <div className="absolute top-0 left-0 right-0 flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
+            <div className="flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
                 <span className="material-symbols-outlined">arrow_back</span>
                 <h2 className="text-lg font-bold flex-1 ml-4">Perfil</h2>
                 <span className="material-symbols-outlined">more_horiz</span>
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col pt-16 pb-20">
+            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col pb-20">
                 {/* Cover Photo */}
                 <div className="relative shrink-0">
                     <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 bg-center bg-cover" style={{ backgroundImage: "url('https://picsum.photos/seed/fb-cover/400/150')" }}>
@@ -38,10 +42,16 @@ export default function FacebookPreview({ cardData }: { cardData: CardData }) {
                     </div>
                     {/* Action Buttons */}
                     <div className="flex flex-col gap-3 w-full">
-                        <button className="w-full text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2" style={{backgroundColor: themeColor}}>
+                        <a 
+                            href={actionHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 text-center" 
+                            style={{backgroundColor: themeColor}}
+                        >
                             <span className="material-symbols-outlined text-xl" style={{fontVariationSettings: "'FILL' 1"}}>social_leaderboard</span>
                             Ver Perfil no Facebook
-                        </button>
+                        </a>
                         <button className="w-full bg-gray-100 dark:bg-gray-800 text-[#121117] dark:text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2">
                             <span className="material-symbols-outlined text-xl">chat_bubble</span>
                             Enviar Mensagem
@@ -79,7 +89,7 @@ export default function FacebookPreview({ cardData }: { cardData: CardData }) {
             </div>
             
             {/* Bottom Nav - LOCKED FOOTER */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            <div className="bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
                 <span className="material-symbols-outlined text-slate-400">play_circle</span>
                 <span className="material-symbols-outlined text-slate-400">group</span>

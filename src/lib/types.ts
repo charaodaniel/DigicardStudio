@@ -1,6 +1,6 @@
 export type SocialLink = {
   id: string;
-  type: 'phone' | 'email' | 'linkedin' | 'instagram' | 'website' | 'github' | 'whatsapp' | 'youtube' | 'tiktok' | 'spotify';
+  type: 'phone' | 'email' | 'linkedin' | 'instagram' | 'website' | 'github' | 'whatsapp' | 'youtube' | 'tiktok' | 'spotify' | 'facebook' | 'discord';
   label: string;
   value: string;
   icon: string;
