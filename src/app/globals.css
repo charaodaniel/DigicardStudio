@@ -65,37 +65,62 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Estilos de Impressão para Cartões Físicos */
+/* Configurações de Impressão Profissional (A4) */
 @media print {
   @page {
+    size: A4;
     margin: 0;
-    size: auto;
   }
   
   body {
     background: white !important;
+    color: black !important;
     padding: 0 !important;
     margin: 0 !important;
+    width: 210mm;
+    height: 297mm;
   }
 
-  .print-hidden, header, footer, aside, button {
+  /* Ocultar tudo que não for o gabarito de impressão */
+  .print-hidden, 
+  header, 
+  footer, 
+  aside, 
+  nav,
+  button,
+  .fixed,
+  .absolute:not(.print-element) {
     display: none !important;
   }
 
-  /* Força cores de fundo na impressão */
-  * {
+  /* Container da Grade A4 */
+  .print-layout-a4 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 85mm) !important;
+    grid-template-rows: repeat(5, 55mm) !important;
+    gap: 0 !important;
+    padding: 10mm !important; /* Margem de segurança da folha */
+    width: 210mm !important;
+    height: 297mm !important;
+    background: white !important;
+    page-break-after: always;
+  }
+
+  /* Item de Cartão Real */
+  .print-card-item {
+    width: 85mm !important;
+    height: 55mm !important;
+    border: 0.1mm solid #eee !important; /* Marca de corte suave */
+    position: relative !important;
+    overflow: hidden !important;
+    background: white !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Container de impressão do cartão */
-  .card-face-container {
-    break-inside: avoid;
-    page-break-after: always;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 100vh !important;
-    width: 100vw !important;
+  /* Forçar cores de fundo na impressão */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
