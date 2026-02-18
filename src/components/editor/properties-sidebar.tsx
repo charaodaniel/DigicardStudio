@@ -34,6 +34,16 @@ export default function PropertiesSidebar({
         '#000000', '#475569', '#94a3b8', '#ffffff'
     ];
 
+    const icons = [
+        'chat', 'photo_camera', 'work', 'language', 'mail', 'phone', 
+        'alternate_email', 'share', 'play_circle', 'subscriptions', 
+        'music_note', 'forum', 'shopping_bag', 'description', 
+        'person', 'group', 'video_library', 'calendar_today', 
+        'location_on', 'star', 'code', 'terminal', 
+        'article', 'headphones', 'smart_display', 'payments', 
+        'wallet', 'campaign'
+    ];
+
     const handleProfileChange = (field: keyof CardData, value: any) => {
         setCardData(prev => ({ ...prev, [field]: value }));
     };
@@ -266,7 +276,7 @@ export default function PropertiesSidebar({
                             <div className="space-y-1.5">
                                 <p className="text-[11px] font-medium text-slate-400 ml-1">Ícone</p>
                                 <div className="grid grid-cols-4 gap-2">
-                                    {['chat', 'photo_camera', 'work', 'language', 'mail', 'phone', 'alternate_email', 'share', 'play_circle', 'subscriptions', 'music_note', 'forum'].map(icon => (
+                                    {icons.map(icon => (
                                         <button 
                                             key={icon}
                                             onClick={() => handleLinkChange(activeLink.id, 'icon', icon)}
