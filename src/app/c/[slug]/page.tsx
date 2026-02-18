@@ -1,8 +1,9 @@
+
 'use client';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { CardData } from '@/lib/types';
-import { initialCardData } from '@/lib/data';
+import { supabaseService } from '@/lib/supabase-service';
 import DigitalCardPreview from '@/components/digital-card-preview';
 import { trackEvent } from '@/lib/analytics';
 
@@ -17,14 +18,13 @@ export default function PublicCardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulação de carregamento da sua futura API
-    // No futuro: fetch(`/api/cards/${slug}`).then(...)
     const loadCard = async () => {
       setIsLoading(true);
       try {
-        // Por enquanto, usamos os dados iniciais como mock
-        setCardData(initialCardData);
-        trackEvent('view_card', { slug });
+        // Busca no Supabase pelo ID (slug)
+        const data = await supabaseService.getCardById(slug);
+        setCardData(data);
+        if (data) trackEvent('view_card', { slug });
       } catch (error) {
         console.error("Erro ao carregar cartão:", error);
       } finally {
@@ -48,8 +48,10 @@ export default function PublicCardPage() {
 
   if (!cardData) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-slate-100 text-slate-900 font-bold">
-        Cartão não encontrado.
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-slate-100 text-slate-900 gap-4">
+        <span className="material-symbols-outlined text-5xl text-slate-300">error</span>
+        <p className="font-bold">Cartão não encontrado ou ID inválido.</p>
+        <a href="/" className="text-primary font-bold text-sm underline">Voltar para o Home</a>
       </div>
     );
   }

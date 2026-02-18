@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -6,10 +7,11 @@ import { useRouter } from 'next/navigation';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { localDb } from '@/lib/local-database';
+import { supabaseService } from '@/lib/supabase-service';
 import type { CardData } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 const Sidebar = () => {
     const userAvatar = PlaceHolderImages.find(p => p.id === 'meus-cartoes-avatar-1');
@@ -126,20 +128,28 @@ export default function MeusCartoesPage() {
     const router = useRouter();
     const [cards, setCards] = useState<CardData[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        setCards(localDb.getAllCards());
+        const loadCards = async () => {
+            setIsLoading(true);
+            const data = await supabaseService.getAllCards();
+            setCards(data);
+            setIsLoading(false);
+        };
+        loadCards();
     }, []);
 
-    const handleCreateNew = () => {
-        const newCard = localDb.createNewCard();
+    const handleCreateNew = async () => {
+        const newCard = await supabaseService.createNewCard();
         router.push(`/?id=${newCard.id}`);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Tem certeza que deseja excluir este cartão?')) {
-            localDb.deleteCard(id);
-            setCards(localDb.getAllCards());
+            await supabaseService.deleteCard(id);
+            const data = await supabaseService.getAllCards();
+            setCards(data);
         }
     };
 
@@ -155,7 +165,14 @@ export default function MeusCartoesPage() {
                  <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
                         <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Meus Cartões</h2>
-                        <p className="text-slate-500 mt-1 font-medium">Gerencie e compartilhe sua identidade digital profissional.</p>
+                        <div className="flex items-center gap-2 mt-1">
+                            <p className="text-slate-500 font-medium">Gerencie sua identidade digital profissional.</p>
+                            {isSupabaseConfigured ? (
+                                <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Supabase Online</span>
+                            ) : (
+                                <span className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Local Database</span>
+                            )}
+                        </div>
                     </div>
                     <Button 
                         onClick={handleCreateNew}
@@ -179,41 +196,50 @@ export default function MeusCartoesPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredCards.map(card => (
-                        <CardItem key={card.id} card={card} onDelete={handleDelete} />
-                    ))}
-                    
-                    <div 
-                        onClick={handleCreateNew}
-                        className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer min-h-[300px]"
-                    >
-                        <div className="size-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors mb-4">
-                            <span className="material-symbols-outlined text-3xl">add</span>
-                        </div>
-                        <h3 className="font-bold text-slate-900 dark:text-white">Novo Cartão</h3>
-                        <p className="text-sm text-slate-500 text-center mt-2 font-medium">Crie uma nova versão para sua identidade.</p>
+                {isLoading ? (
+                    <div className="h-64 flex flex-col items-center justify-center gap-4">
+                        <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+                        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Sincronizando dados...</p>
                     </div>
-                </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {filteredCards.map(card => (
+                            <CardItem key={card.id} card={card} onDelete={handleDelete} />
+                        ))}
+                        
+                        <div 
+                            onClick={handleCreateNew}
+                            className="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group flex flex-col items-center justify-center p-8 cursor-pointer min-h-[300px]"
+                        >
+                            <div className="size-16 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors mb-4">
+                                <span className="material-symbols-outlined text-3xl">add</span>
+                            </div>
+                            <h3 className="font-bold text-slate-900 dark:text-white">Novo Cartão</h3>
+                            <p className="text-sm text-slate-500 text-center mt-2 font-medium">Crie uma nova versão para sua identidade.</p>
+                        </div>
+                    </div>
+                )}
 
-                <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Total de Cartões</span>
-                            <span className="material-symbols-outlined text-primary">credit_card</span>
+                {!isLoading && (
+                    <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Total de Cartões</span>
+                                <span className="material-symbols-outlined text-primary">credit_card</span>
+                            </div>
+                            <p className="text-2xl font-black text-slate-900 dark:text-white">{cards.length}</p>
+                            <p className="text-xs text-slate-500 font-bold mt-1">Sincronizados via {isSupabaseConfigured ? 'Supabase' : 'JSON Local'}</p>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 dark:text-white">{cards.length}</p>
-                        <p className="text-xs text-slate-500 font-bold mt-1">Armazenados localmente</p>
-                    </div>
-                    <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Espaço Usado</span>
-                            <span className="material-symbols-outlined text-primary">database</span>
+                        <div className="bg-white dark:bg-background-dark/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-slate-500 font-bold text-xs uppercase tracking-wider">Storage</span>
+                                <span className="material-symbols-outlined text-primary">database</span>
+                            </div>
+                            <p className="text-2xl font-black text-slate-900 dark:text-white">Ativo</p>
+                            <p className="text-xs text-slate-500 font-bold mt-1">Conexão estável</p>
                         </div>
-                        <p className="text-2xl font-black text-slate-900 dark:text-white">~{Math.round(JSON.stringify(cards).length / 1024)} KB</p>
-                        <p className="text-xs text-slate-500 font-bold mt-1">Sincronizado com JSON</p>
                     </div>
-                </div>
+                )}
 
             </main>
         </div>

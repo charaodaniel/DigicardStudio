@@ -1,9 +1,10 @@
+
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import type { CardData } from '@/lib/types';
 import { initialCardData } from '@/lib/data';
-import { localDb } from '@/lib/local-database';
+import { supabaseService } from '@/lib/supabase-service';
 import EditorHeader from '@/components/editor/editor-header';
 import ToolsSidebar from '@/components/editor/tools-sidebar';
 import Canvas from '@/components/editor/canvas';
@@ -20,21 +21,31 @@ function EditorContent() {
   const [activeTool, setActiveTool] = useState('conteudo');
   const [mode, setMode] = useState<'digital' | 'physical'>('digital');
   const [selectedLinkId, setSelectedLinkId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!!cardId);
 
-  // Carrega do banco local no início
+  // Carrega do Supabase ou banco local no início
   useEffect(() => {
-    if (cardId) {
-      const savedCard = localDb.getCardById(cardId);
-      if (savedCard) {
-        setCardData(savedCard);
+    const loadCard = async () => {
+      if (cardId) {
+        setIsLoading(true);
+        const savedCard = await supabaseService.getCardById(cardId);
+        if (savedCard) {
+          setCardData(savedCard);
+        }
+        setIsLoading(false);
       }
-    }
+    };
+    loadCard();
   }, [cardId]);
 
-  // Salva no banco local sempre que mudar
+  // Salva no banco sempre que mudar (Debounce simplificado pelo useEffect)
   useEffect(() => {
-    localDb.saveCard(cardData);
-    localStorage.setItem('digicard-preview-data', JSON.stringify(cardData));
+    const saveTimeout = setTimeout(() => {
+      supabaseService.saveCard(cardData);
+      localStorage.setItem('digicard-preview-data', JSON.stringify(cardData));
+    }, 1000);
+
+    return () => clearTimeout(saveTimeout);
   }, [cardData]);
 
   const handleToolClick = (toolId: string) => {
@@ -44,6 +55,15 @@ function EditorContent() {
   const handlePreviewClick = () => {
     window.open('/preview', '_blank');
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-900 text-white">
+        <span className="material-symbols-outlined animate-spin text-5xl text-primary mb-4">progress_activity</span>
+        <p className="text-xs font-black uppercase tracking-[0.2em]">Sincronizando Identidade...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 h-screen overflow-hidden flex flex-col">
