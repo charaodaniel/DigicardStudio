@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function FacebookPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links } = cardData;
     return (
-        <div className="bg-white dark:bg-[#1c1b2b] min-h-full flex flex-col relative overflow-hidden">
+        <div className="bg-white dark:bg-[#1c1b2b] min-h-full flex flex-col relative overflow-y-auto no-scrollbar">
             <div className="relative">
                 <div className="w-full h-32 bg-gray-200 dark:bg-gray-700 bg-center bg-cover" style={{ backgroundImage: "url('https://picsum.photos/seed/fb-cover/400/150')" }}>
                 </div>

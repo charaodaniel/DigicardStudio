@@ -13,7 +13,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
     ];
     
     return (
-        <div className="bg-card font-display text-foreground antialiased h-full overflow-y-auto">
+        <div className="bg-card font-display text-foreground antialiased h-full overflow-y-auto no-scrollbar">
             <div className="relative mx-auto min-h-full max-w-md bg-card">
                 <div className="flex flex-col items-center px-6 pt-6 pb-8">
                     <div className="relative mb-4">

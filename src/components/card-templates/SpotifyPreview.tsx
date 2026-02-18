@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links } = cardData;
     return (
-        <div className="bg-[#121121] text-white min-h-full font-display overflow-y-auto">
+        <div className="bg-[#121121] text-white min-h-full font-display overflow-y-auto no-scrollbar">
             <div className="max-w-md mx-auto min-h-full flex flex-col">
                 <header className="relative w-full aspect-square overflow-hidden shadow-2xl shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121121] via-transparent to-transparent z-10"></div>

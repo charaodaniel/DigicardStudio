@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function TiktokPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links } = cardData;
     return (
-        <div className="bg-white font-display text-[#121117] min-h-full flex flex-col overflow-x-hidden">
+        <div className="bg-white font-display text-[#121117] min-h-full flex flex-col overflow-y-auto no-scrollbar">
             <div className="relative h-40 w-full overflow-hidden shrink-0">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent z-10"></div>
                 <img alt="Banner Background" className="w-full h-full object-cover" src="https://picsum.photos/seed/tiktok-banner/400/160" />

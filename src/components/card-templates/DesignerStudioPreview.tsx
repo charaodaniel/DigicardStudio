@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function DesignerStudioPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, avatarUrl, isVerified, links } = cardData;
     return (
-        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-full overflow-y-auto">
+        <div className="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-full overflow-y-auto no-scrollbar">
             <div className="max-w-md mx-auto flex flex-col relative pb-24">
                 <section className="flex flex-col items-center px-6 pt-8 pb-8">
                     <div className="relative mb-6">

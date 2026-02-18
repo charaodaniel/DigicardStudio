@@ -4,7 +4,7 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, links } = cardData;
 
     return (
-        <div className="relative w-full h-full bg-white dark:bg-[#1a192e] shadow-2xl flex flex-col overflow-y-auto">
+        <div className="relative w-full h-full bg-white dark:bg-[#1a192e] shadow-2xl flex flex-col overflow-y-auto no-scrollbar">
             <div className="h-24 bg-gradient-to-r from-primary/80 to-primary w-full relative shrink-0">
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }}></div>
             </div>

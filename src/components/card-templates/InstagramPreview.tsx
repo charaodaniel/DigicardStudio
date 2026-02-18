@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function InstagramPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl } = cardData;
     return (
-        <div className="relative h-full mx-auto max-w-md min-h-screen shadow-2xl overflow-hidden flex flex-col bg-[#121121] text-white">
+        <div className="relative h-full mx-auto max-w-md min-h-screen shadow-2xl overflow-y-auto no-scrollbar flex flex-col bg-[#121121] text-white">
             <header className="pt-12 px-6 pb-6 flex flex-col items-center">
                 <div className="relative group">
                     <div className="absolute -inset-1 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full blur opacity-75"></div>

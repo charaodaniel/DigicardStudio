@@ -4,8 +4,8 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
     const { fullName, bio, isVerified, avatarUrl, links } = cardData;
 
     return (
-        <div className="bg-background-light dark:bg-background-dark font-display text-[#121117] dark:text-white antialiased h-full">
-            <div className="relative min-h-full w-full max-w-md mx-auto pb-12 overflow-y-auto">
+        <div className="bg-background-light dark:bg-background-dark font-display text-[#121117] dark:text-white antialiased h-full overflow-y-auto no-scrollbar">
+            <div className="relative min-h-full w-full max-w-md mx-auto pb-12">
                 <div className="flex p-6">
                     <div className="flex w-full flex-col gap-6 items-center">
                         <div className="relative">

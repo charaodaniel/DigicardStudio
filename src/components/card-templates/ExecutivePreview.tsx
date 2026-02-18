@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl } = cardData;
     return (
-        <div className="bg-[#0a0a0b] font-display text-slate-900 antialiased h-full overflow-y-auto">
+        <div className="bg-[#0a0a0b] font-display text-slate-900 antialiased h-full overflow-y-auto no-scrollbar">
             <div className="relative flex min-h-full w-full flex-col items-center justify-center p-4 sm:p-8">
                 <div className="w-full max-w-md overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl">
                     <div className="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>

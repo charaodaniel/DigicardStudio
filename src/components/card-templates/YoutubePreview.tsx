@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function YoutubePreview({ cardData }: { cardData: CardData }) {
     const { fullName, isVerified, avatarUrl, links } = cardData;
     return (
-        <div className="bg-white dark:bg-slate-900 font-display antialiased h-full overflow-y-auto">
+        <div className="bg-white dark:bg-slate-900 font-display antialiased h-full overflow-y-auto no-scrollbar">
             <div className="relative mx-auto min-h-full max-w-md bg-white dark:bg-slate-900 flex flex-col">
                 <div className="relative flex flex-col items-center pt-8 pb-6 px-4">
                     <div className="relative group">
