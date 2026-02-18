@@ -37,13 +37,13 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
         </button>
       </div>
 
-      {/* Smartphone Mockup com Zoom Aplicado */}
+      {/* Smartphone Mockup */}
       <div 
         className="shadow-[0_0_0_12px_#1f2937,0_0_0_14px_#374151,0_20px_50px_rgba(0,0,0,0.1)] w-[360px] h-[720px] bg-white dark:bg-slate-900 rounded-[3rem] relative overflow-hidden flex flex-col transition-transform duration-200 ease-out"
         style={{ transform: `scale(${zoom / 100})` }}
       >
         {/* Status Bar Mockup */}
-        <div className="h-10 w-full flex items-center justify-between px-8 pt-4 shrink-0">
+        <div className="h-10 w-full flex items-center justify-between px-8 pt-4 shrink-0 z-20 bg-inherit">
           <span className="text-[10px] font-bold text-slate-900 dark:text-slate-100">9:41</span>
           <div className="flex items-center gap-1.5 text-slate-900 dark:text-slate-100">
             <span className="material-symbols-outlined text-[14px]">signal_cellular_4_bar</span>
@@ -52,8 +52,8 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
           </div>
         </div>
 
-        {/* Digital Card Content */}
-        <div className="flex-1 overflow-y-auto no-scrollbar pt-12 pb-8 px-6 flex flex-col items-center">
+        {/* Digital Card Content area */}
+        <div className="flex-1 overflow-y-auto no-scrollbar relative">
             <EditableCardPreview 
                 cardData={cardData} 
                 selectedLinkId={selectedLinkId} 
@@ -63,7 +63,7 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
         </div>
         
         {/* Home Indicator */}
-        <div className="h-1.5 w-32 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4 shrink-0"></div>
+        <div className="h-1.5 w-32 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4 shrink-0 z-20"></div>
       </div>
     </section>
   );

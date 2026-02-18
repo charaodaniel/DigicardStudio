@@ -2,6 +2,7 @@
 import type { CardData } from '@/lib/types';
 import type { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
+import DigitalCardPreview from '@/components/digital-card-preview';
 
 type EditableCardPreviewProps = {
     cardData: CardData;
@@ -11,10 +12,26 @@ type EditableCardPreviewProps = {
 };
 
 export default function EditableCardPreview({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool }: EditableCardPreviewProps) {
-    const { avatarUrl, fullName, jobTitle, isVerified, links, qrCodeUrl, themeColor } = cardData;
+    const { avatarUrl, fullName, jobTitle, isVerified, links, qrCodeUrl, themeColor, template } = cardData;
 
+    // Se o template não for o padrão, mostramos o preview real do template selecionado
+    if (template !== 'default') {
+        return (
+            <div className="w-full h-full min-h-full">
+                <DigitalCardPreview cardData={cardData} />
+                {/* Overlay invisível para permitir cliques e navegação no editor mesmo em templates customizados */}
+                <div 
+                    className="absolute inset-0 z-10 cursor-pointer" 
+                    onClick={() => setActiveTool('conteudo')}
+                    title="Clique para editar conteúdo"
+                />
+            </div>
+        );
+    }
+
+    // Template Padrão com edição direta no canvas
     return (
-        <>
+        <div className="w-full flex flex-col items-center pt-12 pb-8 px-6">
             {/* Foto de Perfil - Ao clicar abre ferramenta de Imagens */}
             <div 
                 onClick={() => setActiveTool('imagens')}
@@ -97,6 +114,6 @@ export default function EditableCardPreview({ cardData, selectedLinkId, setSelec
                     <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold group-hover:text-primary transition-colors">Escaneie para salvar</p>
                 </div>
             )}
-        </>
+        </div>
     );
 }

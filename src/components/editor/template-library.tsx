@@ -52,18 +52,17 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
   }
 
   return (
-    <aside className="w-80 shrink-0 border-r border-slate-200 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
       <div className="p-5 border-b border-slate-100 dark:border-slate-800">
-        <h2 className="text-lg font-bold text-slate-800">Biblioteca de Modelos</h2>
-        <p className="text-xs text-slate-500">Escolha um design para começar</p>
+        <h2 className="text-lg font-bold text-slate-800 dark:text-white">Biblioteca de Modelos</h2>
+        <p className="text-xs text-slate-500">Escolha um design para seu cartão</p>
       </div>
       <div className="flex flex-wrap gap-2 p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
         <button className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-white">Todos</button>
         <button className="rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">Social</button>
-        <button className="rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">Corporativo</button>
-        <button className="rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">Minimalista</button>
+        <button className="rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">Corp</button>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
         {templates.map(template => {
             const image = PlaceHolderImages.find(img => img.id === template.imageId);
             return (
@@ -79,12 +78,13 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
                                 data-ai-hint={image.imageHint}
                             />
                         )}
+                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
                     </div>
                     <p className="mt-2 text-xs font-bold text-slate-700 dark:text-slate-200">{template.name}</p>
                 </div>
             )
         })}
       </div>
-    </aside>
+    </div>
   );
 }

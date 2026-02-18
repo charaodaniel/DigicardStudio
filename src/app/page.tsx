@@ -26,16 +26,20 @@ export default function EditorPage() {
           activeTool={activeTool}
           onToolClick={handleToolClick}
         />
-        {activeTool === 'modelos' ? (
-          <TemplateLibrary setCardData={setCardData} />
-        ) : (
-          <>
-            <Canvas 
-              cardData={cardData} 
-              selectedLinkId={selectedLinkId} 
-              setSelectedLinkId={setSelectedLinkId}
-              setActiveTool={setActiveTool}
-            />
+        
+        {/* O Canvas agora é sempre visível */}
+        <Canvas 
+          cardData={cardData} 
+          selectedLinkId={selectedLinkId} 
+          setSelectedLinkId={setSelectedLinkId}
+          setActiveTool={setActiveTool}
+        />
+
+        {/* A barra lateral alterna entre Propriedades e Biblioteca de Modelos */}
+        <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden">
+          {activeTool === 'modelos' ? (
+            <TemplateLibrary setCardData={setCardData} />
+          ) : (
             <PropertiesSidebar 
               cardData={cardData} 
               setCardData={setCardData} 
@@ -43,8 +47,8 @@ export default function EditorPage() {
               setSelectedLinkId={setSelectedLinkId}
               activeTool={activeTool}
             />
-          </>
-        )}
+          )}
+        </aside>
       </main>
       <EditorFooter />
     </div>
