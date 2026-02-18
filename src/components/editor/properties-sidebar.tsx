@@ -12,6 +12,7 @@ type PropertiesSidebarProps = {
     selectedLinkId: string | null;
     setSelectedLinkId: Dispatch<SetStateAction<string | null>>;
     activeTool: string;
+    setActiveTool: Dispatch<SetStateAction<string>>;
 };
 
 export default function PropertiesSidebar({ 
@@ -19,7 +20,8 @@ export default function PropertiesSidebar({
     setCardData, 
     selectedLinkId, 
     setSelectedLinkId,
-    activeTool 
+    activeTool,
+    setActiveTool
 }: PropertiesSidebarProps) {
 
     const activeLink = cardData.links.find(l => l.id === selectedLinkId);
@@ -356,6 +358,7 @@ export default function PropertiesSidebar({
                             links: [...prev.links, newLink]
                         }));
                         setSelectedLinkId(newId);
+                        setActiveTool('social');
                     }}
                     className="w-full flex items-center justify-center gap-2 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-[0.98]"
                 >

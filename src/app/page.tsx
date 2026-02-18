@@ -46,6 +46,7 @@ export default function EditorPage() {
               selectedLinkId={selectedLinkId}
               setSelectedLinkId={setSelectedLinkId}
               activeTool={activeTool}
+              setActiveTool={setActiveTool}
             />
           )}
         </aside>
