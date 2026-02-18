@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from "react";
@@ -26,21 +25,21 @@ export const templates = [
 ];
 
 const templatePresets: Record<string, Partial<CardData>> = {
-    'default': { themeColor: '#5048e5' },
-    'professionals': { themeColor: '#5048e5' },
-    'linkedin': { themeColor: '#0A66C2' },
-    'instagram': { themeColor: '#E1306C' },
-    'instagram-v': { themeColor: '#E1306C' },
-    'whatsapp': { themeColor: '#25D366'},
-    'executive': { themeColor: '#D4AF37'},
-    'facebook': { themeColor: '#1877F2'},
-    'facebook-v': { themeColor: '#1877F2'},
-    'spotify': { themeColor: '#1DB954'},
-    'spotify-v': { themeColor: '#1DB954'},
-    'youtube': { themeColor: '#FF0000'},
-    'youtube-v': { themeColor: '#FF0000'},
-    'twitch-h': { themeColor: '#9146FF'},
-    'twitch-v': { themeColor: '#9146FF'},
+    'default': { themeColor: '#5048e5', physicalBackgroundColor: '#ffffff' },
+    'professionals': { themeColor: '#5048e5', physicalBackgroundColor: '#ffffff' },
+    'linkedin': { themeColor: '#0A66C2', physicalBackgroundColor: '#ffffff' },
+    'instagram': { themeColor: '#E1306C', physicalBackgroundColor: '#ffffff' },
+    'instagram-v': { themeColor: '#E1306C', physicalBackgroundColor: '#ffffff' },
+    'whatsapp': { themeColor: '#25D366', physicalBackgroundColor: '#ffffff' },
+    'executive': { themeColor: '#D4AF37', physicalBackgroundColor: '#0a0a0b' },
+    'facebook': { themeColor: '#1877F2', physicalBackgroundColor: '#ffffff' },
+    'facebook-v': { themeColor: '#1877F2', physicalBackgroundColor: '#ffffff' },
+    'spotify': { themeColor: '#1DB954', physicalBackgroundColor: '#121212' },
+    'spotify-v': { themeColor: '#1DB954', physicalBackgroundColor: '#121212' },
+    'youtube': { themeColor: '#FF0000', physicalBackgroundColor: '#FF0000' },
+    'youtube-v': { themeColor: '#FF0000', physicalBackgroundColor: '#FF0000' },
+    'twitch-h': { themeColor: '#9146FF', physicalBackgroundColor: '#0e0e10' },
+    'twitch-v': { themeColor: '#9146FF', physicalBackgroundColor: '#0e0e10' },
 }
 
 type TemplateLibraryPanelProps = {
@@ -52,7 +51,7 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
   const [activeFilter, setActiveFilter] = useState('Todos');
 
   const applyTemplate = (templateId: string) => {
-    const preset = templatePresets[templateId] || {};
+    const preset = templatePresets[templateId] || { physicalBackgroundColor: '#ffffff' };
     setCardData(prev => ({
         ...prev,
         ...preset,

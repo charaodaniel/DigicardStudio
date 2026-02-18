@@ -55,13 +55,12 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     switch (template) {
       case 'spotify':
       case 'spotify-v':
-        const spotifyBg = physicalBackgroundColor === '#ffffff' ? '#121212' : physicalBackgroundColor;
-        const spotifyText = getContrastColor(spotifyBg);
+        const spotifyText = getContrastColor(physicalBackgroundColor);
         return (
           <div className={cn(
             "flex-1 flex p-8 relative overflow-hidden",
             isVertical ? "flex-col items-center" : "flex-row items-start gap-8"
-          )} style={{ backgroundColor: spotifyBg, color: spotifyText }}>
+          )} style={{ backgroundColor: physicalBackgroundColor, color: spotifyText }}>
             <div className="absolute top-6 right-8 text-[8px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
             
             <div className={cn("shrink-0", isVertical ? "w-full mb-6" : "w-48")}>
@@ -176,10 +175,9 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
       case 'twitch-h':
       case 'twitch-v':
-        const twitchBg = physicalBackgroundColor === '#ffffff' ? '#0e0e10' : physicalBackgroundColor;
-        const twitchText = getContrastColor(twitchBg);
+        const twitchText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col p-8 relative overflow-hidden" style={{ backgroundColor: twitchBg, color: twitchText }}>
+          <div className="flex-1 flex flex-col p-8 relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: twitchText }}>
             <div className="absolute top-6 right-8 flex items-center gap-2 bg-[#9146ff] px-3 py-1 rounded-full border border-white/20">
                 <div className="size-1.5 bg-white rounded-full animate-pulse"></div>
                 <span className="text-[8px] font-black uppercase tracking-widest text-white">Live Now</span>
@@ -216,10 +214,9 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
         );
 
       case 'linkedin':
-        const liBg = physicalBackgroundColor;
-        const liText = getContrastColor(liBg);
+        const liText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: liBg, color: liText }}>
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: liText }}>
             <div className="h-20 bg-gradient-to-r from-[#0a66c2] to-[#004182] relative">
                 <div className="absolute bottom-4 left-8 text-[8px] font-black text-white/40 uppercase tracking-widest">Professional Summary</div>
             </div>
@@ -266,10 +263,9 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
 
       case 'youtube':
       case 'youtube-v':
-        const ytBg = physicalBackgroundColor === '#ffffff' ? '#FF0000' : physicalBackgroundColor;
-        const ytText = getContrastColor(ytBg);
+        const ytText = getContrastColor(physicalBackgroundColor);
         return (
-          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: ytBg, color: ytText }}>
+          <div className="flex-1 flex flex-col relative overflow-hidden" style={{ backgroundColor: physicalBackgroundColor, color: ytText }}>
             <div className="h-2 w-full bg-[#FF0000] opacity-50"></div>
             <div className={cn("flex-1 p-8 flex", isVertical ? "flex-col items-center gap-8" : "flex-row items-center justify-between")}>
                 <div className={cn("flex flex-col", isVertical ? "items-center text-center" : "items-start")}>
@@ -376,20 +372,11 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
   };
 
   const RenderBack = () => {
-    const isDarkTemplate = ['executive', 'instagram', 'instagram-v', 'youtube', 'youtube-v', 'twitch-h', 'twitch-v', 'spotify', 'spotify-v'].includes(template);
-    
-    // Se o usuário mudou a cor de fundo física para algo diferente de branco, usamos a escolha dele.
-    // Caso contrário, usamos a cor temática do template dark ou branco para os demais.
-    let finalBg = physicalBackgroundColor;
-    if (physicalBackgroundColor === '#ffffff' && isDarkTemplate) {
-        finalBg = (template === 'executive' ? '#0a0a0b' : (template.includes('twitch') ? '#0d0d17' : (template.includes('spotify') ? '#191414' : (template.includes('youtube') ? '#1a1a1a' : themeColor))));
-    }
-
-    const backTextColor = getContrastColor(finalBg);
+    const backTextColor = getContrastColor(physicalBackgroundColor);
     const isDarkBack = backTextColor === '#ffffff';
 
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12 relative" style={{ backgroundColor: finalBg }}>
+      <div className="flex-1 flex flex-col items-center justify-center p-12 relative" style={{ backgroundColor: physicalBackgroundColor }}>
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: `radial-gradient(${backTextColor} 1px, transparent 1px)`, backgroundSize: '32px 32px' }}></div>
         
         {physicalShowQR ? (
