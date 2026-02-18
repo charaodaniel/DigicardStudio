@@ -3,17 +3,17 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function TiktokPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, links, themeColor, bannerUrl } = cardData;
     
-    const tiktokLink = links.find(l => l.type === 'tiktok' || l.type === 'website');
+    const tiktokLink = links.find(l => l.type === 'tiktok') || links.find(l => l.type === 'website');
     const actionHref = tiktokLink ? formatHref(tiktokLink.type, tiktokLink.value) : '#';
 
     return (
-        <div className="bg-white font-display text-[#121117] h-full flex flex-col overflow-hidden">
+        <div className="bg-white font-display text-[#121117] h-full flex flex-col overflow-hidden relative">
             <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
                 <div className="relative h-40 w-full overflow-hidden shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent z-10"></div>
-                    <img alt="Banner Background" className="w-full h-full object-cover" src="https://picsum.photos/seed/tiktok-banner/400/160" />
+                    <img alt="Banner Background" className="w-full h-full object-cover" src={bannerUrl || "https://picsum.photos/seed/tiktok-banner/400/160"} />
                     <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20">
                         <span className="material-symbols-outlined text-white bg-white/20 backdrop-blur-md rounded-full p-2">arrow_back</span>
                         <span className="material-symbols-outlined text-white bg-white/20 backdrop-blur-md rounded-full p-2">more_horiz</span>
@@ -72,8 +72,8 @@ export default function TiktokPreview({ cardData }: { cardData: CardData }) {
                     </div>
                 </div>
             </div>
-            {/* Bottom Nav Mockup */}
-            <div className="bg-white border-t px-4 py-3 flex justify-between items-center z-50 shrink-0">
+            {/* Bottom Nav Mockup - FIXED BOTTOM */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t px-4 py-3 pb-6 flex justify-between items-center z-50 shrink-0">
                 <span className="material-symbols-outlined text-gray-400">home</span>
                 <span className="material-symbols-outlined text-gray-400">search</span>
                 <div className="bg-gradient-to-tr from-[#ff0050] to-[#00f2ea] p-0.5 rounded-lg"><div className="bg-white px-3 py-1 rounded-[7px]"><span className="material-symbols-outlined text-black">add</span></div></div>

@@ -3,21 +3,21 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function DiscordPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor } = cardData;
+    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, bannerUrl, vCardUrl } = cardData;
     
-    const discordLink = links.find(l => l.type === 'discord' || l.type === 'website');
-    const actionHref = discordLink ? formatHref(discordLink.type, discordLink.value) : '#';
+    const discordLink = links.find(l => l.type === 'discord') || links.find(l => l.type === 'website');
+    const actionHref = vCardUrl || (discordLink ? formatHref(discordLink.type, discordLink.value) : '#');
 
     return (
-        <div className="bg-[#1E1F22] text-white h-full font-display flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar p-4">
+        <div className="bg-[#1E1F22] text-white h-full font-display flex flex-col overflow-hidden relative">
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4 pb-12">
                 <div className="w-full rounded-lg overflow-hidden shadow-2xl border border-black/20 bg-[#313338]">
                     {/* Banner */}
                     <div 
                         className="relative h-28 w-full bg-primary" 
                         style={{ 
                             backgroundColor: themeColor,
-                            backgroundImage: `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url('https://picsum.photos/seed/discord-banner/600/200')`,
+                            backgroundImage: `linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url('${bannerUrl || 'https://picsum.photos/seed/discord-banner/600/200'}')`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center'
                         }}

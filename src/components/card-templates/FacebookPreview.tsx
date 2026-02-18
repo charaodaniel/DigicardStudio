@@ -3,25 +3,25 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function FacebookPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, links, themeColor, bannerUrl } = cardData;
     
-    const fbLink = links.find(l => l.type === 'facebook' || l.type === 'website');
+    const fbLink = links.find(l => l.type === 'facebook') || links.find(l => l.type === 'website');
     const actionHref = fbLink ? formatHref(fbLink.type, fbLink.value) : '#';
 
     return (
         <div className="bg-white dark:bg-[#1c1b2b] h-full flex flex-col overflow-hidden relative">
-            {/* Header / Navigation - LOCKED TOP */}
-            <div className="flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
+            {/* Header / Navigation - FIXED TOP */}
+            <div className="absolute top-0 left-0 right-0 flex items-center bg-white dark:bg-[#1c1b2b] p-4 border-b border-gray-100 dark:border-gray-800 shrink-0 z-20">
                 <span className="material-symbols-outlined">arrow_back</span>
                 <h2 className="text-lg font-bold flex-1 ml-4">Perfil</h2>
                 <span className="material-symbols-outlined">more_horiz</span>
             </div>
 
             {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col pb-20">
+            <div className="flex-1 overflow-y-auto no-scrollbar pt-16 pb-24">
                 {/* Cover Photo */}
                 <div className="relative shrink-0">
-                    <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 bg-center bg-cover" style={{ backgroundImage: "url('https://picsum.photos/seed/fb-cover/400/150')" }}>
+                    <div className="w-full h-40 bg-gray-200 dark:bg-gray-700 bg-center bg-cover" style={{ backgroundImage: `url('${bannerUrl || "https://picsum.photos/seed/fb-cover/400/150"}')` }}>
                     </div>
                     <div className="absolute -bottom-16 left-4 p-1 bg-white dark:bg-[#1c1b2b] rounded-full shadow-lg">
                         <div className="size-32 rounded-full border-4 border-white dark:border-[#1c1b2b] bg-center bg-cover bg-gray-300" style={{ backgroundImage: `url('${avatarUrl}')` }}>
@@ -88,8 +88,8 @@ export default function FacebookPreview({ cardData }: { cardData: CardData }) {
                 </div>
             </div>
             
-            {/* Bottom Nav - LOCKED FOOTER */}
-            <div className="bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            {/* Bottom Nav - FIXED BOTTOM */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1c1b2b] border-t border-gray-100 dark:border-gray-800 px-4 py-3 pb-6 flex justify-between items-center z-30 shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
                 <span className="material-symbols-outlined text-slate-400">play_circle</span>
                 <span className="material-symbols-outlined text-slate-400">group</span>
