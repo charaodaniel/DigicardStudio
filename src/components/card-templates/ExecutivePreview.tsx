@@ -3,7 +3,7 @@ import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor, links } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, themeColor, links, stats } = cardData;
     
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
@@ -41,18 +41,12 @@ export default function ExecutivePreview({ cardData }: { cardData: CardData }) {
                             </p>
                         </div>
                         <div className="my-8 flex w-full justify-between border-y border-white/10 py-4 px-2">
-                            <div className="text-center">
-                                <p className="text-[8px] uppercase tracking-widest text-slate-500">Links</p>
-                                <p className="text-base font-bold text-white">{links.length}</p>
-                            </div>
-                            <div className="text-center border-x border-white/10 px-6">
-                                <p className="text-[8px] uppercase tracking-widest text-slate-500">Premium</p>
-                                <p className="text-base font-bold text-white">ID-8</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-[8px] uppercase tracking-widest text-slate-500">Status</p>
-                                <p className="text-base font-bold text-white">Ativo</p>
-                            </div>
+                            {stats && stats.slice(0, 3).map((stat, i) => (
+                                <div key={i} className={`text-center flex-1 ${i === 1 ? 'border-x border-white/10 px-4' : ''}`}>
+                                    <p className="text-[8px] uppercase tracking-widest text-slate-500 truncate">{stat.label}</p>
+                                    <p className="text-base font-bold text-white truncate">{stat.value}</p>
+                                </div>
+                            ))}
                         </div>
                         <div className="w-full text-center mb-8">
                             <h3 className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold mb-2">Bio Estratégica</h3>

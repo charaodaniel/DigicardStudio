@@ -4,14 +4,8 @@ import React from 'react';
 import { formatHref } from '@/lib/utils';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor } = cardData;
+    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor } = cardData;
 
-    const stats = [
-        { label: 'Anos Exp.', value: '12' },
-        { label: 'Projetos', value: '150+' },
-        { label: 'Prêmios', value: '08' },
-    ];
-    
     return (
         <div className="bg-white dark:bg-[#1c1b2b] font-display text-[#121117] antialiased h-full flex flex-col overflow-hidden relative">
             {/* Sticky Top Bar - Absolute within frame */}
@@ -63,11 +57,11 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
 
                 {/* Stats Overview */}
                 <div className="mx-6 mb-8 flex items-center justify-around rounded-2xl bg-slate-50 dark:bg-white/5 py-4 border border-slate-100 dark:border-slate-800">
-                    {stats.map((stat, index) => (
-                        <React.Fragment key={stat.label}>
-                            <div className="text-center">
+                    {stats && stats.map((stat, index) => (
+                        <React.Fragment key={index}>
+                            <div className="text-center px-2">
                                 <p className="text-xl font-bold text-[#121117] dark:text-white">{stat.value}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#656487] dark:text-gray-400">{stat.label}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#656487] dark:text-gray-400 whitespace-nowrap">{stat.label}</p>
                             </div>
                             {index < stats.length - 1 && <div className="h-8 w-px bg-slate-200 dark:bg-white/10"></div>}
                         </React.Fragment>

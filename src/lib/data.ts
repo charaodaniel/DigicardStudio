@@ -19,6 +19,11 @@ export const initialCardData: CardData = {
     { id: '3', type: 'linkedin', label: 'LinkedIn', value: 'https://linkedin.com/in/joao-silva', icon: 'work', color: '#0077b5' },
     { id: '4', type: 'website', label: 'Portfólio', value: 'https://joaosilva.design', icon: 'language', color: '#5048e5' },
   ],
+  stats: [
+    { label: 'Anos Exp.', value: '12' },
+    { label: 'Projetos', value: '150+' },
+    { label: 'Prêmios', value: '08' },
+  ],
   saveContactLabel: 'Salvar Contato',
   qrCodeUrl: qrImage?.imageUrl ?? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=example'
 };

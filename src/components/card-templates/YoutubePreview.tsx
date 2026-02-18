@@ -2,7 +2,7 @@
 import type { CardData } from '@/lib/types';
 
 export default function YoutubePreview({ cardData }: { cardData: CardData }) {
-    const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, isVerified, avatarUrl, stats, themeColor } = cardData;
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display antialiased h-full overflow-y-auto no-scrollbar">
             <div className="relative mx-auto min-h-full max-w-md bg-white dark:bg-slate-900 flex flex-col">
@@ -28,10 +28,13 @@ export default function YoutubePreview({ cardData }: { cardData: CardData }) {
                             {isVerified && <span className="material-symbols-outlined text-blue-500 text-[20px]" title="Verificado" style={{fontVariationSettings: "'FILL' 1"}}>verified</span>}
                         </div>
                         <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">@{fullName.toLowerCase().replace(/\s/g, '_')}_oficial</p>
-                        <div className="flex items-center gap-2 mt-2 bg-slate-100 dark:bg-slate-800 px-4 py-1.5 rounded-full">
-                            <span className="text-[#FF0000] font-bold">1.2M</span>
-                            <span className="text-slate-500 text-xs font-semibold">Inscritos</span>
-                        </div>
+                        
+                        {stats && stats[0] && (
+                            <div className="flex items-center gap-2 mt-2 bg-slate-100 dark:bg-slate-800 px-4 py-1.5 rounded-full">
+                                <span className="text-[#FF0000] font-bold">{stats[0].value}</span>
+                                <span className="text-slate-500 text-xs font-semibold">{stats[0].label}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="w-full mt-8 flex flex-col gap-3">
                         <button className="w-full text-white font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-all" style={{backgroundColor: themeColor}}>

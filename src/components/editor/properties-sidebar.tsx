@@ -1,6 +1,6 @@
 'use client';
 import type { Dispatch, SetStateAction } from 'react';
-import type { CardData, SocialLink } from '@/lib/types';
+import type { CardData, SocialLink, StatItem } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,14 @@ export default function PropertiesSidebar({
             ...prev,
             links: prev.links.map(l => l.id === id ? { ...l, [field]: value } : l)
         }));
+    };
+
+    const handleStatChange = (index: number, field: keyof StatItem, value: string) => {
+        setCardData(prev => {
+            const newStats = [...prev.stats];
+            newStats[index] = { ...newStats[index], [field]: value };
+            return { ...prev, stats: newStats };
+        });
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,6 +189,34 @@ export default function PropertiesSidebar({
                                 />
                             </div>
                         </div>
+
+                        {/* Seção de Métricas / Stats */}
+                        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas e Atributos</label>
+                            <div className="space-y-4">
+                                {cardData.stats.map((stat, index) => (
+                                    <div key={index} className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Rótulo</p>
+                                            <Input 
+                                                className="h-8 text-xs" 
+                                                value={stat.label} 
+                                                onChange={(e) => handleStatChange(index, 'label', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase">Valor</p>
+                                            <Input 
+                                                className="h-8 text-xs" 
+                                                value={stat.value} 
+                                                onChange={(e) => handleStatChange(index, 'value', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
                             <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">verified</span>

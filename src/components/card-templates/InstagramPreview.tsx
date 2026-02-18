@@ -2,7 +2,7 @@
 import type { CardData } from '@/lib/types';
 
 export default function InstagramPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, themeColor } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, themeColor, stats, links } = cardData;
     return (
         <div className="relative h-full mx-auto max-w-md min-h-screen shadow-2xl overflow-y-auto no-scrollbar flex flex-col bg-[#121121] text-white">
             {/* Mesh Background */}
@@ -25,15 +25,15 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                 </div>
                 {/* Stats Bar */}
                 <div className="flex gap-8 mt-6 py-3 px-6 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
-                    <div className="text-center">
-                        <p className="text-lg font-bold text-white leading-none">150k</p>
-                        <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">Seguidores</p>
-                    </div>
-                    <div className="w-px h-8 bg-white/10"></div>
-                    <div className="text-center">
-                        <p className="text-lg font-bold text-white leading-none">{cardData.links.length}</p>
-                        <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">Links</p>
-                    </div>
+                    {stats && stats.slice(0, 3).map((stat, i) => (
+                        <React.Fragment key={i}>
+                            <div className="text-center">
+                                <p className="text-lg font-bold text-white leading-none">{stat.value}</p>
+                                <p className="text-[10px] uppercase tracking-wider text-white/60 font-medium">{stat.label}</p>
+                            </div>
+                            {i < Math.min(stats.length, 3) - 1 && <div className="w-px h-8 bg-white/10"></div>}
+                        </React.Fragment>
+                    ))}
                 </div>
             </header>
 
@@ -42,7 +42,7 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
                     Trabalhe Comigo
                 </button>
                 <div className="flex gap-3">
-                    {cardData.links.slice(0, 2).map(link => (
+                    {links.slice(0, 2).map(link => (
                         <a key={link.id} href="#" className="flex-1 h-12 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white font-semibold rounded-xl flex items-center justify-center gap-2 border border-white/10">
                             <span className="material-symbols-outlined text-lg">{link.icon}</span>
                             {link.label}
@@ -70,3 +70,4 @@ export default function InstagramPreview({ cardData }: { cardData: CardData }) {
         </div>
     )
 }
+import React from 'react';
