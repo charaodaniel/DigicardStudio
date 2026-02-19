@@ -1,84 +1,80 @@
+-- SCRIPT DE CONFIGURAÇÃO COMPLETO PARA DIGICARD STUDIO
+-- Execute este script no SQL Editor do seu projeto Supabase
 
--- SCRIPT DE CONFIGURAÇÃO PARA SUPABASE (DIGICARD STUDIO)
--- Execute este script no SQL Editor do seu projeto Supabase.
-
--- 1. Tabela de Perfis de Usuários (Estende o auth.users)
-create table public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  full_name text,
-  avatar_url text,
-  updated_at timestamp with time zone default timezone('utc'::text, now())
+-- 1. Tabela de Cartões (Cards)
+CREATE TABLE IF NOT EXISTS public.cards (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    template TEXT DEFAULT 'default',
+    full_name TEXT,
+    full_name_link TEXT,
+    job_title TEXT,
+    job_title_link TEXT,
+    bio TEXT,
+    avatar_url TEXT,
+    avatar_link TEXT,
+    banner_url TEXT,
+    banner_link TEXT,
+    vcard_url TEXT,
+    is_verified BOOLEAN DEFAULT false,
+    theme_color TEXT DEFAULT '#5048e5',
+    font_family TEXT DEFAULT 'Inter',
+    base_font_size INTEGER DEFAULT 16,
+    links JSONB DEFAULT '[]'::jsonb,
+    stats JSONB DEFAULT '[]'::jsonb,
+    save_contact_label TEXT DEFAULT 'Salvar Contato',
+    qr_code_url TEXT,
+    qr_code_data TEXT,
+    custom_website_url TEXT,
+    footer_text TEXT,
+    -- Configurações de Impressão (Modo Físico)
+    physical_show_avatar BOOLEAN DEFAULT true,
+    physical_show_title BOOLEAN DEFAULT true,
+    physical_show_stats BOOLEAN DEFAULT true,
+    physical_show_links BOOLEAN DEFAULT true,
+    physical_show_qr BOOLEAN DEFAULT true,
+    physical_show_footer BOOLEAN DEFAULT true,
+    physical_background_color TEXT DEFAULT '#ffffff',
+    last_updated BIGINT
 );
 
--- 2. Tabela de Cartões (Com vínculo de usuário)
-create table public.cards (
-  id text primary key,
-  user_id uuid references auth.users on delete cascade default auth.uid(),
-  template text not null default 'default',
-  full_name text not null,
-  full_name_link text,
-  job_title text,
-  job_title_link text,
-  bio text,
-  avatar_url text,
-  avatar_link text,
-  banner_url text,
-  banner_link text,
-  vcard_url text,
-  is_verified boolean default false,
-  theme_color text default '#5048e5',
-  font_family text default 'Inter',
-  base_font_size integer default 16,
-  links jsonb default '[]'::jsonb,
-  stats jsonb default '[]'::jsonb,
-  save_contact_label text default 'Salvar Contato',
-  qr_code_url text,
-  custom_website_url text,
-  footer_text text,
-  physical_show_avatar boolean default true,
-  physical_show_title boolean default true,
-  physical_show_stats boolean default true,
-  physical_show_links boolean default true,
-  physical_show_qr boolean default true,
-  physical_show_footer boolean default true,
-  physical_background_color text default '#ffffff',
-  last_updated bigint
+-- 2. Habilitar RLS (Row Level Security)
+ALTER TABLE public.cards ENABLE ROW LEVEL SECURITY;
+
+-- 3. Políticas de Acesso
+
+-- Permissão para visualizar qualquer cartão (público)
+CREATE POLICY "Cartões são visíveis publicamente por ID" 
+ON public.cards FOR SELECT 
+USING (true);
+
+-- Permissão para o dono inserir seus próprios cartões
+CREATE POLICY "Usuários podem inserir seus próprios cartões" 
+ON public.cards FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
+
+-- Permissão para o dono atualizar seus próprios cartões
+CREATE POLICY "Usuários podem atualizar seus próprios cartões" 
+ON public.cards FOR UPDATE 
+USING (auth.uid() = user_id);
+
+-- Permissão para o dono excluir seus próprios cartões
+CREATE POLICY "Usuários podem excluir seus próprios cartões" 
+ON public.cards FOR DELETE 
+USING (auth.uid() = user_id);
+
+-- 4. Tabela de Perfis (Opcional, mas recomendado)
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  full_name TEXT,
+  avatar_url TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 3. Habilitar Row Level Security (Segurança por Linha)
-alter table public.profiles enable row level security;
-alter table public.cards enable row level security;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 4. Políticas para Perfis
-create policy "Usuários podem ver seu próprio perfil" on public.profiles
-  for select using (auth.uid() = id);
+CREATE POLICY "Usuários podem ver seu próprio perfil" ON public.profiles
+  FOR SELECT USING (auth.uid() = id);
 
-create policy "Usuários podem atualizar seu próprio perfil" on public.profiles
-  for update using (auth.uid() = id);
-
--- 5. Políticas para Cartões
-create policy "Usuários podem ver seus próprios cartões" on public.cards
-  for select using (auth.uid() = user_id);
-
-create policy "Usuários podem criar seus próprios cartões" on public.cards
-  for insert with check (auth.uid() = user_id);
-
-create policy "Usuários podem editar seus próprios cartões" on public.cards
-  for update using (auth.uid() = user_id);
-
-create policy "Usuários podem deletar seus próprios cartões" on public.cards
-  for delete using (auth.uid() = user_id);
-
--- 6. Trigger para criar perfil automaticamente no cadastro
-create function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, full_name, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
-  return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+CREATE POLICY "Usuários podem atualizar seu próprio perfil" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id);

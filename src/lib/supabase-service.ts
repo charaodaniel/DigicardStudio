@@ -13,7 +13,7 @@ const toDb = (card: CardData, userId?: string) => ({
   full_name: card.fullName,
   full_name_link: card.fullNameLink,
   job_title: card.jobTitle,
-  job_title_link: card.jobTitleLink,
+  job_title_link: card.jobTitle_link || card.jobTitleLink, // fallback for naming variants
   bio: card.bio,
   avatar_url: card.avatarUrl,
   avatar_link: card.avatarLink,
@@ -80,8 +80,13 @@ const fromDb = (dbCard: any): CardData => ({
 
 export const supabaseService = {
   async getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) return null;
+      return user;
+    } catch (e) {
+      return null;
+    }
   },
 
   async getAllCards(): Promise<CardData[]> {
@@ -97,7 +102,7 @@ export const supabaseService = {
       .order('last_updated', { ascending: false });
 
     if (error) {
-      console.error('Erro Supabase ao carregar cartões:', error);
+      console.error('Erro Supabase ao carregar cartões:', error.message);
       return [];
     }
 
@@ -114,7 +119,7 @@ export const supabaseService = {
       .single();
 
     if (error) {
-      console.error('Erro Supabase ao carregar cartão:', error);
+      console.warn('Cartão não encontrado no Supabase (ID público ou inválido):', id);
       return null;
     }
 
@@ -127,15 +132,24 @@ export const supabaseService = {
       return;
     }
 
-    const user = await this.getCurrentUser();
-    if (!user) return;
+    try {
+      const user = await this.getCurrentUser();
+      if (!user) return;
 
-    const { error } = await supabase
-      .from('cards')
-      .upsert(toDb(card, user.id));
+      const payload = toDb(card, user.id);
+      const { error } = await supabase
+        .from('cards')
+        .upsert(payload, { onConflict: 'id' });
 
-    if (error) {
-      console.error('Erro Supabase ao salvar:', error);
+      if (error) {
+        console.error('--- ERRO SUPABASE AO SALVAR ---');
+        console.error('Mensagem:', error.message);
+        console.error('Detalhes:', error.details);
+        console.error('Código:', error.code);
+        console.error('Payload enviado:', payload);
+      }
+    } catch (err) {
+      console.error('Erro inesperado na função saveCard:', err);
     }
   },
 
@@ -151,7 +165,7 @@ export const supabaseService = {
       .eq('id', id);
 
     if (error) {
-      console.error('Erro Supabase ao deletar:', error);
+      console.error('Erro Supabase ao deletar:', error.message);
     }
   },
 
@@ -159,7 +173,7 @@ export const supabaseService = {
     const user = await this.getCurrentUser();
     const newCard: CardData = {
       ...initialCardData,
-      id: `card_${Date.now()}`,
+      id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       fullName: 'Novo Cartão',
       lastUpdated: Date.now()
     };
