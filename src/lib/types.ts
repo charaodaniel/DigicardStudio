@@ -34,6 +34,7 @@ export type CardData = {
   stats: StatItem[];
   saveContactLabel: string;
   qrCodeUrl?: string;
+  qrCodeData?: string; // Informação codificada no QR (URL ou texto)
   customWebsiteUrl?: string;
   footerText?: string;
   // Physical Card Preferences

@@ -1,4 +1,3 @@
-
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { CardData } from './types';
 import { initialCardData } from './data';
@@ -29,6 +28,7 @@ const toDb = (card: CardData, userId?: string) => ({
   stats: card.stats, // JSONB no Supabase
   save_contact_label: card.saveContactLabel,
   qr_code_url: card.qrCodeUrl,
+  qr_code_data: card.qrCodeData,
   custom_website_url: card.customWebsiteUrl,
   footer_text: card.footerText,
   physical_show_avatar: card.physicalShowAvatar,
@@ -65,6 +65,7 @@ const fromDb = (dbCard: any): CardData => ({
   stats: dbCard.stats || [],
   saveContactLabel: dbCard.save_contact_label,
   qrCodeUrl: dbCard.qr_code_url,
+  qrCodeData: dbCard.qr_code_data,
   customWebsiteUrl: dbCard.custom_website_url,
   footerText: dbCard.footer_text,
   physicalShowAvatar: dbCard.physical_show_avatar,

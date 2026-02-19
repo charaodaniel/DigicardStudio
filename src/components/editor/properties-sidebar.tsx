@@ -12,6 +12,7 @@ import SocialIcon from '@/components/social-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { useEffect } from 'react';
 
 type PropertiesSidebarProps = {
     cardData: CardData;
@@ -31,6 +32,18 @@ export default function PropertiesSidebar({
     setActiveTool
 }: PropertiesSidebarProps) {
     const { toast } = useToast();
+
+    // Inicializa o qrCodeData se estiver vazio
+    useEffect(() => {
+        if (activeTool === 'qrcode' && !cardData.qrCodeData) {
+            const defaultUrl = `${window.location.origin}/c/${cardData.id}`;
+            setCardData(prev => ({
+                ...prev,
+                qrCodeData: defaultUrl,
+                qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(defaultUrl)}`
+            }));
+        }
+    }, [activeTool, cardData.id, cardData.qrCodeData, setCardData]);
 
     const colorPalette = [
         '#5048e5', '#6366f1', '#8b5cf6', '#ec4899', 
@@ -75,6 +88,23 @@ export default function PropertiesSidebar({
 
     const handleProfileChange = (field: keyof CardData, value: any) => {
         setCardData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleQrCodeChange = (newData: string) => {
+        setCardData(prev => ({
+            ...prev,
+            qrCodeData: newData,
+            qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(newData)}`
+        }));
+    };
+
+    const resetQrToDefault = () => {
+        const defaultUrl = `${window.location.origin}/c/${cardData.id}`;
+        handleQrCodeChange(defaultUrl);
+        toast({
+            title: "QR Code Restaurado",
+            description: "O código agora aponta para o seu link público."
+        });
     };
 
     const handleLinkChange = (id: string, field: keyof SocialLink, value: string) => {
@@ -437,7 +467,25 @@ export default function PropertiesSidebar({
                         <div className="p-6 bg-white border rounded-2xl mx-auto inline-block shadow-sm">
                             {cardData.qrCodeUrl ? <img src={cardData.qrCodeUrl} className="size-32" alt="QR" /> : <span className="material-symbols-outlined text-4xl opacity-20">qr_code_2</span>}
                         </div>
-                        <Input className="text-sm mt-4" placeholder="URL do QR Code..." value={cardData.qrCodeUrl || ''} onChange={(e) => handleProfileChange('qrCodeUrl', e.target.value)} />
+                        
+                        <div className="space-y-3 text-left">
+                            <p className="text-[11px] font-medium text-slate-400 ml-1">Destino do QR Code (URL ou Texto)</p>
+                            <Input 
+                                className="text-sm" 
+                                placeholder="https://..." 
+                                value={cardData.qrCodeData || ''} 
+                                onChange={(e) => handleQrCodeChange(e.target.value)} 
+                            />
+                            <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full text-[10px] font-bold uppercase h-9"
+                                onClick={resetQrToDefault}
+                            >
+                                <span className="material-symbols-outlined text-sm mr-2">link</span>
+                                Usar Link do Cartão
+                            </Button>
+                        </div>
                     </div>
                 )}
 
