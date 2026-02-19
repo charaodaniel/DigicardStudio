@@ -13,7 +13,7 @@ const toDb = (card: CardData, userId?: string) => ({
   full_name: card.fullName,
   full_name_link: card.fullNameLink,
   job_title: card.jobTitle,
-  job_title_link: card.jobTitle_link || card.jobTitleLink, // fallback for naming variants
+  job_title_link: card.jobTitleLink,
   bio: card.bio,
   avatar_url: card.avatarUrl,
   avatar_link: card.avatarLink,
@@ -142,11 +142,12 @@ export const supabaseService = {
         .upsert(payload, { onConflict: 'id' });
 
       if (error) {
-        console.error('--- ERRO SUPABASE AO SALVAR ---');
-        console.error('Mensagem:', error.message);
-        console.error('Detalhes:', error.details);
-        console.error('Código:', error.code);
-        console.error('Payload enviado:', payload);
+        console.error('Erro detalhado Supabase:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
       }
     } catch (err) {
       console.error('Erro inesperado na função saveCard:', err);
