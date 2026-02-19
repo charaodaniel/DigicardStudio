@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import SocialIcon from '@/components/social-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 type PropertiesSidebarProps = {
     cardData: CardData;
@@ -29,6 +30,7 @@ export default function PropertiesSidebar({
     activeTool,
     setActiveTool
 }: PropertiesSidebarProps) {
+    const { toast } = useToast();
 
     const colorPalette = [
         '#5048e5', '#6366f1', '#8b5cf6', '#ec4899', 
@@ -88,6 +90,32 @@ export default function PropertiesSidebar({
             newStats[index] = { ...newStats[index], [field]: value };
             return { ...prev, stats: newStats };
         });
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl') => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Limite de 2MB para manter no banco JSONB
+        if (file.size > 2 * 1024 * 1024) {
+            toast({
+                variant: "destructive",
+                title: "Arquivo muito grande",
+                description: "Por favor, escolha uma imagem de até 2MB."
+            });
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            setCardData(prev => ({ ...prev, [field]: base64String }));
+            toast({
+                title: "Upload concluído!",
+                description: "Sua imagem foi atualizada com sucesso."
+            });
+        };
+        reader.readAsDataURL(file);
     };
 
     const deleteLink = (id: string) => {
@@ -322,6 +350,24 @@ export default function PropertiesSidebar({
                                 <img src={cardData.avatarUrl} className="w-full h-full rounded-full object-cover" alt="Avatar" />
                             </div>
                             <div className="space-y-2">
+                                <div className="flex gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        className="flex-1 gap-2 text-xs h-10"
+                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                    >
+                                        <span className="material-symbols-outlined text-lg">upload</span>
+                                        Fazer Upload
+                                    </Button>
+                                    <input 
+                                        id="avatar-upload" 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        onChange={(e) => handleImageUpload(e, 'avatarUrl')}
+                                    />
+                                </div>
                                 <Input className="text-sm" placeholder="URL da Foto..." value={cardData.avatarUrl} onChange={(e) => handleProfileChange('avatarUrl', e.target.value)} />
                                 <Input className="text-sm" placeholder="Link ao clicar..." value={cardData.avatarLink || ''} onChange={(e) => handleProfileChange('avatarLink', e.target.value)} />
                             </div>
@@ -333,6 +379,24 @@ export default function PropertiesSidebar({
                                 {cardData.bannerUrl && <img src={cardData.bannerUrl} className="w-full h-full object-cover" alt="Banner" />}
                             </div>
                             <div className="space-y-2">
+                                <div className="flex gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm"
+                                        className="flex-1 gap-2 text-xs h-10"
+                                        onClick={() => document.getElementById('banner-upload')?.click()}
+                                    >
+                                        <span className="material-symbols-outlined text-lg">upload</span>
+                                        Fazer Upload
+                                    </Button>
+                                    <input 
+                                        id="banner-upload" 
+                                        type="file" 
+                                        accept="image/*" 
+                                        className="hidden" 
+                                        onChange={(e) => handleImageUpload(e, 'bannerUrl')}
+                                    />
+                                </div>
                                 <Input className="text-sm" placeholder="URL do Banner..." value={cardData.bannerUrl || ''} onChange={(e) => handleProfileChange('bannerUrl', e.target.value)} />
                                 <Input className="text-sm" placeholder="Link ao clicar..." value={cardData.bannerLink || ''} onChange={(e) => handleProfileChange('bannerLink', e.target.value)} />
                             </div>
