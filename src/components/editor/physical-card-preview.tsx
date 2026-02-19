@@ -94,6 +94,18 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
               <p className="text-xs font-bold uppercase tracking-widest opacity-60" style={{ color: themeColor }}>{jobTitle}</p>
             </div>
           )}
+          
+          {physicalShowStats && stats.length > 0 && (
+            <div className="flex gap-4 mb-4">
+              {stats.slice(0, 3).map((s, i) => (
+                <div key={i} className="text-left">
+                  <p className="text-[10px] font-black leading-none">{s.value}</p>
+                  <p className="text-[6px] uppercase font-bold opacity-40">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           {physicalShowLinks && (
             <div className="space-y-2">
               {links.slice(0, 3).map(l => (
@@ -149,7 +161,7 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             Gabarito Técnico "Aberto" (A4)
           </h4>
           <p className="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-            O PDF será gerado com frentes e versos organizados com espaçamento (gap) para facilitar o corte.
+            O PDF será gerado com frentes e versos organizados com espaçamento (gap) para facilitar o corte. Use a ferramenta "Impressão" na lateral para personalizar.
           </p>
         </div>
 

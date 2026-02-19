@@ -13,6 +13,7 @@ export default function ToolsSidebar({ activeTool, onToolClick }: ToolsSidebarPr
         { id: 'imagens', label: 'Imagens', icon: 'image' },
         { id: 'social', label: 'Social', icon: 'share' },
         { id: 'qrcode', label: 'QR Code', icon: 'qr_code_2' },
+        { id: 'fisico', label: 'Impressão', icon: 'print' },
     ];
 
     return (

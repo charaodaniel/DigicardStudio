@@ -11,6 +11,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import SocialIcon from '@/components/social-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
 
 type PropertiesSidebarProps = {
     cardData: CardData;
@@ -91,6 +92,20 @@ export default function PropertiesSidebar({
         });
     };
 
+    const addStat = () => {
+        setCardData(prev => ({
+            ...prev,
+            stats: [...prev.stats, { label: 'Nova Métrica', value: '0' }]
+        }));
+    };
+
+    const removeStat = (index: number) => {
+        setCardData(prev => ({
+            ...prev,
+            stats: prev.stats.filter((_, i) => i !== index)
+        }));
+    };
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'avatarUrl' | 'bannerUrl') => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -130,6 +145,7 @@ export default function PropertiesSidebar({
             case 'social': return 'Playlist de Links';
             case 'imagens': return 'Mídia & Capa';
             case 'qrcode': return 'QR Code';
+            case 'fisico': return 'Impressão';
             default: return 'Geral';
         }
     }
@@ -195,16 +211,29 @@ export default function PropertiesSidebar({
                         </div>
 
                         <div className="space-y-4 pt-4 border-t">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas Autônomas</label>
-                            {cardData.stats.map((stat, index) => (
-                                <div key={index} className="space-y-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <Input className="h-8 text-xs" value={stat.label} onChange={(e) => handleStatChange(index, 'label', e.target.value)} />
-                                        <Input className="h-8 text-xs font-bold" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} />
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Métricas Autônomas</label>
+                                <Button variant="ghost" size="sm" onClick={addStat} className="h-6 text-[10px] uppercase font-bold text-primary px-2">
+                                    Adicionar
+                                </Button>
+                            </div>
+                            <div className="space-y-3">
+                                {cardData.stats.map((stat, index) => (
+                                    <div key={index} className="space-y-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 relative group">
+                                        <button 
+                                            onClick={() => removeStat(index)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full size-5 items-center justify-center hidden group-hover:flex shadow-lg"
+                                        >
+                                            <span className="material-symbols-outlined text-xs">close</span>
+                                        </button>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Input className="h-8 text-xs" value={stat.label} onChange={(e) => handleStatChange(index, 'label', e.target.value)} />
+                                            <Input className="h-8 text-xs font-bold" value={stat.value} onChange={(e) => handleStatChange(index, 'value', e.target.value)} />
+                                        </div>
+                                        <Input className="h-7 text-[10px] bg-white dark:bg-slate-900" placeholder="Link da métrica..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
                                     </div>
-                                    <Input className="h-7 text-[10px] bg-white dark:bg-slate-900" placeholder="Link da métrica..." value={stat.url || ''} onChange={(e) => handleStatChange(index, 'url', e.target.value)} />
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -409,6 +438,59 @@ export default function PropertiesSidebar({
                             {cardData.qrCodeUrl ? <img src={cardData.qrCodeUrl} className="size-32" alt="QR" /> : <span className="material-symbols-outlined text-4xl opacity-20">qr_code_2</span>}
                         </div>
                         <Input className="text-sm mt-4" placeholder="URL do QR Code..." value={cardData.qrCodeUrl || ''} onChange={(e) => handleProfileChange('qrCodeUrl', e.target.value)} />
+                    </div>
+                )}
+
+                {activeTool === 'fisico' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                        <div className="space-y-4">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Layout de Impressão</label>
+                            <div className="space-y-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir Foto de Perfil</Label>
+                                    <Switch checked={cardData.physicalShowAvatar} onCheckedChange={(val) => handleProfileChange('physicalShowAvatar', val)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir Nome e Cargo</Label>
+                                    <Switch checked={cardData.physicalShowTitle} onCheckedChange={(val) => handleProfileChange('physicalShowTitle', val)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir Métricas</Label>
+                                    <Switch checked={cardData.physicalShowStats} onCheckedChange={(val) => handleProfileChange('physicalShowStats', val)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir Links (Top 3)</Label>
+                                    <Switch checked={cardData.physicalShowLinks} onCheckedChange={(val) => handleProfileChange('physicalShowLinks', val)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir QR Code (Verso)</Label>
+                                    <Switch checked={cardData.physicalShowQR} onCheckedChange={(val) => handleProfileChange('physicalShowQR', val)} />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-sm font-semibold">Exibir Rodapé Técnico</Label>
+                                    <Switch checked={cardData.physicalShowFooter} onCheckedChange={(val) => handleProfileChange('physicalShowFooter', val)} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 pt-6 border-t">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Cor do Papel</label>
+                            <ColorPickerGrid currentColor={cardData.physicalBackgroundColor || '#ffffff'} onSelect={(c) => handleProfileChange('physicalBackgroundColor', c)} />
+                        </div>
+
+                        <div className="space-y-4 pt-6 border-t">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Metadados do Rodapé</label>
+                            <div className="space-y-3">
+                                <div className="space-y-1">
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Seu Website</p>
+                                    <Input className="text-sm" placeholder="ex: www.seusite.com" value={cardData.customWebsiteUrl || ''} onChange={(e) => handleProfileChange('customWebsiteUrl', e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[11px] font-medium text-slate-400 ml-1">Texto de Créditos</p>
+                                    <Input className="text-sm" placeholder="ex: DESIGNED BY..." value={cardData.footerText || ''} onChange={(e) => handleProfileChange('footerText', e.target.value)} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
