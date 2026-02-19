@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import type { Dispatch, SetStateAction } from "react";
@@ -44,11 +45,17 @@ const templatePresets: Record<string, Partial<CardData>> = {
 
 type TemplateLibraryPanelProps = {
     setCardData: Dispatch<SetStateAction<CardData>>;
+    mode: 'digital' | 'physical';
 };
 
 
-export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelProps) {
+export default function TemplateLibrary({ setCardData, mode }: TemplateLibraryPanelProps) {
   const [activeFilter, setActiveFilter] = useState('Todos');
+
+  // Reset filter when mode changes
+  useEffect(() => {
+    setActiveFilter('Todos');
+  }, [mode]);
 
   const applyTemplate = (templateId: string) => {
     const preset = templatePresets[templateId] || { physicalBackgroundColor: '#ffffff' };
@@ -59,17 +66,27 @@ export default function TemplateLibrary({ setCardData }: TemplateLibraryPanelPro
     }));
   };
 
-  const filteredTemplates = activeFilter === 'Todos' 
-    ? templates 
-    : templates.filter(t => t.category === activeFilter);
+  const filterButtons = mode === 'digital' 
+    ? ['Todos', 'Social', 'Corp'] 
+    : ['Todos', 'Horizontal', 'Vertical'];
 
-  const filterButtons = ['Todos', 'Social', 'Corp'];
+  const filteredTemplates = templates.filter(t => {
+    if (activeFilter === 'Todos') return true;
+    
+    if (mode === 'digital') {
+        return t.category === activeFilter;
+    } else {
+        return t.orientation?.toLowerCase() === activeFilter.toLowerCase();
+    }
+  });
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <div className="p-5 border-b border-slate-100 dark:border-slate-800">
         <h2 className="text-lg font-bold text-slate-800 dark:text-white">Biblioteca de Modelos</h2>
-        <p className="text-xs text-slate-500">Escolha um design para seu cartão</p>
+        <p className="text-xs text-slate-500">
+            {mode === 'digital' ? 'Estilos otimizados para perfis digitais.' : 'Gabaritos para impressão técnica.'}
+        </p>
       </div>
       <div className="flex flex-wrap gap-2 p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
         {filterButtons.map(filter => (

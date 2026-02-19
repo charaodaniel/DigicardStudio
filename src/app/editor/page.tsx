@@ -144,7 +144,7 @@ function EditorContent() {
         />
         <aside className="w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-hidden">
           {activeTool === 'modelos' ? (
-            <TemplateLibrary setCardData={updateCardData} />
+            <TemplateLibrary setCardData={updateCardData} mode={mode} />
           ) : (
             <PropertiesSidebar 
               cardData={cardData} 
