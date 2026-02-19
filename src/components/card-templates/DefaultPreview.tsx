@@ -15,7 +15,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
   const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
 
   return (
-    <div className="flex h-full w-full flex-col bg-white overflow-y-auto no-scrollbar pb-24 relative">
+    <div className="flex flex-1 min-h-0 flex-col bg-white overflow-y-auto no-scrollbar pb-24 relative">
       <div
         className="relative h-48 shrink-0"
         style={{ backgroundColor: themeColor }}
@@ -41,7 +41,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
           />
         </div>
       </div>
-      <div className="mt-14 flex flex-col items-center px-6">
+      <div className="mt-14 flex flex-col items-center px-6 shrink-0">
         <div className="flex items-center gap-1.5">
           <h3 className="text-xl font-bold text-slate-800">{fullName}</h3>
           {isVerified && (

@@ -12,7 +12,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
     const actionHref = instagramLink ? formatHref(instagramLink.type, instagramLink.value) : '#';
 
     return (
-        <div className="relative h-full mx-auto w-full shadow-2xl flex flex-col bg-[#121121] text-white overflow-hidden">
+        <div className="relative flex-1 min-h-0 mx-auto w-full shadow-2xl flex flex-col bg-[#121121] text-white overflow-hidden">
             {/* Mesh Background */}
             <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: "radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%)" }}></div>
             
@@ -24,7 +24,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                     <span className="material-symbols-outlined text-white text-xl">share</span>
                 </button>
 
-                <header className="relative pt-12 px-6 pb-6 flex flex-col items-center">
+                <header className="relative pt-12 px-6 pb-6 flex flex-col items-center shrink-0">
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-full blur opacity-75"></div>
                         <div className="relative bg-[#121121] rounded-full p-1">
@@ -73,7 +73,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                     </div>
                 </header>
 
-                <div className="relative mt-4">
+                <div className="relative mt-4 shrink-0">
                     {/* Grid de Fotos com Blur (Fundo) */}
                     <div className="absolute inset-0 px-1 opacity-40 blur-[3px] pointer-events-none">
                         <div className="grid grid-cols-3 gap-1 h-full">
@@ -89,7 +89,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                             href={actionHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-xl transition-all flex items-center justify-center text-center text-base tracking-wide" 
+                            className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-xl transition-all flex items-center justify-center text-center text-base tracking-wide shrink-0" 
                             style={{backgroundColor: themeColor, boxShadow: `0 8px 30px ${themeColor}44` }}
                         >
                             Trabalhe Comigo
@@ -102,7 +102,7 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                                     href={formatHref(link.type, link.value)} 
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white font-semibold border border-white/10 transition-all group"
+                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl hover:bg-white/20 text-white font-semibold border border-white/10 transition-all group shrink-0"
                                 >
                                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${link.color || themeColor}22` }}>
                                         <SocialIcon type={link.type} icon={link.icon} style={{ color: link.color || themeColor }} className="text-xl" />

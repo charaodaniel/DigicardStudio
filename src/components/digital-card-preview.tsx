@@ -43,7 +43,7 @@ export default function DigitalCardPreview({
     trackEvent('save_contact', { name: cardData.fullName });
   };
 
-  const PreviewComponent = () => {
+  const renderTemplate = () => {
     const baseTemplate = cardData.template.split('-')[0];
     const props = { cardData, onShare: handleShare, onSaveContact: handleSaveContact };
 
@@ -85,9 +85,9 @@ export default function DigitalCardPreview({
         fontFamily: `'${cardData.fontFamily}', sans-serif`,
         fontSize: `${cardData.baseFontSize}px`
       }}
-      className="h-full w-full overflow-hidden"
+      className="h-full w-full overflow-hidden flex flex-col"
     >
-      <PreviewComponent />
+      {renderTemplate()}
       <ShareModal 
         isOpen={isShareModalOpen} 
         onOpenChange={setIsShareModalOpen} 
