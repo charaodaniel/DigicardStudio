@@ -23,7 +23,8 @@ export default function DiscordPreview({ cardData }: { cardData: CardData }) {
 
     return (
         <div className="bg-[#1E1F22] text-white h-full font-display flex flex-col overflow-hidden relative">
-            <div className="flex-1 overflow-y-auto no-scrollbar p-4 pb-12">
+            {/* O container abaixo agora tem flex-1 e min-h-0 para permitir scroll correto */}
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-4 pb-12">
                 <div className="w-full rounded-lg overflow-hidden shadow-2xl border border-black/20 bg-[#313338]">
                     {/* Banner */}
                     <div 

@@ -11,7 +11,7 @@ export default function YoutubePreview({ cardData, onShare }: { cardData: CardDa
     return (
         <div className="bg-slate-50 dark:bg-background-dark font-display antialiased h-full flex flex-col overflow-hidden relative">
             {/* Header Mockup - FIXED TOP */}
-            <div className="absolute top-0 left-0 right-0 z-50 flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 justify-between border-b border-gray-100 dark:border-slate-800 shrink-0">
+            <div className="flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 justify-between border-b border-gray-100 dark:border-slate-800 shrink-0 z-50">
                 <span className="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
                 <h2 className="text-base font-bold flex-1 text-center">Perfil Oficial</h2>
                 <button onClick={onShare} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
@@ -19,7 +19,7 @@ export default function YoutubePreview({ cardData, onShare }: { cardData: CardDa
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar pt-16 pb-24">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pb-24">
                 {/* Banner Image */}
                 <div className="h-32 w-full bg-slate-200 dark:bg-slate-800 overflow-hidden shrink-0 relative">
                     <img 
@@ -83,7 +83,7 @@ export default function YoutubePreview({ cardData, onShare }: { cardData: CardDa
             </div>
 
             {/* Bottom Nav Mockup - FIXED BOTTOM */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t px-6 py-3 pb-6 flex items-center justify-between z-50 shrink-0">
+            <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t px-6 py-3 pb-6 flex items-center justify-between z-50 shrink-0">
                 <span className="material-symbols-outlined text-primary" style={{fontVariationSettings: "'FILL' 1"}}>home</span>
                 <span className="material-symbols-outlined text-slate-400">video_library</span>
                 <span className="material-symbols-outlined text-slate-400">group</span>

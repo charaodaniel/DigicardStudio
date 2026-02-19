@@ -7,9 +7,9 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
     const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor } = cardData;
 
     return (
-        <div className="bg-slate-50 dark:bg-background-dark h-full flex flex-col relative overflow-hidden">
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div className="bg-slate-50 dark:bg-slate-950 h-full flex flex-col relative overflow-hidden">
+            {/* Scrollable Content Area - O segredo está no flex-1 min-h-0 */}
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
                 {/* Header Image / Cover */}
                 <div className="h-32 bg-gradient-to-r from-primary/80 to-primary w-full relative shrink-0">
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "24px 24px" }}></div>
@@ -64,7 +64,7 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
                             href={formatHref(link.type, link.value)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all"
+                            className="flex items-center justify-between p-4 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/50 transition-all"
                         >
                             <div className="flex items-center gap-3">
                                 <SocialIcon type={link.type} icon={link.icon} className="text-lg" style={{color: link.color || themeColor}} />
@@ -77,7 +77,7 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
             </div>
             
             {/* Fixed Bottom Nav */}
-            <nav className="bg-white dark:bg-[#1a192e] border-t border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center shrink-0 z-30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+            <nav className="bg-white dark:bg-[#1a192e] border-t border-gray-100 dark:border-gray-800 px-4 py-3 pb-6 flex justify-between items-center shrink-0 z-30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 {['home', 'group', 'person', 'work', 'chat'].map((icon, i) => (
                     <a key={icon} className={`flex flex-col items-center gap-1 ${i === 2 ? 'text-primary' : 'text-gray-400'}`} href="#">
                         <span className="material-symbols-outlined" style={{fontVariationSettings: i === 2 ? "'FILL' 1" : ""}}>{icon}</span>
