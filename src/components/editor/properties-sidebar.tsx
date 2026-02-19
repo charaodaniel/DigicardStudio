@@ -1,4 +1,3 @@
-
 'use client';
 import type { Dispatch, SetStateAction } from 'react';
 import type { CardData, SocialLink, StatItem } from '@/lib/types';
@@ -96,7 +95,6 @@ export default function PropertiesSidebar({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Limite de 2MB para manter no banco JSONB
         if (file.size > 2 * 1024 * 1024) {
             toast({
                 variant: "destructive",

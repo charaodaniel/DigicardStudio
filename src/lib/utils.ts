@@ -98,10 +98,6 @@ export const downloadVCard = (cardData: CardData) => {
   document.body.removeChild(link);
 };
 
-/**
- * Converte uma URL de imagem em uma string Base64 PNG de alta qualidade.
- * Isso garante que o SVG seja auto-contido e as plotters consigam carregar os elementos.
- */
 async function imageToHighQualityBase64(url: string): Promise<string> {
   if (!url) return '';
   try {
@@ -113,7 +109,6 @@ async function imageToHighQualityBase64(url: string): Promise<string> {
       img.crossOrigin = 'anonymous';
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        // Redimensionar para garantir alta qualidade na impressão (approx 1024px para manter peso vs qualidade)
         const scale = 1024 / Math.max(img.width, img.height);
         canvas.width = img.width * (scale < 1 ? scale : 1);
         canvas.height = img.height * (scale < 1 ? scale : 1);
@@ -125,7 +120,7 @@ async function imageToHighQualityBase64(url: string): Promise<string> {
         }
         
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/png', 1.0)); // Qualidade máxima
+        resolve(canvas.toDataURL('image/png', 1.0));
       };
       img.onerror = () => resolve(url);
       img.src = URL.createObjectURL(blob);
@@ -145,18 +140,17 @@ const getContrastColor = (hexcolor: string) => {
   return yiq >= 128 ? '#000000' : '#ffffff';
 };
 
-/**
- * Gera a string do SVG técnico para o modo físico (Frente + Verso lado a lado)
- */
 export async function generatePhysicalCardSVG(cardData: CardData): Promise<string> {
-  const w = 85; // mm
-  const h = 55; // mm
-  const gap = 5; // mm
+  const w = 85; 
+  const h = 55; 
+  const gap = 5; 
   
-  // Captura as imagens em alta resolução
   const avatarBase64 = cardData.physicalShowAvatar ? await imageToHighQualityBase64(cardData.avatarUrl) : '';
   const qrBase64 = cardData.physicalShowQR ? await imageToHighQualityBase64(cardData.qrCodeUrl || '') : '';
   const textColor = getContrastColor(cardData.physicalBackgroundColor || '#ffffff');
+  
+  const baseSize = cardData.baseFontSize || 16;
+  const fontName = cardData.fontFamily || 'Inter';
 
   return `
 <svg width="${(w * 2) + gap}mm" height="${h}mm" viewBox="0 0 ${(w * 2) + gap} ${h}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -167,12 +161,11 @@ export async function generatePhysicalCardSVG(cardData: CardData): Promise<strin
   </defs>
   <style>
     .cut { fill: none; stroke: #FF0000; stroke-width: 0.1; }
-    .text { fill: ${textColor}; font-family: '${cardData.fontFamily}', Arial, sans-serif; }
+    .text { fill: ${textColor}; font-family: '${fontName}', Arial, sans-serif; }
     .label { fill: ${cardData.themeColor}; font-weight: bold; }
     .small-label { fill: ${textColor}; opacity: 0.5; font-size: 1.8px; font-weight: bold; }
   </style>
 
-  <!-- FRENTE (Anverso) -->
   <g id="front">
     <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
@@ -183,15 +176,15 @@ export async function generatePhysicalCardSVG(cardData: CardData): Promise<strin
     ` : ''}
 
     ${cardData.physicalShowTitle ? `
-    <text x="6" y="12" class="text" font-size="5" font-weight="900">${cardData.fullName.toUpperCase()}</text>
-    <text x="6" y="17" class="label" font-size="2.5" letter-spacing="0.5">${cardData.jobTitle.toUpperCase()}</text>
+    <text x="6" y="12" class="text" font-size="${(baseSize / 16) * 5}" font-weight="900">${cardData.fullName.toUpperCase()}</text>
+    <text x="6" y="17" class="label" font-size="${(baseSize / 16) * 2.5}" letter-spacing="0.5">${cardData.jobTitle.toUpperCase()}</text>
     ` : ''}
 
     ${cardData.physicalShowLinks ? `
     <g transform="translate(6, 26)">
       ${cardData.links.slice(0, 4).map((l, i) => `
         <text x="0" y="${i * 6}" class="small-label">${l.label.toUpperCase()}</text>
-        <text x="0" y="${(i * 6) + 3}" class="text" font-size="2.6" font-weight="bold">${l.value}</text>
+        <text x="0" y="${(i * 6) + 3}" class="text" font-size="${(baseSize / 16) * 2.6}" font-weight="bold">${l.value}</text>
       `).join('')}
     </g>
     ` : ''}
@@ -203,7 +196,6 @@ export async function generatePhysicalCardSVG(cardData: CardData): Promise<strin
     ` : ''}
   </g>
 
-  <!-- VERSO (Reverso) -->
   <g id="back" transform="translate(${w + gap}, 0)">
     <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
@@ -241,32 +233,24 @@ export const downloadPlotterSVG = async (cardData: CardData) => {
 
 export const downloadPhysicalPNG = async (cardData: CardData) => {
   const svgString = await generatePhysicalCardSVG(cardData);
-  
-  // 350 DPI calculations for A4 width area (approx 175mm open)
   const dpi = 350;
   const mmPerInch = 25.4;
   const widthMm = 175; 
   const heightMm = 55;
-  
   const widthPx = Math.round((widthMm / mmPerInch) * dpi);
   const heightPx = Math.round((heightMm / mmPerInch) * dpi);
-
   const canvas = document.createElement('canvas');
   canvas.width = widthPx;
   canvas.height = heightPx;
   const ctx = canvas.getContext('2d');
-
   if (!ctx) return;
-
   const img = new Image();
   const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
-
   img.onload = () => {
     ctx.fillStyle = 'white'; 
     ctx.fillRect(0, 0, widthPx, heightPx);
     ctx.drawImage(img, 0, 0, widthPx, heightPx);
-    
     canvas.toBlob((blob) => {
       if (!blob) return;
       const pngUrl = URL.createObjectURL(blob);
@@ -278,8 +262,7 @@ export const downloadPhysicalPNG = async (cardData: CardData) => {
       document.body.removeChild(link);
       URL.revokeObjectURL(pngUrl);
       URL.revokeObjectURL(url);
-    }, 'image/png', 1.0); // Qualidade máxima para PNG
+    }, 'image/png', 1.0);
   };
-
   img.src = url;
 };
