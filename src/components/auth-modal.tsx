@@ -1,5 +1,5 @@
 'use client';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import AuthForm from './auth-form';
 import { useRouter } from 'next/navigation';
 
@@ -19,6 +19,10 @@ export default function AuthModal({ isOpen, onOpenChange }: AuthModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
+        <DialogTitle className="sr-only">Acesso ao DigiCard Studio</DialogTitle>
+        <DialogDescription className="sr-only">
+          Entre ou crie sua conta profissional para gerenciar seus cartões de visita digitais e gabaritos de impressão.
+        </DialogDescription>
         <AuthForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
