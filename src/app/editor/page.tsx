@@ -136,6 +136,7 @@ function EditorContent() {
         <ToolsSidebar activeTool={activeTool} onToolClick={setActiveTool} />
         <Canvas 
           cardData={cardData} 
+          setCardData={updateCardData}
           selectedLinkId={selectedLinkId} 
           setSelectedLinkId={setSelectedLinkId}
           setActiveTool={setActiveTool}

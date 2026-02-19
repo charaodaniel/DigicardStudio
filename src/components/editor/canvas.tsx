@@ -10,13 +10,21 @@ import { cn } from '@/lib/utils';
 
 type CanvasProps = {
   cardData: CardData;
+  setCardData: Dispatch<SetStateAction<CardData>>;
   selectedLinkId: string | null;
   setSelectedLinkId: Dispatch<SetStateAction<string | null>>;
   setActiveTool: (toolId: string) => void;
   mode: 'digital' | 'physical';
 };
 
-export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, setActiveTool, mode }: CanvasProps) {
+export default function Canvas({ 
+  cardData, 
+  setCardData, 
+  selectedLinkId, 
+  setSelectedLinkId, 
+  setActiveTool, 
+  mode 
+}: CanvasProps) {
   const [zoom, setZoom] = useState(85);
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 5, 150));
@@ -65,6 +73,7 @@ export default function Canvas({ cardData, selectedLinkId, setSelectedLinkId, se
             <div className="flex-1 relative overflow-hidden">
                 <EditableCardPreview 
                     cardData={cardData} 
+                    setCardData={setCardData}
                     selectedLinkId={selectedLinkId} 
                     setSelectedLinkId={setSelectedLinkId}
                     setActiveTool={setActiveTool}
