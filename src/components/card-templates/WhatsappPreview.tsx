@@ -5,7 +5,7 @@ import { formatHref } from '@/lib/utils';
 import SocialIcon from '@/components/social-icon';
 
 export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, links, themeColor, qrCodeUrl } = cardData;
 
     return (
         <div className="bg-slate-50 dark:bg-slate-950 font-display text-[#121117] dark:text-white h-full flex flex-col overflow-hidden relative">
@@ -95,6 +95,15 @@ export default function WhatsappPreview({ cardData }: { cardData: CardData }) {
                             <div className="flex justify-between"><span className="text-slate-500">Sábado</span><span className="font-semibold">09:00 - 13:00</span></div>
                         </div>
                     </div>
+
+                    {qrCodeUrl && (
+                        <div className="mt-8 mb-12 flex flex-col items-center gap-4 py-8 border-t border-primary/10 w-full shrink-0">
+                            <div className="p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
+                                <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-center">Scan to add on WhatsApp</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

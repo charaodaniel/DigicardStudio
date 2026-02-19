@@ -1,15 +1,16 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function YoutubePreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
-    const { fullName, isVerified, avatarUrl, stats, themeColor, links, bannerUrl } = cardData;
+    const { fullName, isVerified, avatarUrl, stats, themeColor, links, bannerUrl, qrCodeUrl } = cardData;
     
     const youtubeLink = links.find(l => l.type === 'youtube') || links.find(l => l.type === 'website');
     const actionHref = youtubeLink ? formatHref(youtubeLink.type, youtubeLink.value) : '#';
 
     return (
-        <div className="bg-slate-50 dark:bg-background-dark font-display antialiased h-full flex flex-col overflow-hidden relative">
+        <div className="bg-slate-50 dark:bg-slate-900 font-display antialiased h-full flex flex-col overflow-hidden relative">
             {/* Header Mockup - FIXED TOP */}
             <div className="flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md p-4 justify-between border-b border-gray-100 dark:border-slate-800 shrink-0 z-50">
                 <span className="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
@@ -80,6 +81,15 @@ export default function YoutubePreview({ cardData, onShare }: { cardData: CardDa
                         </div>
                     ))}
                 </div>
+
+                {qrCodeUrl && (
+                    <div className="mt-12 mb-12 flex flex-col items-center gap-4 px-6 shrink-0">
+                        <div className="p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
+                            <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-slate-500 text-center">Scan to Subscribe</p>
+                    </div>
+                )}
             </div>
 
             {/* Bottom Nav Mockup - FIXED BOTTOM */}

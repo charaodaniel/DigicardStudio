@@ -1,10 +1,11 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref, shareCard } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
 export default function DiscordPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, bannerUrl, vCardUrl } = cardData;
+    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, bannerUrl, vCardUrl, qrCodeUrl } = cardData;
     const { toast } = useToast();
     
     const discordLink = links.find(l => l.type === 'discord') || links.find(l => l.type === 'website');
@@ -134,6 +135,15 @@ export default function DiscordPreview({ cardData }: { cardData: CardData }) {
                                 Compartilhar
                             </button>
                         </div>
+
+                        {qrCodeUrl && (
+                            <div className="mt-8 flex flex-col items-center gap-3 py-6 border-t border-white/5 shrink-0">
+                                <div className="p-3 bg-white rounded-xl">
+                                    <img src={qrCodeUrl} alt="QR Code" className="size-24" />
+                                </div>
+                                <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#B5BAC1]">Scan Me</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Status Bar */}

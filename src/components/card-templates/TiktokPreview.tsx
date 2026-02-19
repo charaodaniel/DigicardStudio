@@ -1,9 +1,10 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 
 export default function TiktokPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, bio, isVerified, avatarUrl, links, themeColor, bannerUrl } = cardData;
+    const { fullName, bio, isVerified, avatarUrl, links, themeColor, bannerUrl, qrCodeUrl } = cardData;
     
     const tiktokLink = links.find(l => l.type === 'tiktok') || links.find(l => l.type === 'website');
     const actionHref = tiktokLink ? formatHref(tiktokLink.type, tiktokLink.value) : '#';
@@ -70,6 +71,15 @@ export default function TiktokPreview({ cardData }: { cardData: CardData }) {
                             </a>
                         ))}
                     </div>
+
+                    {qrCodeUrl && (
+                        <div className="mt-12 mb-12 flex flex-col items-center gap-4 py-8 border-t border-gray-100 w-full shrink-0">
+                            <div className="p-4 bg-white rounded-2xl shadow-xl border border-gray-100">
+                                <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Scan to follow on TikTok</p>
+                        </div>
+                    )}
                 </div>
             </div>
             {/* Bottom Nav Mockup - FIXED BOTTOM */}

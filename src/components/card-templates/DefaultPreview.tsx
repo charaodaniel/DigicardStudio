@@ -12,7 +12,7 @@ type DefaultPreviewProps = {
 };
 
 export default function DefaultPreview({ cardData, onShare, onSaveContact }: DefaultPreviewProps) {
-  const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
+  const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel, qrCodeUrl } = cardData;
 
   return (
     <div className="flex flex-1 min-h-0 flex-col bg-white overflow-y-auto no-scrollbar pb-24 relative">
@@ -97,6 +97,17 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
         >
           {saveContactLabel}
         </button>
+
+        {qrCodeUrl && (
+          <div className="mt-8 mb-12 flex flex-col items-center gap-4 py-8 border-t border-slate-100 w-full shrink-0">
+            <div className="p-4 bg-white rounded-2xl shadow-xl border border-slate-100">
+              <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+            </div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-slate-500">
+              Escaneie para salvar o contato
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

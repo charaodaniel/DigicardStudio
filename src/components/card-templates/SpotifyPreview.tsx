@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import SocialIcon from '@/components/social-icon';
 
 export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, isVerified, avatarUrl, links, themeColor, qrCodeUrl } = cardData;
     const { toast } = useToast();
     
     const spotifyLink = links.find(l => l.type === 'spotify' || l.type === 'website');
@@ -83,6 +83,15 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
                             </a>
                         ))}
                     </div>
+
+                    {qrCodeUrl && (
+                        <div className="mt-12 mb-12 flex flex-col items-center gap-4 py-8 border-t border-white/5 w-full shrink-0">
+                            <div className="p-4 bg-white rounded-2xl shadow-xl">
+                                <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1DB954]">Spotify Digital ID</p>
+                        </div>
+                    )}
                 </main>
             </div>
 

@@ -4,7 +4,7 @@ import type { CardData } from '@/lib/types';
 import SocialIcon from '@/components/social-icon';
 
 export default function DesignerStudioPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
-    const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
+    const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor, qrCodeUrl } = cardData;
 
     return (
         <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-full flex flex-col relative overflow-hidden">
@@ -82,6 +82,17 @@ export default function DesignerStudioPreview({ cardData, onShare }: { cardData:
                         ))}
                     </div>
                 </section>
+
+                {qrCodeUrl && (
+                    <section className="mt-8 mb-12 flex flex-col items-center gap-4 px-6 shrink-0">
+                        <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+                            <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-center">
+                            Scan to connect
+                        </p>
+                    </section>
+                )}
             </div>
 
             {/* Bottom Nav */}

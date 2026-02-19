@@ -5,7 +5,7 @@ import { formatHref } from '@/lib/utils';
 import SocialIcon from '@/components/social-icon';
 
 export default function ExecutivePreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
-    const { fullName, fullNameLink, jobTitle, jobTitleLink, bio, isVerified, avatarUrl, avatarLink, themeColor, links, stats, bannerUrl } = cardData;
+    const { fullName, fullNameLink, jobTitle, jobTitleLink, bio, isVerified, avatarUrl, avatarLink, themeColor, links, stats, bannerUrl, qrCodeUrl } = cardData;
     
     const linkedinLink = links.find(l => l.type === 'linkedin' || l.type === 'website');
     const actionHref = linkedinLink ? formatHref(linkedinLink.type, linkedinLink.value) : '#';
@@ -108,7 +108,7 @@ export default function ExecutivePreview({ cardData, onShare }: { cardData: Card
                 </div>
 
                 {/* Additional Links Section */}
-                <div className="w-full mt-8 space-y-3 pb-12">
+                <div className="w-full mt-8 space-y-3">
                     <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-center mb-4">Canais de Contato</h4>
                     {links.map(link => (
                         <a 
@@ -128,6 +128,17 @@ export default function ExecutivePreview({ cardData, onShare }: { cardData: Card
                         </a>
                     ))}
                 </div>
+
+                {qrCodeUrl && (
+                    <div className="mt-12 mb-12 flex flex-col items-center gap-4 px-6 shrink-0">
+                        <div className="p-4 bg-white dark:bg-[#0a0a0b] rounded-2xl shadow-xl border border-white/10">
+                            <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                        </div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D4AF37] text-center opacity-60">
+                            Exclusive Digital ID
+                        </p>
+                    </div>
+                )}
             </div>
             
             {/* Fixed Bottom Navbar */}

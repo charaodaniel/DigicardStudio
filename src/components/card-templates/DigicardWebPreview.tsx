@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import SocialIcon from '@/components/social-icon';
 
 export default function DigicardWebPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, saveContactLabel } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, saveContactLabel, qrCodeUrl } = cardData;
     const { toast } = useToast();
 
     const handleShare = async () => {
@@ -63,7 +63,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                     </div>
                 </section>
 
-                <section className="flex flex-col gap-3 px-6 py-4 pb-12">
+                <section className="flex flex-col gap-3 px-6 py-4">
                     {links.map(link => (
                         <a key={link.id} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${link.color || themeColor}15`, color: link.color || themeColor }}>
@@ -74,6 +74,15 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                         </a>
                     ))}
                 </section>
+
+                {qrCodeUrl && (
+                    <section className="mt-8 mb-8 flex flex-col items-center gap-4 px-6 shrink-0">
+                        <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+                            <img src={qrCodeUrl} alt="QR Code" className="size-28" />
+                        </div>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] opacity-40">Scan to View</p>
+                    </section>
+                )}
 
                 <footer className="py-12 text-center bg-slate-50 dark:bg-slate-900/50 shrink-0">
                     <p className="text-slate-400 dark:text-slate-600 text-xs font-medium tracking-tight">

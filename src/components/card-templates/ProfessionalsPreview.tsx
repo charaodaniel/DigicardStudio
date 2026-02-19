@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import SocialIcon from '@/components/social-icon';
 
 export default function ProfessionalsPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor, vCardUrl } = cardData;
+    const { fullName, jobTitle, bio, avatarUrl, isVerified, links, stats, themeColor, vCardUrl, qrCodeUrl } = cardData;
     const { toast } = useToast();
 
     const contactLink = links.find(l => l.type === 'email' || l.type === 'whatsapp' || l.type === 'website');
@@ -143,6 +143,17 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                         ))}
                     </div>
                 </div>
+
+                {qrCodeUrl && (
+                    <div className="mt-12 mb-12 flex flex-col items-center gap-4 px-6 shrink-0">
+                        <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+                            <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                        </div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-40 text-center">
+                            Scan to see Portfolio
+                        </p>
+                    </div>
+                )}
             </div>
 
             {/* Floating Navigation - Absolute bottom */}

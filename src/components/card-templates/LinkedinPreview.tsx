@@ -1,10 +1,11 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
 import SocialIcon from '@/components/social-icon';
 
 export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
-    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor } = cardData;
+    const { fullName, jobTitle, bio, isVerified, avatarUrl, links, themeColor, qrCodeUrl } = cardData;
 
     return (
         <div className="bg-slate-50 dark:bg-slate-950 h-full flex flex-col relative overflow-hidden">
@@ -73,6 +74,15 @@ export default function LinkedinPreview({ cardData }: { cardData: CardData }) {
                             <span className="material-symbols-outlined text-gray-400 text-sm">chevron_right</span>
                         </a>
                     ))}
+
+                    {qrCodeUrl && (
+                        <div className="mt-12 mb-12 flex flex-col items-center gap-4 py-8 border-t border-gray-100 dark:border-gray-800 w-full shrink-0">
+                            <div className="p-4 bg-white rounded-2xl shadow-xl border border-gray-100">
+                                <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Scan to save Profile</p>
+                        </div>
+                    )}
                 </div>
             </div>
             

@@ -6,7 +6,7 @@ import React from 'react';
 import SocialIcon from '@/components/social-icon';
 
 export default function InstagramPreview({ cardData, onShare }: { cardData: CardData, onShare: () => void }) {
-    const { fullName, fullNameLink, bio, isVerified, avatarUrl, avatarLink, themeColor, stats, links } = cardData;
+    const { fullName, fullNameLink, bio, isVerified, avatarUrl, avatarLink, themeColor, stats, links, qrCodeUrl } = cardData;
     
     const instagramLink = links.find(l => l.type === 'instagram' || l.type === 'website');
     const actionHref = instagramLink ? formatHref(instagramLink.type, instagramLink.value) : '#';
@@ -115,6 +115,15 @@ export default function InstagramPreview({ cardData, onShare }: { cardData: Card
                                 </a>
                             ))}
                         </div>
+
+                        {qrCodeUrl && (
+                            <div className="mt-12 mb-12 flex flex-col items-center gap-4 py-8 border-t border-white/5 w-full shrink-0">
+                                <div className="p-4 bg-white rounded-2xl shadow-xl">
+                                    <img src={qrCodeUrl} alt="QR Code" className="size-32" />
+                                </div>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Gere sua Identidade Digital</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
