@@ -9,9 +9,10 @@ import SocialIcon from '@/components/social-icon';
 type PhysicalCardPreviewProps = {
   cardData: CardData;
   setActiveTool: (toolId: string) => void;
+  setSelectedLinkId: (id: string | null) => void;
 };
 
-export default function PhysicalCardPreview({ cardData, setActiveTool }: PhysicalCardPreviewProps) {
+export default function PhysicalCardPreview({ cardData, setActiveTool, setSelectedLinkId }: PhysicalCardPreviewProps) {
   const { 
     template, themeColor, fullName, jobTitle, bio, avatarUrl, links, qrCodeUrl, 
     customWebsiteUrl, footerText, stats, fontFamily, baseFontSize,
@@ -55,12 +56,15 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           style={{ ...globalStyle, backgroundColor: physicalBackgroundColor, color: textColor }}
         >
           <div className="absolute top-4 right-4 text-[6px] font-bold tracking-[0.2em] opacity-40 uppercase">DigiCard Music</div>
-          <div className={cn("shrink-0", isVertical ? "w-full mb-4" : "w-32")}>
+          <div 
+            className={cn("shrink-0 cursor-pointer hover:ring-2 hover:ring-primary rounded transition-all", isVertical ? "w-full mb-4" : "w-32")}
+            onClick={() => setActiveTool('imagens')}
+          >
             {physicalShowAvatar && <img src={avatarUrl} className="w-full aspect-square object-cover rounded shadow-lg" />}
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {physicalShowTitle && (
-              <div className="mb-2">
+              <div className="mb-2 cursor-pointer hover:opacity-70 transition-opacity" onClick={() => setActiveTool('conteudo')}>
                 <h2 className="text-sm font-black uppercase tracking-tight" style={{ fontSize: `${baseFontSize * 0.8}px` }}>{fullName}</h2>
                 <p className="text-[#1DB954] text-[8px] font-bold uppercase">{jobTitle || 'Artista'}</p>
               </div>
@@ -68,7 +72,11 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             {physicalShowLinks && (
               <div className="space-y-1">
                 {links.slice(0, 3).map((l, i) => (
-                  <div key={l.id} className="flex items-center gap-2 text-[8px] border-b border-black/5 dark:border-white/5 py-0.5">
+                  <div 
+                    key={l.id} 
+                    onClick={() => { setSelectedLinkId(l.id); setActiveTool('social'); }}
+                    className="flex items-center gap-2 text-[8px] border-b border-black/5 dark:border-white/5 py-0.5 cursor-pointer hover:bg-black/5 rounded px-1 transition-colors"
+                  >
                     <span className="opacity-30">0{i+1}</span>
                     <span className="font-bold truncate">{l.value}</span>
                   </div>
@@ -91,14 +99,20 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
       >
         <div className="flex flex-col flex-1">
           {physicalShowTitle && (
-            <div className="mb-4">
+            <div 
+              className="mb-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-1 rounded transition-colors" 
+              onClick={() => setActiveTool('conteudo')}
+            >
               <h2 className="text-xl font-black tracking-tight" style={{ fontSize: `${baseFontSize * 1.2}px` }}>{fullName}</h2>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60" style={{ color: themeColor }}>{jobTitle}</p>
             </div>
           )}
           
           {physicalShowStats && stats.length > 0 && (
-            <div className="flex gap-4 mb-4">
+            <div 
+              className="flex gap-4 mb-4 cursor-pointer hover:bg-black/5 rounded p-1 transition-colors"
+              onClick={() => setActiveTool('conteudo')}
+            >
               {stats.slice(0, 3).map((s, i) => (
                 <div key={i} className="text-left">
                   <p className="text-[10px] font-black leading-none">{s.value}</p>
@@ -111,7 +125,12 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           {physicalShowLinks && (
             <div className="space-y-2">
               {links.slice(0, 3).map(l => (
-                <div key={l.id} className="flex items-center gap-2 text-[10px]" style={{ fontSize: `${baseFontSize * 0.6}px` }}>
+                <div 
+                  key={l.id} 
+                  onClick={() => { setSelectedLinkId(l.id); setActiveTool('social'); }}
+                  className="flex items-center gap-2 text-[10px] cursor-pointer hover:bg-black/5 rounded p-1 transition-colors" 
+                  style={{ fontSize: `${baseFontSize * 0.6}px` }}
+                >
                   <SocialIcon 
                     type={l.type} 
                     icon={l.icon} 
@@ -125,12 +144,18 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
           )}
         </div>
         {physicalShowAvatar && (
-          <div className={cn("rounded-full overflow-hidden border-2 border-white shadow-xl bg-slate-100", isVertical ? "size-24" : "size-32")}>
+          <div 
+            onClick={() => setActiveTool('imagens')}
+            className={cn("rounded-full overflow-hidden border-2 border-white shadow-xl bg-slate-100 cursor-pointer hover:scale-105 transition-transform", isVertical ? "size-24" : "size-32")}
+          >
             <img src={avatarUrl} className="w-full h-full object-cover" />
           </div>
         )}
         {physicalShowFooter && (
-          <div className="absolute bottom-4 left-8 right-8 flex justify-between items-center opacity-40 text-[7px] font-bold uppercase tracking-widest">
+          <div 
+            onClick={() => setActiveTool('fisico')}
+            className="absolute bottom-4 left-8 right-8 flex justify-between items-center opacity-40 text-[7px] font-bold uppercase tracking-widest cursor-pointer hover:opacity-100 transition-opacity"
+          >
             <span>{customWebsiteUrl || 'digicard.studio'}</span>
             <span>{footerText || 'PRODUCED BY DIGICARD'}</span>
           </div>
@@ -146,8 +171,11 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
     >
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${textColor} 1px, transparent 1px)`, backgroundSize: '24px 24px' }}></div>
       {physicalShowQR && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="p-4 bg-white rounded-3xl shadow-xl border border-slate-100">
+        <div 
+          className="flex flex-col items-center gap-4 cursor-pointer group"
+          onClick={() => setActiveTool('qrcode')}
+        >
+          <div className="p-4 bg-white rounded-3xl shadow-xl border border-slate-100 group-hover:border-primary transition-colors">
             {qrCodeUrl ? <img src={qrCodeUrl} className="size-32" /> : <div className="size-32 bg-slate-100 rounded flex items-center justify-center"><span className="material-symbols-outlined text-4xl text-slate-300">qr_code_2</span></div>}
           </div>
           <div className="text-center">
