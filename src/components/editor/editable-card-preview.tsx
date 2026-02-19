@@ -57,7 +57,7 @@ export default function EditableCardPreview({
     // Overlay para templates não-padrão para permitir edição de áreas específicas
     if (template !== 'default') {
         return (
-            <div className="w-full h-full relative group overflow-hidden flex flex-col">
+            <div className="w-full h-full relative group flex flex-col overflow-hidden">
                 <DigitalCardPreview cardData={cardData} />
                 
                 {/* Inputs ocultos para upload direto */}
@@ -84,7 +84,6 @@ export default function EditableCardPreview({
                             onClick={(e) => { 
                                 e.stopPropagation(); 
                                 setActiveTool('imagens');
-                                // Tenta abrir o seletor de arquivos se o usuário clicar na área de imagem
                                 avatarInputRef.current?.click();
                             }}
                             className="absolute top-0 left-0 w-full h-[25%] cursor-pointer pointer-events-auto group/edit"

@@ -57,8 +57,8 @@ export default function PublicCardPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-950 flex justify-center overflow-y-auto">
-      <div className="relative w-full max-w-[500px] min-h-screen bg-white dark:bg-slate-900 shadow-2xl">
+    <div className="h-screen w-full bg-slate-50 dark:bg-slate-950 flex justify-center overflow-hidden">
+      <div className="relative w-full max-w-[500px] h-full bg-white dark:bg-slate-900 shadow-2xl overflow-hidden">
         <DigitalCardPreview cardData={cardData} />
       </div>
     </div>

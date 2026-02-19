@@ -15,7 +15,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
   const { fullName, jobTitle, bio, avatarUrl, isVerified, links, themeColor, saveContactLabel } = cardData;
 
   return (
-    <div className="flex min-h-full w-full flex-col bg-white overflow-y-auto no-scrollbar pb-20 relative">
+    <div className="flex h-full w-full flex-col bg-white overflow-y-auto no-scrollbar pb-24 relative">
       <div
         className="relative h-48 shrink-0"
         style={{ backgroundColor: themeColor }}
@@ -92,7 +92,7 @@ export default function DefaultPreview({ cardData, onShare, onSaveContact }: Def
         </div>
         <button
           onClick={onSaveContact}
-          className="mt-10 w-full rounded-xl py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98] transition-all"
+          className="mt-10 w-full rounded-xl py-4 text-sm font-bold text-white shadow-lg active:scale-[0.98] transition-all mb-8"
           style={{ backgroundColor: themeColor, boxShadow: `0 8px 20px -4px ${themeColor}66` }}
         >
           {saveContactLabel}

@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import type { CardData } from '@/lib/types';
@@ -84,7 +85,7 @@ export default function DigitalCardPreview({
         fontFamily: `'${cardData.fontFamily}', sans-serif`,
         fontSize: `${cardData.baseFontSize}px`
       }}
-      className="h-full w-full"
+      className="h-full w-full overflow-hidden"
     >
       <PreviewComponent />
       <ShareModal 
