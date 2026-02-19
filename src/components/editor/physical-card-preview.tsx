@@ -1,8 +1,10 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { templates } from './template-library';
 import React from 'react';
+import SocialIcon from '@/components/social-icon';
 
 type PhysicalCardPreviewProps = {
   cardData: CardData;
@@ -110,7 +112,12 @@ export default function PhysicalCardPreview({ cardData, setActiveTool }: Physica
             <div className="space-y-2">
               {links.slice(0, 3).map(l => (
                 <div key={l.id} className="flex items-center gap-2 text-[10px]" style={{ fontSize: `${baseFontSize * 0.6}px` }}>
-                  <span className="material-symbols-outlined text-xs" style={{ color: themeColor, fontSize: '1.2em' }}>{l.icon}</span>
+                  <SocialIcon 
+                    type={l.type} 
+                    icon={l.icon} 
+                    className="text-xs" 
+                    style={{ color: l.color || themeColor, fontSize: '1.2em' }} 
+                  />
                   <span className="font-medium truncate">{l.value}</span>
                 </div>
               ))}
