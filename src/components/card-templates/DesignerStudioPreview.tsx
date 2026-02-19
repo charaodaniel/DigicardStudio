@@ -1,3 +1,4 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import SocialIcon from '@/components/social-icon';
@@ -6,9 +7,9 @@ export default function DesignerStudioPreview({ cardData, onShare }: { cardData:
     const { fullName, jobTitle, avatarUrl, isVerified, links, themeColor } = cardData;
 
     return (
-        <div className="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 h-full flex flex-col relative overflow-hidden">
+        <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 h-full flex flex-col relative overflow-hidden">
             {/* Header */}
-            <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 bg-slate-50/80 dark:bg-background-dark/80 backdrop-blur-md z-20 border-b border-slate-100 dark:border-slate-800">
+            <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md z-20 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">auto_awesome</span>
                     <h1 className="font-bold text-lg tracking-tight">Designer Studio</h1>
@@ -22,13 +23,13 @@ export default function DesignerStudioPreview({ cardData, onShare }: { cardData:
             </header>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pt-20 pb-24">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pt-20 pb-24">
                 <section className="flex flex-col items-center px-6 pt-4 pb-8">
                     <div className="relative mb-6">
                         <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1">
                             <img alt={fullName} className="w-full h-full object-cover rounded-full shadow-lg" src={avatarUrl} />
                         </div>
-                        {isVerified && <div className="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-slate-50 dark:border-background-dark flex items-center justify-center">
+                        {isVerified && <div className="absolute bottom-1 right-1 bg-primary text-white rounded-full p-1 border-2 border-slate-50 dark:border-slate-950 flex items-center justify-center">
                             <span className="material-symbols-outlined text-[16px] font-bold">verified</span>
                         </div>}
                     </div>

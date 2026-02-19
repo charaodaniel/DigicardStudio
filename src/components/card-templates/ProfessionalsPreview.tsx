@@ -1,3 +1,4 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import React from 'react';
@@ -24,9 +25,9 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
     };
 
     return (
-        <div className="bg-white dark:bg-[#1c1b2b] font-display text-[#121117] antialiased h-full flex flex-col overflow-hidden relative">
+        <div className="bg-white dark:bg-slate-950 font-display text-[#121117] antialiased h-full flex flex-col overflow-hidden relative">
             {/* Sticky Top Bar - Absolute within frame */}
-            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-[#1c1b2b]/80 border-b border-slate-100 dark:border-slate-800">
+            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between bg-white/80 px-4 py-4 backdrop-blur-md dark:bg-slate-950/80 border-b border-slate-100 dark:border-slate-800">
                 <button className="flex size-10 items-center justify-center rounded-full bg-slate-50 text-[#121117] dark:bg-primary/10 dark:text-white">
                     <span className="material-symbols-outlined text-[22px]">arrow_back</span>
                 </button>
@@ -40,7 +41,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar pt-20 pb-32">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pt-20 pb-32">
                 {/* Profile Header Section */}
                 <div className="flex flex-col items-center px-6 pt-6 pb-8">
                     <div className="relative mb-4">
@@ -60,7 +61,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
                             <span className="material-symbols-outlined text-xs">location_on</span>
                             <span>São Paulo, Brasil</span>
                         </div>
-                        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-[300px] mx-auto">
+                        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-[320px] mx-auto">
                             {bio}
                         </p>
                     </div>
@@ -145,7 +146,7 @@ export default function ProfessionalsPreview({ cardData }: { cardData: CardData 
             </div>
 
             {/* Floating Navigation - Absolute bottom */}
-            <div className="absolute bottom-6 left-1/2 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-white/90 p-2 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:bg-[#1c1b2b]/90 z-50">
+            <div className="absolute bottom-6 left-1/2 flex w-max -translate-x-1/2 items-center gap-2 rounded-full bg-white/90 p-2 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:bg-slate-950/90 z-50">
                 <button className="flex size-12 items-center justify-center rounded-full bg-primary text-white">
                     <span className="material-symbols-outlined">person</span>
                 </button>

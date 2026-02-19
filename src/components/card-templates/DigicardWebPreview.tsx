@@ -21,9 +21,9 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
     };
 
     return (
-        <div className="bg-white dark:bg-background-dark h-full flex flex-col relative shadow-2xl overflow-hidden">
+        <div className="bg-white dark:bg-slate-950 h-full flex flex-col relative shadow-2xl overflow-hidden">
             {/* Top Navigation Area */}
-            <div className="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md z-10 shrink-0 border-b border-slate-50 dark:border-slate-800">
+            <div className="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md z-10 shrink-0 border-b border-slate-50 dark:border-slate-800">
                 <div className="w-10 h-10 flex items-center justify-center text-primary">
                     <span className="material-symbols-outlined">qr_code_2</span>
                 </div>
@@ -38,7 +38,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
                 <section className="flex flex-col items-center px-6 pt-8 pb-4 shrink-0">
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-blue-400 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
@@ -75,7 +75,7 @@ export default function DigicardWebPreview({ cardData }: { cardData: CardData })
                     ))}
                 </section>
 
-                <footer className="py-12 text-center bg-slate-50 dark:bg-background-dark/50 shrink-0">
+                <footer className="py-12 text-center bg-slate-50 dark:bg-slate-900/50 shrink-0">
                     <p className="text-slate-400 dark:text-slate-600 text-xs font-medium tracking-tight">
                         Criado com <span className="text-primary font-bold">DigiCard Web</span>
                     </p>

@@ -25,7 +25,7 @@ export default function SpotifyPreview({ cardData }: { cardData: CardData }) {
 
     return (
         <div className="bg-[#121121] text-white h-full flex flex-col relative overflow-hidden font-display">
-            <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pb-32">
                 <header className="relative w-full aspect-square overflow-hidden shadow-2xl shrink-0">
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121121] via-transparent to-transparent z-10"></div>
                     <img alt="Artist Profile" className="w-full h-full object-cover" src={avatarUrl} />

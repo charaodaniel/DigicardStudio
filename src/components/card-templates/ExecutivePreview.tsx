@@ -1,3 +1,4 @@
+
 'use client';
 import type { CardData } from '@/lib/types';
 import { formatHref } from '@/lib/utils';
@@ -10,9 +11,9 @@ export default function ExecutivePreview({ cardData, onShare }: { cardData: Card
     const actionHref = linkedinLink ? formatHref(linkedinLink.type, linkedinLink.value) : '#';
 
     return (
-        <div className="bg-slate-50 dark:bg-background-dark font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
+        <div className="bg-slate-50 dark:bg-slate-950 font-display text-slate-900 antialiased h-full flex flex-col relative overflow-hidden">
             {/* Top Navigation */}
-            <header className="flex items-center justify-between bg-white/90 dark:bg-background-dark/90 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 z-20">
+            <header className="flex items-center justify-between bg-white/90 dark:bg-slate-950/90 backdrop-blur-md p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 z-20">
                 <button className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
                     <span className="material-symbols-outlined text-xl">arrow_back_ios</span>
                     <span className="text-sm font-medium">Voltar</span>
@@ -24,7 +25,7 @@ export default function ExecutivePreview({ cardData, onShare }: { cardData: Card
             </header>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar px-4 pt-6 pb-8">
+            <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar px-4 pt-6 pb-8">
                 {/* Main Executive Black Card */}
                 <div className="w-full max-w-md mx-auto overflow-hidden rounded-xl bg-[#0a0a0b] relative group border border-white/10 shadow-2xl">
                     <div className="absolute inset-0 pointer-events-none opacity-20 bg-gradient-to-tr from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
