@@ -1,40 +1,28 @@
 
--- LIMPEZA TOTAL (DROP)
-DROP POLICY IF EXISTS "Public can view any card" ON cards;
-DROP POLICY IF EXISTS "Users can manage their own cards" ON cards;
-DROP POLICY IF EXISTS "Admins can view all cards" ON cards;
-DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
-DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
-DROP POLICY IF EXISTS "Admins can manage all profiles" ON profiles;
+-- 1. Limpeza total (Cuidado: apaga dados existentes para garantir sincronia total)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP TABLE IF EXISTS public.cards;
+DROP TABLE IF EXISTS public.profiles;
+DROP TYPE IF EXISTS user_role;
 
-DROP TABLE IF EXISTS cards;
-DROP TABLE IF EXISTS profiles;
+-- 2. Criação do Tipo de Role (Hierarquia do SaaS)
+CREATE TYPE user_role AS ENUM ('super_admin', 'admin', 'premium', 'free');
 
--- EXTENSÕES
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- TIPOS DE USUÁRIOS (ROLES)
--- super_admin: Acesso total ao sistema e faturamento
--- admin: Gestão de usuários e suporte
--- premium: Cliente com recursos ilimitados
--- free: Usuário com limites básicos
-
--- TABELA DE PERFIS (PROFILES)
--- Complementa o auth.users do Supabase
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+-- 3. Tabela de Perfis (Extensão de auth.users)
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
   avatar_url TEXT,
-  role TEXT NOT NULL DEFAULT 'free' CHECK (role IN ('super_admin', 'admin', 'premium', 'free')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  role user_role DEFAULT 'free' NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
--- TABELA DE CARTÕES (CARDS)
-CREATE TABLE cards (
+-- 4. Tabela de Cartões Profissionais
+CREATE TABLE public.cards (
   id TEXT PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  template TEXT NOT NULL DEFAULT 'default',
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE,
+  template TEXT NOT NULL,
   full_name TEXT NOT NULL,
   full_name_link TEXT,
   job_title TEXT NOT NULL,
@@ -45,77 +33,60 @@ CREATE TABLE cards (
   banner_url TEXT,
   banner_link TEXT,
   vcard_url TEXT,
-  is_verified BOOLEAN DEFAULT false,
-  theme_color TEXT DEFAULT '#5048e5',
-  font_family TEXT DEFAULT 'Inter',
-  base_font_size INTEGER DEFAULT 16,
-  links JSONB DEFAULT '[]',
-  stats JSONB DEFAULT '[]',
-  save_contact_label TEXT DEFAULT 'Salvar Contato',
+  is_verified BOOLEAN DEFAULT FALSE,
+  theme_color TEXT,
+  font_family TEXT,
+  base_font_size INTEGER,
+  links JSONB DEFAULT '[]'::JSONB,
+  stats JSONB DEFAULT '[]'::JSONB,
+  save_contact_label TEXT,
   qr_code_url TEXT,
   qr_code_data TEXT,
   custom_website_url TEXT,
   footer_text TEXT,
-  physical_show_avatar BOOLEAN DEFAULT true,
-  physical_show_title BOOLEAN DEFAULT true,
-  physical_show_stats BOOLEAN DEFAULT true,
-  physical_show_links BOOLEAN DEFAULT true,
-  physical_show_qr BOOLEAN DEFAULT true,
-  physical_show_footer BOOLEAN DEFAULT true,
+  physical_show_avatar BOOLEAN DEFAULT TRUE,
+  physical_show_title BOOLEAN DEFAULT TRUE,
+  physical_show_stats BOOLEAN DEFAULT TRUE,
+  physical_show_links BOOLEAN DEFAULT TRUE,
+  physical_show_qr BOOLEAN DEFAULT TRUE,
+  physical_show_footer BOOLEAN DEFAULT TRUE,
   physical_background_color TEXT DEFAULT '#ffffff',
-  last_updated BIGINT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  last_updated BIGINT
 );
 
--- HABILITAR SEGURANÇA (RLS)
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
+-- 5. Segurança de Dados (Row Level Security)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cards ENABLE ROW LEVEL SECURITY;
 
--- POLÍTICAS PARA PROFILES
-CREATE POLICY "Users can view their own profile" ON profiles
-  FOR SELECT USING (auth.uid() = id);
+-- Políticas para Profiles
+CREATE POLICY "Perfis visíveis para todos" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Usuários editam próprio perfil" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Admins gerenciam todos perfis" ON public.profiles ALL USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'super_admin'))
+);
 
-CREATE POLICY "Users can update their own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = id);
+-- Políticas para Cards
+CREATE POLICY "Cartões públicos visíveis" ON public.cards FOR SELECT USING (true);
+CREATE POLICY "Usuários criam próprios cartões" ON public.cards FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Usuários editam próprios cartões" ON public.cards FOR UPDATE USING (
+  auth.uid() = user_id OR 
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'super_admin'))
+);
+CREATE POLICY "Usuários deletam próprios cartões" ON public.cards FOR DELETE USING (
+  auth.uid() = user_id OR 
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'super_admin'))
+);
 
-CREATE POLICY "Admins can view all profiles" ON profiles
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin')
-    )
-  );
-
-CREATE POLICY "Super Admins can manage roles" ON profiles
-  FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin'
-    )
-  );
-
--- POLÍTICAS PARA CARTÕES
-CREATE POLICY "Public can view any card" ON cards
-  FOR SELECT USING (true);
-
-CREATE POLICY "Users can manage their own cards" ON cards
-  FOR ALL USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all cards" ON cards
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE id = auth.uid() AND (role = 'admin' OR role = 'super_admin')
-    )
-  );
-
--- TRIGGER PARA CRIAR PERFIL AUTOMATICAMENTE NO SIGNUP
+-- 6. Automação: Criação de Perfil no Cadastro
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, full_name, avatar_url, role)
   VALUES (
-    NEW.id, 
-    NEW.raw_user_meta_data->>'full_name', 
-    NEW.raw_user_meta_data->>'avatar_url',
-    'free' -- Padrão ao cadastrar
+    new.id, 
+    new.raw_user_meta_data->>'full_name', 
+    new.raw_user_meta_data->>'avatar_url', 
+    'free'
   );
   RETURN NEW;
 END;
@@ -123,4 +94,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

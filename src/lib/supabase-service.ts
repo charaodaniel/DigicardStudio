@@ -103,7 +103,10 @@ export const supabaseService = {
       .eq('id', user.id)
       .single();
 
-    if (error) return null;
+    if (error) {
+      console.warn('Perfil não encontrado para o usuário:', user.id);
+      return null;
+    }
     return profileFromDb(data);
   },
 
@@ -120,7 +123,7 @@ export const supabaseService = {
       .order('last_updated', { ascending: false });
 
     if (error) {
-      console.error('Erro Supabase ao carregar cartões:', error.message);
+      console.error('Erro ao carregar cartões:', error.message);
       return [];
     }
 
@@ -154,7 +157,14 @@ export const supabaseService = {
       .from('cards')
       .upsert(payload);
 
-    if (error) console.error('Erro ao salvar:', error.message);
+    if (error) {
+      console.error('Erro detalhado Supabase (Save):', {
+        msg: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+    }
   },
 
   async deleteCard(id: string): Promise<void> {
