@@ -34,11 +34,11 @@ const Sidebar = ({ user }: { user: any }) => {
                 </div>
             </Link>
             <nav className="flex-1 px-4 space-y-1">
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/meus-cartoes">
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="/meus-cartoes">
                     <span className="material-symbols-outlined">dashboard</span>
                     <span className="text-sm font-medium">Dashboard</span>
                 </Link>
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="/meus-cartoes">
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/meus-cartoes">
                     <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>credit_card</span>
                     <span className="text-sm font-medium">Meus Cartões</span>
                 </Link>
@@ -46,6 +46,15 @@ const Sidebar = ({ user }: { user: any }) => {
                     <span className="material-symbols-outlined">edit_note</span>
                     <span className="text-sm font-medium">Abrir Editor</span>
                 </Link>
+                
+                <div className="pt-4 pb-2">
+                    <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administração</p>
+                </div>
+                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/admin">
+                    <span className="material-symbols-outlined text-primary">shield_person</span>
+                    <span className="text-sm font-medium">Painel Admin</span>
+                </Link>
+                
                 <div className="pt-4 pb-2">
                     <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</p>
                 </div>
