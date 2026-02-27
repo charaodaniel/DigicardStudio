@@ -1,95 +1,69 @@
 # DigiCard Studio 📇✨
 
-O **DigiCard Studio** é uma plataforma SaaS moderna para criação de identidades profissionais híbridas. Com uma interface de arrastar-e-soltar (drag-and-drop), permite que profissionais criem cartões de visita digitais interativos e gerem gabaritos técnicos de alta qualidade para impressão física e recorte em plotters.
+O **DigiCard Studio** é uma plataforma SaaS (Software as a Service) de arquitetura híbrida projetada para a gestão de identidades profissionais. O sistema permite a transição fluida entre perfis digitais interativos e gabaritos técnicos de alta fidelidade para produção física em larga escala.
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 🏗️ Arquitetura do Sistema
 
-- **Editor Visual Real-time**: Edição intuitiva com preview instantâneo em mockups de smartphones.
-- **Modo Híbrido (Digital vs Físico)**: Alternância entre design para web e gabaritos de produção industrial.
-- **Assistente de Design IA**: Sugestões inteligentes de templates, cores e fontes baseadas na profissão e estilo do usuário (Powered by Genkit).
-- **Exportação Profissional**:
-  - **PDF Técnico (A4)**: Grade de 10 cartões por folha com marcas de corte e sangria.
-  - **Salvar SVG (Vetorial)**: Arquivo otimizado para plotters de recorte (Cricut/Silhouette) com camadas de corte em Base64.
-  - **PNG 350 DPI**: Imagem de alta resolução para fidelidade gráfica absoluta.
-- **Gerador de VCard**: Download de arquivo `.vcf` real para salvar contatos diretamente no celular.
-- **Biblioteca de Modelos**: Diversos presets inspirados em redes sociais (Instagram, Spotify, LinkedIn, TikTok) e modelos executivos.
+A plataforma é construída sobre uma pilha tecnológica moderna focada em performance, segurança e escalabilidade:
 
----
+### Core & Framework
+- **Next.js 15 (App Router)**: Utilização de Server Components para otimização de SEO nas páginas públicas e Client Components para o editor em tempo real.
+- **TypeScript**: Tipagem rigorosa em toda a aplicação para garantir a integridade dos dados de design.
+- **Tailwind CSS**: Sistema de design baseado em utilitários para interface responsiva e modo escuro nativo.
 
-## 🛠️ Tecnologias Utilizadas
-
-### Core
-- **Next.js 15 (App Router)**: Framework React para performance e SEO.
-- **TypeScript**: Tipagem estática para robustez do código.
-- **Tailwind CSS**: Estilização baseada em utilitários para interface responsiva.
-
-### Interface & Componentes
-- **ShadCN UI**: Componentes acessíveis e elegantes baseados em Radix UI.
-- **Lucide React**: Biblioteca de ícones consistente.
-- **Material Symbols Outlined**: Ícones técnicos para o editor.
-- **Embla Carousel**: Para bibliotecas de templates e carrosséis de mídia.
+### Backend & Segurança (BaaS)
+- **Supabase (PostgreSQL)**: Persistência de dados relacionais para cartões e perfis.
+- **RBAC (Role-Based Access Control)**: Sistema de permissões hierárquico implementado via Row Level Security (RLS), suportando:
+  - `super_admin`: Acesso total ao sistema e banco de dados.
+  - `admin`: Gestão de usuários e moderação de conteúdo.
+  - `premium`: Acesso a templates exclusivos e exportação industrial.
+  - `free`: Nível de entrada com limites de criação de cartões.
 
 ### Inteligência Artificial
-- **Genkit 1.x**: Framework da Google para integração de fluxos de IA.
-- **Google Generative AI (Gemini)**: Modelo utilizado para sugestões de design.
+- **Genkit 1.x & Google Gemini**: Fluxos de IA para sugestões inteligentes de design baseadas em processamento de linguagem natural (NLP).
 
 ---
 
-## 📐 Exportação & Manipulação de Arquivos
+## 🛠️ Motores de Renderização e Exportação
 
-Para garantir a maior qualidade possível (350 DPI) e compatibilidade industrial sem sobrecarregar o bundle da aplicação, utilizamos padrões nativos modernos:
+O diferencial técnico do DigiCard Studio reside em sua capacidade de processar ativos gráficos para diferentes mídias:
 
-### 1. Manipulação de Vetores (SVG)
-- **Padrão**: XML/SVG 1.1 nativo.
-- **Processamento**: Geração dinâmica via Template Literals em TypeScript.
-- **Imagens**: Conversão de URLs remotas para **Base64 (Data URI)** em tempo de execução para garantir que o SVG seja auto-contido em softwares como Inkscape, Illustrator e softwares de Plotters (Cricut/Silhouette).
+### 1. Renderização Digital (Web-First)
+- **Flexbox Scroll Engine**: Arquitetura CSS `flex-1 min-h-0` para garantir rolagem independente de conteúdo em mockups de dispositivos móveis.
+- **QR Code Inteligente**: Geração dinâmica de códigos de resposta rápida (API-driven) integrados ao final do fluxo de leitura do usuário.
 
-### 2. Geração de PDF (A4 Técnico)
-- **Padrão**: CSS Paged Media (@media print).
-- **Processamento**: Motor de renderização nativo do navegador (`window.print()`).
-- **Layout**: CSS Grid especializado para alinhamento milimétrico em folhas A4, garantindo frentes e versos emparelhados (Layout "Aberto").
-
-### 3. Alta Resolução (PNG 350 DPI)
-- **Biblioteca**: HTML5 Canvas API.
-- **Processamento**: Renderização de planos vetoriais em buffer de memória com cálculo de densidade de pixels (DPI) para saída de alta fidelidade gráfica.
-
-### 4. Identidade Digital (VCard)
-- **Padrão**: vCard 3.0.
-- **Processamento**: Serialização de objetos de dados para arquivos `.vcf` via Blobs binários.
+### 2. Exportação Industrial (Print-Ready)
+- **Motor de 350 DPI**: Processamento de planos vetoriais via HTML5 Canvas API com interpolação de alta qualidade para saída em PNG de alta resolução.
+- **SVG Vetorial Autocontido**: Geração de arquivos XML/SVG 1.1 com conversão de imagens remotas para **Base64 (Data URI)**, garantindo compatibilidade total com softwares de Plotters (Cricut, Silhouette, Roland).
+- **Layout A4 "Aberto"**: Algoritmo de posicionamento milimétrico para impressão em grade (10 cartões por folha), com marcas de sangria e compensação de corte.
 
 ---
 
-## 📦 Bibliotecas Relevantes (package.json)
+## 📋 Requisitos e Instalação
 
-- `@genkit-ai/google-genai`: Integração oficial com modelos Gemini.
-- `class-variance-authority`: Gestão de variantes de componentes UI.
-- `framer-motion`: Animações fluidas na interface.
-- `react-day-picker`: Seletores de data customizados.
-- `tailwind-merge`: Utilizado para composição dinâmica de classes CSS.
-- `recharts`: Estrutura pronta para exibição de métricas e analytics.
-
----
-
-## 🏁 Como Começar
-
-1. **Instalação**:
+1. **Dependências**:
    ```bash
    npm install
    ```
 
-2. **Configuração de Variáveis**:
-   Crie um arquivo `.env` com sua chave do Google AI:
-   ```env
-   GOOGLE_GENAI_API_KEY=sua_chave_aqui
-   ```
+2. **Variáveis de Ambiente (.env)**:
+   - `NEXT_PUBLIC_SUPABASE_URL`: Endpoint do projeto Supabase.
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Chave pública de anonimato.
+   - `GOOGLE_GENAI_API_KEY`: Chave para o motor Genkit/Gemini.
 
-3. **Desenvolvimento**:
-   ```bash
-   npm run dev
-   ```
-   Acesse o editor em `http://localhost:9002`.
+3. **Banco de Dados**:
+   - Execute o script `supabase_setup.sql` localizado na pasta `/docs` para provisionar as tabelas, tipos ENUM e políticas RLS.
 
 ---
-*Desenvolvido com ❤️ no DigiCard Studio.*
+
+## 🚀 Roadmap Técnico
+- [x] Implementação de Hierarquia de Usuários (RBAC).
+- [x] Motor de exportação SVG para Plotters.
+- [x] Filtros contextuais na biblioteca de modelos (Digital vs Físico).
+- [x] Painel Administrativo Geral com métricas MRR.
+- [ ] Integração com Gateway de Pagamento (Stripe).
+- [ ] Suporte a domínios personalizados via CNAME.
+
+*Desenvolvido com rigor técnico no DigiCard Studio.*
