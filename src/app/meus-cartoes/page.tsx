@@ -4,23 +4,25 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabaseService } from '@/lib/supabase-service';
 import { supabase } from '@/lib/supabase';
-import type { CardData } from '@/lib/types';
+import type { CardData, UserProfile, UserRole } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { Crown, ShieldCheck, User as UserIcon } from 'lucide-react';
 
-const Sidebar = ({ user }: { user: any }) => {
+const Sidebar = ({ profile }: { profile: UserProfile | null }) => {
     const router = useRouter();
     
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.push('/login');
     };
+
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
 
     return (
         <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col fixed h-full z-10">
@@ -30,7 +32,7 @@ const Sidebar = ({ user }: { user: any }) => {
                 </div>
                 <div>
                     <h1 className="text-lg font-bold leading-none tracking-tight">DigiCard</h1>
-                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">SaaS Dashboard</p>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Professional</p>
                 </div>
             </Link>
             <nav className="flex-1 px-4 space-y-1">
@@ -47,13 +49,17 @@ const Sidebar = ({ user }: { user: any }) => {
                     <span className="text-sm font-medium">Abrir Editor</span>
                 </Link>
                 
-                <div className="pt-4 pb-2">
-                    <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administração</p>
-                </div>
-                <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/admin">
-                    <span className="material-symbols-outlined text-primary">shield_person</span>
-                    <span className="text-sm font-medium">Painel Admin</span>
-                </Link>
+                {isAdmin && (
+                    <>
+                        <div className="pt-4 pb-2">
+                            <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Administração</p>
+                        </div>
+                        <Link className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" href="/admin">
+                            <span className="material-symbols-outlined text-primary">shield_person</span>
+                            <span className="text-sm font-medium">Painel Admin</span>
+                        </Link>
+                    </>
+                )}
                 
                 <div className="pt-4 pb-2">
                     <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</p>
@@ -65,16 +71,22 @@ const Sidebar = ({ user }: { user: any }) => {
             </nav>
             <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-3 p-2">
-                    <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                        {user?.user_metadata?.avatar_url ? (
-                            <Image alt="Avatar" className="size-full object-cover" src={user.user_metadata.avatar_url} width={36} height={36} />
+                    <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-primary/20">
+                        {profile?.avatarUrl ? (
+                            <Image alt="Avatar" className="size-full object-cover" src={profile.avatarUrl} width={36} height={36} />
                         ) : (
-                            <span className="material-symbols-outlined text-slate-400">person</span>
+                            <UserIcon size={18} className="text-slate-400" />
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{user?.user_metadata?.full_name || user?.email}</p>
-                        <p className="text-xs text-slate-500 truncate">Plano Pro</p>
+                        <p className="text-sm font-semibold truncate">{profile?.fullName || 'Usuário'}</p>
+                        <div className="flex items-center gap-1">
+                            {profile?.role === 'premium' && <Crown size={10} className="text-indigo-500" />}
+                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                                {profile?.role === 'free' ? 'Plano Free' : 
+                                 profile?.role === 'premium' ? 'Plano Premium' : 'Equipe Admin'}
+                            </p>
+                        </div>
                     </div>
                     <button onClick={handleLogout} className="material-symbols-outlined text-slate-400 text-lg hover:text-red-500 transition-colors">logout</button>
                 </div>
@@ -144,21 +156,25 @@ const CardItem = ({ card, onDelete }: { card: CardData, onDelete: (id: string) =
 export default function MeusCartoesPage() {
     const router = useRouter();
     const [cards, setCards] = useState<CardData[]>([]);
-    const [user, setUser] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const loadInitialData = async () => {
             setIsLoading(true);
-            const currentUser = await supabaseService.getCurrentUser();
+            const userProfile = await supabaseService.getUserProfile();
             
-            if (!currentUser) {
-                router.push('/login');
-                return;
+            if (!userProfile && isSupabaseConfigured) {
+                // Se não tem perfil mas está logado, pode ser erro de sincronismo
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push('/login');
+                    return;
+                }
             }
 
-            setUser(currentUser);
+            setProfile(userProfile);
             const data = await supabaseService.getAllCards();
             setCards(data);
             setIsLoading(false);
@@ -167,6 +183,12 @@ export default function MeusCartoesPage() {
     }, [router]);
 
     const handleCreateNew = async () => {
+        // Limite de cartões por plano (exemplo básico)
+        if (profile?.role === 'free' && cards.length >= 1) {
+            alert('Usuários do plano Free podem criar apenas 1 cartão. Faça o upgrade para o Premium para ter até 10 cartões!');
+            return;
+        }
+        
         const newCard = await supabaseService.createNewCard();
         router.push(`/editor?id=${newCard.id}`);
     };
@@ -184,7 +206,7 @@ export default function MeusCartoesPage() {
         c.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    if (isLoading && !user) return (
+    if (isLoading) return (
         <div className="h-screen w-full flex items-center justify-center">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
         </div>
@@ -192,17 +214,17 @@ export default function MeusCartoesPage() {
 
     return (
         <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex">
-            <Sidebar user={user} />
+            <Sidebar profile={profile} />
             <main className="flex-1 ml-64 p-8">
                  <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                     <div>
                         <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Meus Cartões</h2>
                         <div className="flex items-center gap-2 mt-1">
                             <p className="text-slate-500 font-medium">Gerencie sua identidade digital profissional.</p>
-                            {isSupabaseConfigured ? (
-                                <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Supabase Online</span>
-                            ) : (
-                                <span className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Modo Offline</span>
+                            {profile?.role === 'premium' && (
+                                <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none gap-1 font-bold uppercase tracking-widest text-[10px]">
+                                    <Crown size={10} /> Premium Member
+                                </Badge>
                             )}
                         </div>
                     </div>

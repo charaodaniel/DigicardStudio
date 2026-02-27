@@ -1,12 +1,18 @@
+
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { CardData } from './types';
+import type { CardData, UserProfile, UserRole } from './types';
 import { initialCardData } from './data';
 import { localDb } from './local-database';
 
-/**
- * Mapeia o objeto da aplicação (camelCase) para o banco de dados (snake_case)
- */
-const toDb = (card: CardData, userId?: string) => ({
+const profileFromDb = (dbProfile: any): UserProfile => ({
+  id: dbProfile.id,
+  fullName: dbProfile.full_name,
+  avatarUrl: dbProfile.avatar_url,
+  role: dbProfile.role as UserRole,
+  createdAt: dbProfile.created_at
+});
+
+const cardToDb = (card: CardData, userId?: string) => ({
   id: card.id,
   user_id: userId,
   template: card.template,
@@ -24,8 +30,8 @@ const toDb = (card: CardData, userId?: string) => ({
   theme_color: card.themeColor,
   font_family: card.fontFamily,
   base_font_size: card.baseFontSize,
-  links: card.links, // JSONB no Supabase
-  stats: card.stats, // JSONB no Supabase
+  links: card.links,
+  stats: card.stats,
   save_contact_label: card.saveContactLabel,
   qr_code_url: card.qrCodeUrl,
   qr_code_data: card.qrCodeData,
@@ -41,10 +47,7 @@ const toDb = (card: CardData, userId?: string) => ({
   last_updated: Date.now()
 });
 
-/**
- * Mapeia o banco de dados (snake_case) de volta para o objeto da aplicação (camelCase)
- */
-const fromDb = (dbCard: any): CardData => ({
+const cardFromDb = (dbCard: any): CardData => ({
   id: dbCard.id,
   template: dbCard.template,
   fullName: dbCard.full_name,
@@ -89,6 +92,21 @@ export const supabaseService = {
     }
   },
 
+  async getUserProfile(): Promise<UserProfile | null> {
+    if (!isSupabaseConfigured) return null;
+    const user = await this.getCurrentUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) return null;
+    return profileFromDb(data);
+  },
+
   async getAllCards(): Promise<CardData[]> {
     if (!isSupabaseConfigured) return localDb.getAllCards();
 
@@ -106,7 +124,7 @@ export const supabaseService = {
       return [];
     }
 
-    return (data || []).map(fromDb);
+    return (data || []).map(cardFromDb);
   },
 
   async getCardById(id: string): Promise<CardData | null> {
@@ -118,12 +136,8 @@ export const supabaseService = {
       .eq('id', id)
       .single();
 
-    if (error) {
-      console.warn('Cartão não encontrado no Supabase (ID público ou inválido):', id);
-      return null;
-    }
-
-    return fromDb(data);
+    if (error) return null;
+    return cardFromDb(data);
   },
 
   async saveCard(card: CardData): Promise<void> {
@@ -132,26 +146,15 @@ export const supabaseService = {
       return;
     }
 
-    try {
-      const user = await this.getCurrentUser();
-      if (!user) return;
+    const user = await this.getCurrentUser();
+    if (!user) return;
 
-      const payload = toDb(card, user.id);
-      const { error } = await supabase
-        .from('cards')
-        .upsert(payload, { onConflict: 'id' });
+    const payload = cardToDb(card, user.id);
+    const { error } = await supabase
+      .from('cards')
+      .upsert(payload);
 
-      if (error) {
-        console.error('Erro detalhado Supabase:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-      }
-    } catch (err) {
-      console.error('Erro inesperado na função saveCard:', err);
-    }
+    if (error) console.error('Erro ao salvar:', error.message);
   },
 
   async deleteCard(id: string): Promise<void> {
@@ -165,9 +168,7 @@ export const supabaseService = {
       .delete()
       .eq('id', id);
 
-    if (error) {
-      console.error('Erro Supabase ao deletar:', error.message);
-    }
+    if (error) console.error('Erro ao deletar:', error.message);
   },
 
   async createNewCard(): Promise<CardData> {

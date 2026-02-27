@@ -1,3 +1,14 @@
+
+export type UserRole = 'super_admin' | 'admin' | 'premium' | 'free';
+
+export type UserProfile = {
+  id: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  role: UserRole;
+  createdAt: string;
+};
+
 export type SocialLink = {
   id: string;
   type: 'phone' | 'email' | 'linkedin' | 'instagram' | 'website' | 'github' | 'whatsapp' | 'youtube' | 'tiktok' | 'spotify' | 'facebook' | 'discord';
@@ -14,7 +25,7 @@ export type StatItem = {
 };
 
 export type CardData = {
-  id: string; // ID obrigatório para o banco local
+  id: string;
   template: string;
   fullName: string;
   fullNameLink?: string;
@@ -34,7 +45,7 @@ export type CardData = {
   stats: StatItem[];
   saveContactLabel: string;
   qrCodeUrl?: string;
-  qrCodeData?: string; // Informação codificada no QR (URL ou texto)
+  qrCodeData?: string;
   customWebsiteUrl?: string;
   footerText?: string;
   // Physical Card Preferences

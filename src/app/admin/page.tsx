@@ -17,7 +17,10 @@ import {
   Settings,
   LayoutDashboard,
   LogOut,
-  Plus
+  Plus,
+  Crown,
+  ShieldAlert,
+  UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,12 +39,6 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { 
-  Tabs, 
-  TabsContent, 
-  TabsList, 
-  TabsTrigger 
-} from '@/components/ui/tabs';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -62,17 +59,14 @@ import {
   LineChart, 
   Line 
 } from 'recharts';
-
-/**
- * @fileOverview Painel de Administração Geral (Admin Dashboard)
- */
+import type { UserRole } from '@/lib/types';
 
 const mockData = {
   stats: [
     { title: 'Total Usuários', value: '1,284', change: '+12%', positive: true, icon: Users },
     { title: 'Cartões Ativos', value: '3,492', change: '+18%', positive: true, icon: Activity },
     { title: 'Receita Mensal', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
-    { title: 'Novos Assinantes', value: '42', change: '-2%', positive: false, icon: ShieldCheck },
+    { title: 'Assinantes Premium', value: '312', change: '+8%', positive: true, icon: Crown },
   ],
   chartData: [
     { name: 'Jan', users: 400, revenue: 2400 },
@@ -84,34 +78,54 @@ const mockData = {
     { name: 'Jul', users: 349, revenue: 4300 },
   ],
   users: [
-    { id: '1', name: 'João Silva', email: 'joao@exemplo.com', plan: 'Pro', status: 'Ativo', cards: 5, date: '12/05/2024' },
-    { id: '2', name: 'Maria Souza', email: 'maria@exemplo.com', plan: 'Free', status: 'Inativo', cards: 1, date: '10/05/2024' },
-    { id: '3', name: 'Pedro Santos', email: 'pedro@exemplo.com', plan: 'Pro', status: 'Ativo', cards: 12, date: '08/05/2024' },
-    { id: '4', name: 'Ana Oliveira', email: 'ana@exemplo.com', plan: 'Pro', status: 'Ativo', cards: 3, date: '05/05/2024' },
-    { id: '5', name: 'Lucas Lima', email: 'lucas@exemplo.com', plan: 'Free', status: 'Ativo', cards: 2, date: '01/05/2024' },
+    { id: '1', name: 'João Silva', email: 'joao@exemplo.com', role: 'super_admin' as UserRole, status: 'Ativo', cards: 5, date: '12/05/2024' },
+    { id: '2', name: 'Maria Souza', email: 'maria@exemplo.com', role: 'free' as UserRole, status: 'Inativo', cards: 1, date: '10/05/2024' },
+    { id: '3', name: 'Pedro Santos', email: 'pedro@exemplo.com', role: 'premium' as UserRole, status: 'Ativo', cards: 12, date: '08/05/2024' },
+    { id: '4', name: 'Ana Oliveira', email: 'ana@exemplo.com', role: 'admin' as UserRole, status: 'Ativo', cards: 3, date: '05/05/2024' },
+    { id: '5', name: 'Lucas Lima', email: 'lucas@exemplo.com', role: 'premium' as UserRole, status: 'Ativo', cards: 2, date: '01/05/2024' },
   ],
   plans: [
     { name: 'Free', price: 'R$ 0', users: 842, active: true },
-    { name: 'Profissional', price: 'R$ 29,90', users: 312, active: true },
+    { name: 'Premium', price: 'R$ 29,90', users: 312, active: true },
     { name: 'Enterprise', price: 'Sob consulta', users: 130, active: true },
   ]
+};
+
+const RoleBadge = ({ role }: { role: UserRole }) => {
+  switch (role) {
+    case 'super_admin':
+      return <Badge className="bg-red-500 hover:bg-red-600 text-white font-black uppercase text-[9px] tracking-widest gap-1"><ShieldAlert size={10} /> Super Admin</Badge>;
+    case 'admin':
+      return <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase text-[9px] tracking-widest gap-1"><ShieldCheck size={10} /> Admin</Badge>;
+    case 'premium':
+      return <Badge className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase text-[9px] tracking-widest gap-1"><Crown size={10} /> Premium</Badge>;
+    default:
+      return <Badge variant="secondary" className="font-bold uppercase text-[9px] tracking-widest gap-1"><UserCheck size={10} /> Free</Badge>;
+  }
 };
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     const checkAdmin = async () => {
       setIsLoading(true);
-      const currentUser = await supabaseService.getCurrentUser();
-      if (!currentUser) {
+      const userProfile = await supabaseService.getUserProfile();
+      
+      if (!userProfile) {
         router.push('/login');
         return;
       }
-      setUser(currentUser);
+
+      if (userProfile.role !== 'admin' && userProfile.role !== 'super_admin') {
+        router.push('/meus-cartoes');
+        return;
+      }
+
+      setProfile(userProfile);
       setIsLoading(false);
     };
     checkAdmin();
@@ -132,7 +146,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
-      {/* Sidebar Administrativa */}
       <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0">
         <div className="p-6 flex items-center gap-3">
           <div className="bg-primary size-10 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
@@ -140,7 +153,7 @@ export default function AdminDashboard() {
           </div>
           <div>
             <h1 className="text-lg font-bold leading-none tracking-tight">DigiCard</h1>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Admin Panel</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Gestão SaaS</p>
           </div>
         </div>
 
@@ -157,7 +170,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'users' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             <Users size={18} />
-            <span className="text-sm font-semibold">Usuários</span>
+            <span className="text-sm font-semibold">Usuários & Níveis</span>
           </button>
           <button 
             onClick={() => setActiveTab('plans')}
@@ -171,14 +184,14 @@ export default function AdminDashboard() {
           </div>
           <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <Settings size={18} />
-            <span className="text-sm font-semibold">Sistema</span>
+            <span className="text-sm font-semibold">Configuração do Sistema</span>
           </button>
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
           <Link href="/meus-cartoes" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors mb-2">
             <ArrowUpRight size={18} />
-            <span className="text-sm font-semibold">Ir para o App</span>
+            <span className="text-sm font-semibold">Voltar ao App</span>
           </Link>
           <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
             <LogOut size={18} />
@@ -187,23 +200,22 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto no-scrollbar">
         <header className="h-20 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-8 flex items-center justify-between sticky top-0 z-10">
           <div>
             <h2 className="text-xl font-bold tracking-tight">
               {activeTab === 'overview' ? 'Dashboard Administrativo' : 
-               activeTab === 'users' ? 'Gerenciamento de Usuários' : 'Planos & Assinaturas'}
+               activeTab === 'users' ? 'Usuários & Permissões' : 'Planos & Assinaturas'}
             </h2>
-            <p className="text-xs text-slate-500 font-medium">Controle total da plataforma DigiCard Studio.</p>
+            <p className="text-xs text-slate-500 font-medium">Controle central de acesso do DigiCard Studio.</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-4" />
-              <Input placeholder="Buscar..." className="pl-9 w-64 bg-slate-50 dark:bg-slate-800 border-none" />
+              <Input placeholder="Filtrar por nome, email ou nível..." className="pl-9 w-64 bg-slate-50 dark:bg-slate-800 border-none" />
             </div>
-            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-              {user?.email?.[0].toUpperCase()}
+            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border-2 border-primary/20">
+              {profile?.fullName?.[0] || 'A'}
             </div>
           </div>
         </header>
@@ -211,7 +223,6 @@ export default function AdminDashboard() {
         <div className="p-8 max-w-7xl mx-auto space-y-8">
           {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in duration-500">
-              {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {mockData.stats.map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
@@ -223,19 +234,18 @@ export default function AdminDashboard() {
                       <div className="text-2xl font-black">{stat.value}</div>
                       <p className={`text-[10px] font-bold mt-1 flex items-center gap-1 ${stat.positive ? 'text-emerald-500' : 'text-red-500'}`}>
                         {stat.positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                        {stat.change} desde o mês passado
+                        {stat.change} vs mês anterior
                       </p>
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
-              {/* Charts Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
-                    <CardTitle>Crescimento de Usuários</CardTitle>
-                    <CardDescription>Membros registrados nos últimos 6 meses.</CardDescription>
+                    <CardTitle>Novos Cadastros</CardTitle>
+                    <CardDescription>Crescimento da base de usuários por nível.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
@@ -248,7 +258,7 @@ export default function AdminDashboard() {
                             contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
                             itemStyle={{ color: '#fff' }}
                           />
-                          <Line type="monotone" dataKey="users" stroke="#5048e5" strokeWidth={3} dot={{ r: 4, fill: '#5048e5' }} activeDot={{ r: 6 }} />
+                          <Line type="monotone" dataKey="users" stroke="#5048e5" strokeWidth={3} dot={{ r: 4, fill: '#5048e5' }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -257,8 +267,8 @@ export default function AdminDashboard() {
 
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
-                    <CardTitle>Receita Mensal (BRL)</CardTitle>
-                    <CardDescription>Fluxo de caixa gerado por assinaturas Pro.</CardDescription>
+                    <CardTitle>MRR - Receita Recurrente</CardTitle>
+                    <CardDescription>Fluxo gerado por assinaturas Premium e Enterprise.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
@@ -267,9 +277,7 @@ export default function AdminDashboard() {
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                           <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
-                          />
+                          <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }} />
                           <Bar dataKey="revenue" fill="#5048e5" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
@@ -284,12 +292,12 @@ export default function AdminDashboard() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-lg font-bold">Membros Registrados</h3>
-                  <p className="text-sm text-slate-500">Gerencie permissões e visualize atividades.</p>
+                  <h3 className="text-lg font-bold">Membros & Permissões</h3>
+                  <p className="text-sm text-slate-500">Altere níveis de acesso e gerencie usuários Premium.</p>
                 </div>
                 <Button className="rounded-xl font-bold gap-2">
                   <Plus size={18} />
-                  Convidar Usuário
+                  Novo Usuário
                 </Button>
               </div>
 
@@ -297,8 +305,8 @@ export default function AdminDashboard() {
                 <Table>
                   <TableHeader className="bg-slate-50 dark:bg-slate-800/50">
                     <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
-                      <TableHead className="font-bold text-xs uppercase tracking-widest py-4">Usuário</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-widest">Plano</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-widest py-4">Membro</TableHead>
+                      <TableHead className="font-bold text-xs uppercase tracking-widest">Nível de Acesso</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Cartões</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Status</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Cadastro</TableHead>
@@ -320,9 +328,7 @@ export default function AdminDashboard() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={user.plan === 'Pro' ? 'default' : 'secondary'} className="rounded-md font-bold uppercase text-[9px] tracking-widest">
-                            {user.plan}
-                          </Badge>
+                          <RoleBadge role={user.role} />
                         </TableCell>
                         <TableCell className="font-medium text-sm">{user.cards}</TableCell>
                         <TableCell>
@@ -339,12 +345,14 @@ export default function AdminDashboard() {
                                 <MoreHorizontal size={16} />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 rounded-xl shadow-2xl border-none">
-                              <DropdownMenuLabel className="text-xs uppercase tracking-widest text-slate-400">Ações</DropdownMenuLabel>
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm">Ver Perfil</DropdownMenuItem>
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm">Alterar Plano</DropdownMenuItem>
+                            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-none">
+                              <DropdownMenuLabel className="text-xs uppercase tracking-widest text-slate-400">Ações de Gestão</DropdownMenuLabel>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm">Ver Detalhes do Perfil</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-red-500">Banir Usuário</DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-indigo-500">Alterar para Premium</DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-orange-500">Tornar Administrador</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-red-500 font-bold">Banir Permanentemente</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -360,8 +368,8 @@ export default function AdminDashboard() {
             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-lg font-bold">Níveis de Assinatura</h3>
-                  <p className="text-sm text-slate-500">Configure limites e preços dos planos SaaS.</p>
+                  <h3 className="text-lg font-bold">Modelos de Negócio</h3>
+                  <p className="text-sm text-slate-500">Configure limites técnicos e preços das assinaturas.</p>
                 </div>
                 <Button className="rounded-xl font-bold gap-2">
                   <Plus size={18} />
@@ -374,8 +382,11 @@ export default function AdminDashboard() {
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
                     {plan.active && <div className="absolute top-0 right-0 p-4"><Badge className="bg-emerald-500 text-white uppercase text-[8px] font-black">Ativo</Badge></div>}
                     <CardHeader>
-                      <CardTitle className="text-xl">{plan.name}</CardTitle>
-                      <CardDescription>Plano de entrada para usuários.</CardDescription>
+                      <CardTitle className="text-xl flex items-center gap-2">
+                        {plan.name === 'Premium' && <Crown size={18} className="text-indigo-500" />}
+                        {plan.name}
+                      </CardTitle>
+                      <CardDescription>Limites e precificação para {plan.name}.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1">
                       <div className="flex items-baseline gap-1 mb-6">
@@ -384,17 +395,21 @@ export default function AdminDashboard() {
                       </div>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500 font-medium">Usuários neste plano</span>
+                          <span className="text-slate-500 font-medium">Usuários ativos</span>
                           <span className="font-bold">{plan.users}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500 font-medium">Limites de cartões</span>
-                          <span className="font-bold">{plan.name === 'Free' ? '1' : 'Ilimitado'}</span>
+                          <span className="text-slate-500 font-medium">Limite de cartões</span>
+                          <span className="font-bold">{plan.name === 'Free' ? '1' : plan.name === 'Premium' ? '10' : 'Ilimitado'}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-slate-500 font-medium">Exportação Industrial</span>
+                          <span className="font-bold">{plan.name === 'Free' ? 'Não' : 'Sim'}</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardHeader className="pt-0">
-                      <Button variant="outline" className="w-full rounded-xl font-bold">Editar Configurações</Button>
+                      <Button variant="outline" className="w-full rounded-xl font-bold">Editar Configurações do Plano</Button>
                     </CardHeader>
                   </Card>
                 ))}
