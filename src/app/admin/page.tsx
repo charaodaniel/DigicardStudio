@@ -12,7 +12,6 @@ import {
   Search, 
   MoreHorizontal, 
   ArrowUpRight, 
-  ArrowDownRight,
   Settings,
   LayoutDashboard,
   LogOut,
@@ -26,11 +25,13 @@ import {
   Mail,
   User as UserIcon,
   Check,
-  X,
   Globe,
   Monitor,
   HardDrive,
-  Link2
+  Link2,
+  Key,
+  Database,
+  Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -135,7 +136,11 @@ export default function AdminDashboard() {
     heroTitle: '',
     heroSubtitle: '',
     supportEmail: '',
-    maintenanceMode: false
+    maintenanceMode: false,
+    mercadopagoPublicKey: '',
+    mercadopagoAccessToken: '',
+    supabaseUrl: '',
+    supabaseAnonKey: ''
   });
 
   const loadData = async () => {
@@ -177,12 +182,9 @@ export default function AdminDashboard() {
     loadData();
   }, [router]);
 
-  // Cálculo dinâmico de dados para os gráficos baseados nos usuários reais
   const chartData = useMemo(() => {
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const now = new Date();
-    
-    // Gerar esqueleto dos últimos 7 meses
     const last7Months = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -195,13 +197,11 @@ export default function AdminDashboard() {
       });
     }
 
-    // Processar usuários reais
     users.forEach(u => {
       if (!u.createdAt) return;
       const date = new Date(u.createdAt);
       const m = date.getMonth();
       const y = date.getFullYear();
-      
       const target = last7Months.find(item => item.monthNum === m && item.yearNum === y);
       if (target) {
         target.users++;
@@ -210,7 +210,6 @@ export default function AdminDashboard() {
         }
       }
     });
-
     return last7Months;
   }, [users]);
 
@@ -332,7 +331,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'plans' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             <CreditCard size={18} />
-            <span className="text-sm font-semibold">Planos & Mercado Pago</span>
+            <span className="text-sm font-semibold">Planos & Checkout</span>
           </button>
           <div className="pt-4 pb-2 px-3">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configurações</p>
@@ -342,7 +341,14 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'settings' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             <Settings size={18} />
-            <span className="text-sm font-semibold">Configuração do Sistema</span>
+            <span className="text-sm font-semibold">Sistema & Marca</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('integrations')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'integrations' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+          >
+            <Key size={18} />
+            <span className="text-sm font-semibold">Integrações & APIs</span>
           </button>
         </nav>
 
@@ -364,7 +370,8 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-bold tracking-tight">
               {activeTab === 'overview' ? 'Dashboard Administrativo' : 
                activeTab === 'users' ? 'Usuários & Permissões' : 
-               activeTab === 'plans' ? 'Planos & Pagamentos' : 'Configurações de Marca'}
+               activeTab === 'plans' ? 'Planos & Pagamentos' : 
+               activeTab === 'settings' ? 'Configurações de Marca' : 'Integrações Externas'}
             </h2>
             <p className="text-xs text-slate-500 font-medium">Controle central de acesso do DigiCard Studio.</p>
           </div>
@@ -372,7 +379,7 @@ export default function AdminDashboard() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-4" />
               <Input 
-                placeholder="Filtrar por nome ou nível..." 
+                placeholder="Filtrar..." 
                 className="pl-9 w-64 bg-slate-50 dark:bg-slate-800 border-none" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -466,22 +473,16 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold">Membros & Permissões</h3>
                   <p className="text-sm text-slate-500">Gerencie os níveis de acesso e visualize perfis reais.</p>
                 </div>
-                
                 <div className="flex items-center gap-2">
                   <Button variant="outline" onClick={loadData} disabled={isLoading} className="rounded-xl font-bold gap-2 border-slate-200 dark:border-slate-800">
                     <RefreshCcw size={18} className={isLoading ? "animate-spin" : ""} />
                     Sincronizar
                   </Button>
-
                   <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
                     <DialogTrigger asChild>
                       <Button className="rounded-xl font-bold gap-2"><Plus size={18} /> Novo Usuário</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="sr-only">Adicionar Novo Usuário</DialogTitle>
-                        <DialogDescription className="sr-only">Preencha o formulário para criar uma nova conta.</DialogDescription>
-                      </DialogHeader>
                       <AuthForm onSuccess={() => { setIsAddUserModalOpen(false); loadData(); }} />
                     </DialogContent>
                   </Dialog>
@@ -560,7 +561,6 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold">Modelos de Negócio</h3>
                   <p className="text-sm text-slate-500">Configure limites técnicos e links de Checkout do Mercado Pago.</p>
                 </div>
-                
                 <Dialog open={isPlanModalOpen} onOpenChange={(open) => {
                   setIsPlanModalOpen(open);
                   if (!open) { setEditingPlan(null); setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false, checkoutUrl: '' }); }
@@ -571,7 +571,6 @@ export default function AdminDashboard() {
                   <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-2xl font-black">{editingPlan ? 'Editar Plano' : 'Criar Novo Plano'}</DialogTitle>
-                      <DialogDescription>Defina as regras e o link de pagamento do Mercado Pago.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSavePlan} className="space-y-4 pt-4">
                       <div className="space-y-2">
@@ -588,14 +587,10 @@ export default function AdminDashboard() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="checkoutUrl" className="flex items-center gap-2">Checkout Mercado Pago <Link2 size={14} className="text-primary" /></Label>
-                        <Input id="checkoutUrl" value={planForm.checkoutUrl} onChange={e => setPlanForm({...planForm, checkoutUrl: e.target.value})} placeholder="https://www.mercadopago.com.br/checkout/v1/redirect/..." />
-                        <p className="text-[10px] text-slate-400 font-medium">Cole aqui o link do seu botão de pagamento.</p>
+                        <Input id="checkoutUrl" value={planForm.checkoutUrl} onChange={e => setPlanForm({...planForm, checkoutUrl: e.target.value})} placeholder="https://www.mercadopago.com.br/..." />
                       </div>
                       <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                        <div className="space-y-0.5">
-                          <Label className="text-sm font-bold">Exportação Industrial</Label>
-                          <p className="text-[10px] text-slate-500 font-medium">Permite baixar SVG/PNG em alta resolução.</p>
-                        </div>
+                        <Label className="text-sm font-bold">Exportação Industrial</Label>
                         <Switch checked={planForm.industrialExport} onCheckedChange={val => setPlanForm({...planForm, industrialExport: val})} />
                       </div>
                       <DialogFooter className="pt-4">
@@ -626,14 +621,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Exportação Industrial</span>
-                          <span className="font-bold">{plan.industrialExport ? <Check size={16} className="text-emerald-500" /> : <X size={16} className="text-red-500" />}</span>
-                        </div>
-                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Link de Integração</p>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 truncate bg-slate-50 dark:bg-slate-800 p-2 rounded">
-                            <Link2 size={12} className="shrink-0" />
-                            <span className="truncate">{plan.checkoutUrl || 'Não configurado'}</span>
-                          </div>
+                          <span className="font-bold">{plan.industrialExport ? <Check size={16} className="text-emerald-500" /> : <Check size={16} className="text-red-500" />}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -654,110 +642,161 @@ export default function AdminDashboard() {
                   <p className="text-sm text-slate-500">Personalize a identidade e o comportamento da plataforma.</p>
                 </div>
                 <Button onClick={handleSaveSystemSettings} className="rounded-xl font-bold gap-2 h-12 px-8">
-                  <Check size={18} />
-                  Salvar Alterações
+                  <Check size={18} /> Salvar Alterações
                 </Button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                   <Card className="border-none shadow-sm dark:bg-slate-900">
-                    <CardHeader>
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Globe className="size-4 text-primary" /> Identidade Visual & Branding
-                      </CardTitle>
-                    </CardHeader>
+                    <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Globe className="size-4 text-primary" /> Branding</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Nome do Sistema</Label>
-                          <Input 
-                            value={systemSettings.siteName} 
-                            onChange={e => setSystemSettings({...systemSettings, siteName: e.target.value})} 
-                            placeholder="Ex: DigiCard Studio"
-                          />
+                          <Input value={systemSettings.siteName} onChange={e => setSystemSettings({...systemSettings, siteName: e.target.value})} />
                         </div>
                         <div className="space-y-2">
                           <Label>E-mail de Suporte</Label>
-                          <Input 
-                            value={systemSettings.supportEmail} 
-                            onChange={e => setSystemSettings({...systemSettings, supportEmail: e.target.value})} 
-                            placeholder="suporte@exemplo.com"
-                          />
+                          <Input value={systemSettings.supportEmail} onChange={e => setSystemSettings({...systemSettings, supportEmail: e.target.value})} />
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card className="border-none shadow-sm dark:bg-slate-900">
-                    <CardHeader>
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <Monitor className="size-4 text-primary" /> Conteúdo da Landing Page
-                      </CardTitle>
-                    </CardHeader>
+                    <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Monitor className="size-4 text-primary" /> Landing Page</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
                         <Label>Título Principal (Hero)</Label>
-                        <Input 
-                          value={systemSettings.heroTitle} 
-                          onChange={e => setSystemSettings({...systemSettings, heroTitle: e.target.value})} 
-                          placeholder="Ex: Seu Cartão, Reinventado."
-                        />
+                        <Input value={systemSettings.heroTitle} onChange={e => setSystemSettings({...systemSettings, heroTitle: e.target.value})} />
                       </div>
                       <div className="space-y-2">
                         <Label>Subtítulo (Hero)</Label>
-                        <Textarea 
-                          value={systemSettings.heroSubtitle} 
-                          onChange={e => setSystemSettings({...systemSettings, heroSubtitle: e.target.value})} 
-                          placeholder="Breve descrição sobre o produto..."
-                          className="min-h-[100px]"
-                        />
+                        <Textarea value={systemSettings.heroSubtitle} onChange={e => setSystemSettings({...systemSettings, heroSubtitle: e.target.value})} className="min-h-[100px]" />
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <div className="space-y-6">
-                  <Card className="border-none shadow-sm dark:bg-slate-900 border-l-4 border-l-orange-500">
-                    <CardHeader>
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <ShieldAlert className="size-4 text-orange-500" /> Controle de Estado
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30">
-                        <div className="space-y-0.5">
-                          <Label className="text-sm font-bold text-orange-700 dark:text-orange-400">Modo de Manutenção</Label>
-                          <p className="text-[10px] text-orange-600 dark:text-orange-500 font-medium">Bloqueia o acesso de usuários.</p>
-                        </div>
-                        <Switch 
-                          checked={systemSettings.maintenanceMode} 
-                          onCheckedChange={val => setSystemSettings({...systemSettings, maintenanceMode: val})} 
-                        />
+                <Card className="border-none shadow-sm dark:bg-slate-900 border-l-4 border-l-orange-500 h-fit">
+                  <CardHeader><CardTitle className="text-sm flex items-center gap-2"><ShieldAlert className="size-4 text-orange-500" /> Estado</CardTitle></CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-950/20 rounded-xl">
+                      <div className="space-y-0.5">
+                        <Label className="text-sm font-bold">Modo Manutenção</Label>
+                        <p className="text-[10px] text-slate-500">Bloqueia acesso público.</p>
                       </div>
+                      <Switch checked={systemSettings.maintenanceMode} onCheckedChange={val => setSystemSettings({...systemSettings, maintenanceMode: val})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold text-slate-500 uppercase">Infraestrutura</Label>
+                      <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="flex items-center gap-1"><HardDrive size={10} /> Storage</span>
+                          <span className="text-primary">12.4 GB / 50 GB</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary w-[25%] rounded-full"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
 
-                      <div className="space-y-2">
-                        <Label className="text-xs font-bold text-slate-500 uppercase">Capacidade de Infra</Label>
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3">
-                          <div className="flex justify-between text-[10px] font-bold">
-                            <span className="flex items-center gap-1"><HardDrive size={10} /> Storage em uso</span>
-                            <span className="text-primary">12.4 GB / 50 GB</span>
-                          </div>
-                          <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary w-[25%] rounded-full"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+          {activeTab === 'integrations' && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h3 className="text-lg font-bold">Integrações & APIs</h3>
+                  <p className="text-sm text-slate-500">Conecte os motores de pagamento e banco de dados.</p>
                 </div>
+                <Button onClick={handleSaveSystemSettings} className="rounded-xl font-bold gap-2 h-12 px-8">
+                  <Check size={18} /> Salvar Chaves
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card className="border-none shadow-sm dark:bg-slate-900">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                        <CreditCard size={20} />
+                      </div>
+                      <div>
+                        <CardTitle>Mercado Pago</CardTitle>
+                        <CardDescription>Credenciais para processamento de vendas.</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Public Key</Label>
+                      <Input 
+                        placeholder="APP_USR-..." 
+                        value={systemSettings.mercadopagoPublicKey || ''} 
+                        onChange={e => setSystemSettings({...systemSettings, mercadopagoPublicKey: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Access Token (Secret)</Label>
+                      <div className="relative">
+                        <Input 
+                          type="password"
+                          placeholder="APP_USR-..." 
+                          value={systemSettings.mercadopagoAccessToken || ''} 
+                          onChange={e => setSystemSettings({...systemSettings, mercadopagoAccessToken: e.target.value})}
+                        />
+                        <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none shadow-sm dark:bg-slate-900">
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <Database size={20} />
+                      </div>
+                      <div>
+                        <CardTitle>Supabase Connection</CardTitle>
+                        <CardDescription>Variáveis de ambiente do seu banco de dados.</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Project URL</Label>
+                      <Input 
+                        placeholder="https://your-project.supabase.co" 
+                        value={systemSettings.supabaseUrl || ''} 
+                        onChange={e => setSystemSettings({...systemSettings, supabaseUrl: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Anon Key</Label>
+                      <div className="relative">
+                        <Input 
+                          type="password"
+                          placeholder="eyJhbG..." 
+                          value={systemSettings.supabaseAnonKey || ''} 
+                          onChange={e => setSystemSettings({...systemSettings, supabaseAnonKey: e.target.value})}
+                        />
+                        <Lock className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
         </div>
       </main>
 
-      {/* Modal de Detalhes do Perfil */}
       <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
         <DialogContent className="sm:max-w-lg rounded-[2rem] p-0 border-none shadow-2xl overflow-hidden bg-white dark:bg-slate-900">
           {selectedViewUser && (
@@ -778,28 +817,22 @@ export default function AdminDashboard() {
                 <Separator className="bg-slate-100 dark:bg-slate-800" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Fingerprint size={12} /> Identificador Único</p>
-                    <p className="text-xs font-mono bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg text-slate-600 dark:text-slate-300 break-all border border-slate-100 dark:border-slate-800">{selectedViewUser.id}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Fingerprint size={12} /> ID Único</p>
+                    <p className="text-xs font-mono bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg break-all">{selectedViewUser.id}</p>
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Calendar size={12} /> Data de Cadastro</p>
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedViewUser.createdAt ? format(new Date(selectedViewUser.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'N/A'}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Calendar size={12} /> Cadastro</p>
+                    <p className="text-sm font-semibold">{selectedViewUser.createdAt ? format(new Date(selectedViewUser.createdAt), "dd/MM/yyyy", { locale: ptBR }) : 'N/A'}</p>
                   </div>
                 </div>
                 <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><Activity size={20} /></div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status da Conta</p>
-                      <p className="text-sm font-black text-primary">ATIVA & SINCRONIZADA</p>
-                    </div>
+                    <div><p className="text-xs font-bold text-slate-500 uppercase">Status</p><p className="text-sm font-black text-primary">SINCRONIZADA</p></div>
                   </div>
                   <Badge className="bg-emerald-500 text-white font-bold">ONLINE</Badge>
                 </div>
-                <DialogFooter className="pt-4 gap-2">
-                  <Button variant="outline" className="rounded-xl font-bold flex-1" onClick={() => setIsDetailsModalOpen(false)}>Fechar Visualização</Button>
-                  <Button className="rounded-xl font-bold flex-1 bg-slate-900 dark:bg-white dark:text-slate-900">Acessar Painel do Usuário</Button>
-                </DialogFooter>
+                <DialogFooter className="pt-4"><Button variant="outline" className="rounded-xl font-bold w-full" onClick={() => setIsDetailsModalOpen(false)}>Fechar Visualização</Button></DialogFooter>
               </div>
             </div>
           )}

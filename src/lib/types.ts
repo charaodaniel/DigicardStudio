@@ -25,6 +25,11 @@ export type SystemSettings = {
   heroSubtitle: string;
   supportEmail: string;
   maintenanceMode: boolean;
+  // Integrações
+  mercadopagoPublicKey?: string;
+  mercadopagoAccessToken?: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
 };
 
 export type SocialLink = {

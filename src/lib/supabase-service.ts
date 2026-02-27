@@ -28,7 +28,7 @@ const cardToDb = (card: CardData, userId?: string) => ({
   is_verified: card.isVerified,
   theme_color: card.themeColor,
   font_family: card.fontFamily,
-  base_font_size: card.baseFontSize,
+  base_font_size: card.base_font_size,
   links: card.links,
   stats: card.stats,
   save_contact_label: card.saveContactLabel,
@@ -304,8 +304,12 @@ export const supabaseService = {
       siteName: data.site_name,
       heroTitle: data.hero_title,
       heroSubtitle: data.hero_subtitle,
-      support_email: data.support_email,
-      maintenance_mode: data.maintenance_mode
+      supportEmail: data.support_email,
+      maintenanceMode: data.maintenance_mode,
+      mercadopagoPublicKey: data.mercadopago_public_key,
+      mercadopagoAccessToken: data.mercadopago_access_token,
+      supabaseUrl: data.supabase_url,
+      supabaseAnonKey: data.supabase_anon_key
     };
   },
 
@@ -319,6 +323,10 @@ export const supabaseService = {
       hero_subtitle: settings.heroSubtitle,
       support_email: settings.supportEmail,
       maintenance_mode: settings.maintenanceMode,
+      mercadopago_public_key: settings.mercadopagoPublicKey,
+      mercadopago_access_token: settings.mercadopagoAccessToken,
+      supabase_url: settings.supabaseUrl,
+      supabase_anon_key: settings.supabaseAnonKey,
       last_updated: new Date().toISOString()
     };
 
