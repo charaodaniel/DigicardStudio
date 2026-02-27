@@ -46,6 +46,14 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { 
   BarChart, 
@@ -61,6 +69,7 @@ import {
 import type { UserRole, UserProfile } from '@/lib/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import AuthForm from '@/components/auth-form';
 
 const mockChartData = [
   { name: 'Jan', users: 400, revenue: 2400 },
@@ -92,31 +101,33 @@ export default function AdminDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    const userProfile = await supabaseService.getUserProfile();
+    
+    if (!userProfile) {
+      router.push('/login');
+      return;
+    }
+
+    if (userProfile.role !== 'admin' && userProfile.role !== 'super_admin') {
+      router.push('/meus-cartoes');
+      return;
+    }
+
+    setProfile(userProfile);
+    
+    // Carrega usuários reais do banco
+    const allUsers = await supabaseService.getAllProfiles();
+    setUsers(allUsers);
+    
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    const checkAdminAndLoadData = async () => {
-      setIsLoading(true);
-      const userProfile = await supabaseService.getUserProfile();
-      
-      if (!userProfile) {
-        router.push('/login');
-        return;
-      }
-
-      if (userProfile.role !== 'admin' && userProfile.role !== 'super_admin') {
-        router.push('/meus-cartoes');
-        return;
-      }
-
-      setProfile(userProfile);
-      
-      // Carrega usuários reais do banco
-      const allUsers = await supabaseService.getAllProfiles();
-      setUsers(allUsers);
-      
-      setIsLoading(false);
-    };
-    checkAdminAndLoadData();
+    loadData();
   }, [router]);
 
   const handleLogout = async () => {
@@ -126,7 +137,8 @@ export default function AdminDashboard() {
 
   const filteredUsers = users.filter(u => 
     u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.role.toLowerCase().includes(searchTerm.toLowerCase())
+    u.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (isLoading) {
@@ -298,10 +310,27 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold">Membros & Permissões</h3>
                   <p className="text-sm text-slate-500">Gerencie os níveis de acesso e visualize perfis reais.</p>
                 </div>
-                <Button className="rounded-xl font-bold gap-2">
-                  <Plus size={18} />
-                  Novo Usuário
-                </Button>
+                
+                <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="rounded-xl font-bold gap-2">
+                      <Plus size={18} />
+                      Novo Usuário
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="sr-only">Adicionar Novo Usuário</DialogTitle>
+                      <DialogDescription className="sr-only">
+                        Preencha o formulário para criar uma nova conta de usuário.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <AuthForm onSuccess={() => {
+                      setIsAddUserModalOpen(false);
+                      loadData();
+                    }} />
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <Card className="border-none shadow-sm dark:bg-slate-900 overflow-hidden">
@@ -316,16 +345,16 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUsers.map((u) => (
+                    {filteredUsers.length > 0 ? filteredUsers.map((u) => (
                       <TableRow key={u.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden font-bold text-slate-500 text-xs">
+                            <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden font-bold text-slate-500 text-xs shrink-0">
                               {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" /> : u.fullName?.[0]}
                             </div>
-                            <div>
-                              <p className="font-bold text-sm">{u.fullName || 'Sem Nome'}</p>
-                              <p className="text-[10px] text-slate-400 font-mono">{u.id}</p>
+                            <div className="min-w-0">
+                              <p className="font-bold text-sm truncate">{u.fullName || 'Sem Nome'}</p>
+                              <p className="text-[10px] text-slate-400 font-mono truncate">{u.id}</p>
                             </div>
                           </div>
                         </TableCell>
@@ -339,7 +368,7 @@ export default function AdminDashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="text-sm text-slate-500 font-medium">
-                          {format(new Date(u.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                          {u.createdAt ? format(new Date(u.createdAt), "dd/MM/yyyy", { locale: ptBR }) : '---'}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -360,7 +389,13 @@ export default function AdminDashboard() {
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center text-slate-500 font-medium">
+                          Nenhum usuário encontrado.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </Card>
