@@ -254,7 +254,8 @@ export const supabaseService = {
       price: p.price,
       cardLimit: p.card_limit,
       industrialExport: p.industrial_export,
-      active: p.active
+      active: p.active,
+      checkoutUrl: p.checkout_url
     }));
   },
 
@@ -265,7 +266,8 @@ export const supabaseService = {
       price: plan.price,
       card_limit: plan.cardLimit,
       industrial_export: plan.industrialExport,
-      active: plan.active ?? true
+      active: plan.active ?? true,
+      checkout_url: plan.checkoutUrl
     };
 
     if (plan.id) {
@@ -302,8 +304,8 @@ export const supabaseService = {
       siteName: data.site_name,
       heroTitle: data.hero_title,
       heroSubtitle: data.hero_subtitle,
-      supportEmail: data.support_email,
-      maintenanceMode: data.maintenance_mode
+      support_email: data.support_email,
+      maintenance_mode: data.maintenance_mode
     };
   },
 

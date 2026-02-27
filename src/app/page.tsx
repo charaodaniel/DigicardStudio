@@ -7,18 +7,25 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { SiInstagram, SiSpotify, SiLinkedin, SiWhatsapp } from "react-icons/si";
 import AuthModal from '@/components/auth-modal';
 import { supabaseService } from '@/lib/supabase-service';
-import type { SystemSettings } from '@/lib/types';
+import type { SystemSettings, Plan } from '@/lib/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Check, Crown, Zap } from 'lucide-react';
 
 export default function LandingPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [settings, setSettings] = useState<SystemSettings | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      const data = await supabaseService.getSystemSettings();
-      setSettings(data);
+    const fetchData = async () => {
+      const [settingsData, plansData] = await Promise.all([
+        supabaseService.getSystemSettings(),
+        supabaseService.getAllPlans()
+      ]);
+      setSettings(settingsData);
+      setPlans(plansData.filter(p => p.active));
     };
-    fetchSettings();
+    fetchData();
   }, []);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'template-digicard-web');
@@ -83,9 +90,9 @@ export default function LandingPage() {
                     Começar Gratuitamente
                   </Button>
                 </Link>
-                <Link href="#features">
+                <Link href="#pricing">
                   <Button size="lg" variant="outline" className="h-16 px-10 text-lg font-bold rounded-2xl border-2 hover:bg-slate-100 transition-all">
-                    Ver Funcionalidades
+                    Ver Planos Premium
                   </Button>
                 </Link>
               </div>
@@ -141,8 +148,73 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Pricing Section */}
+        <section id="pricing" className="py-24 px-6 bg-slate-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16 space-y-4">
+              <h2 className="text-4xl font-black tracking-tighter">Escolha o seu nível</h2>
+              <p className="text-slate-500 font-medium">Invista na sua presença profissional com o melhor custo-benefício.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {plans.map((plan) => (
+                <Card key={plan.id} className={`relative border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col ${plan.name === 'Premium' ? 'ring-2 ring-primary scale-105 z-10' : ''}`}>
+                  {plan.name === 'Premium' && (
+                    <div className="bg-primary text-white text-center py-2 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                      <Crown size={12} /> Mais Popular
+                    </div>
+                  )}
+                  <CardHeader className="p-10 pb-0 text-center">
+                    <CardTitle className="text-2xl font-black mb-2">{plan.name}</CardTitle>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-black">{plan.price}</span>
+                      {plan.price.includes('R$') && <span className="text-slate-400 font-bold text-sm">/mês</span>}
+                    </div>
+                    <CardDescription className="pt-4 font-medium">
+                      Ideal para {plan.name === 'Free' ? 'começar agora' : plan.name === 'Premium' ? 'profissionais em ascensão' : 'grandes empresas'}.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-10 flex-1 flex flex-col">
+                    <ul className="space-y-4 mb-10">
+                      <li className="flex items-center gap-3 text-sm font-bold text-slate-600">
+                        <Check size={18} className="text-emerald-500 shrink-0" /> {plan.cardLimit} {plan.cardLimit === '1' ? 'Cartão Ativo' : 'Cartões Ativos'}
+                      </li>
+                      <li className="flex items-center gap-3 text-sm font-bold text-slate-600">
+                        <Check size={18} className={plan.industrialExport ? 'text-emerald-500' : 'text-slate-300'} /> Exportação Industrial {plan.industrialExport ? '(SVG/PNG)' : '(Não incluído)'}
+                      </li>
+                      <li className="flex items-center gap-3 text-sm font-bold text-slate-600">
+                        <Check size={18} className="text-emerald-500" /> Bio com IA
+                      </li>
+                      <li className="flex items-center gap-3 text-sm font-bold text-slate-600">
+                        <Check size={18} className="text-emerald-500" /> QR Code Dinâmico
+                      </li>
+                    </ul>
+                    
+                    <div className="mt-auto">
+                      {plan.checkoutUrl ? (
+                        <Button 
+                          onClick={() => window.open(plan.checkoutUrl, '_blank')}
+                          className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-95 gap-2"
+                        >
+                          <Zap size={18} /> Assinar Agora
+                        </Button>
+                      ) : (
+                        <Link href="/editor" className="w-full">
+                          <Button variant="outline" className="w-full h-14 rounded-2xl border-2 font-black text-lg hover:bg-slate-100 transition-all">
+                            Começar Grátis
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Templates Showcase */}
-        <section id="templates" className="py-24 px-6 overflow-hidden">
+        <section id="templates" className="py-24 px-6 overflow-hidden bg-white">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
               <div className="space-y-4">

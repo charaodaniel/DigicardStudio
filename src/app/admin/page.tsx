@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -30,7 +29,8 @@ import {
   X,
   Globe,
   Monitor,
-  HardDrive
+  HardDrive,
+  Link2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -124,7 +124,8 @@ export default function AdminDashboard() {
     name: '',
     price: '',
     cardLimit: '',
-    industrialExport: false
+    industrialExport: false,
+    checkoutUrl: ''
   });
 
   // Configurações do Sistema
@@ -205,7 +206,6 @@ export default function AdminDashboard() {
       if (target) {
         target.users++;
         if (u.role === 'premium') {
-          // Estimativa baseada no valor padrão de R$ 29,90 se não houver valor no banco
           target.revenue += 29.90;
         }
       }
@@ -225,7 +225,7 @@ export default function AdminDashboard() {
       toast({ title: "Nível alterado", description: `O usuário agora possui o plano ${role}.` });
       loadData();
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erro na sincronia", description: "Verifique se a função is_admin() foi criada no SQL Editor." });
+      toast({ variant: "destructive", title: "Erro na sincronia", description: error.message });
     }
   };
 
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
       toast({ title: editingPlan ? "Plano Atualizado" : "Plano Criado", description: `O plano ${planForm.name} foi processado.` });
       setIsPlanModalOpen(false);
       setEditingPlan(null);
-      setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
+      setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false, checkoutUrl: '' });
       loadData();
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Erro ao salvar plano', description: error.message });
@@ -276,7 +276,8 @@ export default function AdminDashboard() {
       name: plan.name,
       price: plan.price,
       cardLimit: plan.cardLimit,
-      industrialExport: plan.industrialExport
+      industrialExport: plan.industrialExport,
+      checkoutUrl: plan.checkoutUrl || ''
     });
     setIsPlanModalOpen(true);
   };
@@ -331,7 +332,7 @@ export default function AdminDashboard() {
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'plans' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             <CreditCard size={18} />
-            <span className="text-sm font-semibold">Planos & Assinaturas</span>
+            <span className="text-sm font-semibold">Planos & Mercado Pago</span>
           </button>
           <div className="pt-4 pb-2 px-3">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configurações</p>
@@ -363,7 +364,7 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-bold tracking-tight">
               {activeTab === 'overview' ? 'Dashboard Administrativo' : 
                activeTab === 'users' ? 'Usuários & Permissões' : 
-               activeTab === 'plans' ? 'Planos & Assinaturas' : 'Configurações de Marca'}
+               activeTab === 'plans' ? 'Planos & Pagamentos' : 'Configurações de Marca'}
             </h2>
             <p className="text-xs text-slate-500 font-medium">Controle central de acesso do DigiCard Studio.</p>
           </div>
@@ -557,12 +558,12 @@ export default function AdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-bold">Modelos de Negócio</h3>
-                  <p className="text-sm text-slate-500">Configure limites técnicos e preços das assinaturas.</p>
+                  <p className="text-sm text-slate-500">Configure limites técnicos e links de Checkout do Mercado Pago.</p>
                 </div>
                 
                 <Dialog open={isPlanModalOpen} onOpenChange={(open) => {
                   setIsPlanModalOpen(open);
-                  if (!open) { setEditingPlan(null); setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false }); }
+                  if (!open) { setEditingPlan(null); setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false, checkoutUrl: '' }); }
                 }}>
                   <DialogTrigger asChild>
                     <Button className="rounded-xl font-bold gap-2"><Plus size={18} /> Novo Plano</Button>
@@ -570,7 +571,7 @@ export default function AdminDashboard() {
                   <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-2xl font-black">{editingPlan ? 'Editar Plano' : 'Criar Novo Plano'}</DialogTitle>
-                      <DialogDescription>Defina as regras para este nível de assinatura.</DialogDescription>
+                      <DialogDescription>Defina as regras e o link de pagamento do Mercado Pago.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSavePlan} className="space-y-4 pt-4">
                       <div className="space-y-2">
@@ -578,12 +579,17 @@ export default function AdminDashboard() {
                         <Input id="planName" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} required />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="planPrice">Preço Mensal</Label>
-                        <Input id="planPrice" value={planForm.price} onChange={e => setPlanForm({...planForm, price: e.target.value})} required />
+                        <Label htmlFor="planPrice">Preço Mensal (Texto)</Label>
+                        <Input id="planPrice" value={planForm.price} onChange={e => setPlanForm({...planForm, price: e.target.value})} required placeholder="Ex: R$ 29,90" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="planLimit">Limite de Cartões</Label>
                         <Input id="planLimit" value={planForm.cardLimit} onChange={e => setPlanForm({...planForm, cardLimit: e.target.value})} required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="checkoutUrl" className="flex items-center gap-2">Checkout Mercado Pago <Link2 size={14} className="text-primary" /></Label>
+                        <Input id="checkoutUrl" value={planForm.checkoutUrl} onChange={e => setPlanForm({...planForm, checkoutUrl: e.target.value})} placeholder="https://www.mercadopago.com.br/checkout/v1/redirect/..." />
+                        <p className="text-[10px] text-slate-400 font-medium">Cole aqui o link do seu botão de pagamento.</p>
                       </div>
                       <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                         <div className="space-y-0.5">
@@ -621,6 +627,13 @@ export default function AdminDashboard() {
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Exportação Industrial</span>
                           <span className="font-bold">{plan.industrialExport ? <Check size={16} className="text-emerald-500" /> : <X size={16} className="text-red-500" />}</span>
+                        </div>
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Link de Integração</p>
+                          <div className="flex items-center gap-2 text-xs text-slate-500 truncate bg-slate-50 dark:bg-slate-800 p-2 rounded">
+                            <Link2 size={12} className="shrink-0" />
+                            <span className="truncate">{plan.checkoutUrl || 'Não configurado'}</span>
+                          </div>
                         </div>
                       </div>
                     </CardContent>

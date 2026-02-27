@@ -15,6 +15,7 @@ export type Plan = {
   cardLimit: string;
   industrialExport: boolean;
   active: boolean;
+  checkoutUrl?: string;
 };
 
 export type SystemSettings = {
