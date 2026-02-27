@@ -161,6 +161,16 @@ export const supabaseService = {
     return (data || []).map(cardFromDb);
   },
 
+  async getTotalCardCount(): Promise<number> {
+    if (!isSupabaseConfigured) return localDb.getAllCards().length;
+    const { count, error } = await supabase
+      .from('cards')
+      .select('*', { count: 'exact', head: true });
+    
+    if (error) return 0;
+    return count || 0;
+  },
+
   async getCardById(id: string): Promise<CardData | null> {
     if (!isSupabaseConfigured) return localDb.getCardById(id) || null;
 

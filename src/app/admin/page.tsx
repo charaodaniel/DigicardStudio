@@ -114,6 +114,7 @@ export default function AdminDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [totalCards, setTotalCards] = useState(0);
   
   // Modais
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
@@ -149,13 +150,15 @@ export default function AdminDashboard() {
       setProfile(userProfile);
       
       // Busca dados reais do banco
-      const [allUsers, allPlans] = await Promise.all([
+      const [allUsers, allPlans, cardCount] = await Promise.all([
         supabaseService.getAllProfiles(),
-        supabaseService.getAllPlans()
+        supabaseService.getAllPlans(),
+        supabaseService.getTotalCardCount()
       ]);
       
       setUsers(allUsers);
       setPlans(allPlans);
+      setTotalCards(cardCount);
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Erro ao carregar dados', description: error.message });
     } finally {
@@ -247,6 +250,10 @@ export default function AdminDashboard() {
     u.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Cálculos dinâmicos de estatísticas
+  const premiumCount = users.filter(u => u.role === 'premium').length;
+  const estimatedRevenue = premiumCount * 29.90; // Exemplo de cálculo MRR básico
 
   if (isLoading && profile === null) {
     return (
@@ -342,10 +349,10 @@ export default function AdminDashboard() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { title: 'Total Usuários', value: users.length.toString(), change: '+12%', positive: true, icon: Users },
-                  { title: 'Cartões Ativos', value: '3,492', change: '+18%', positive: true, icon: Activity },
-                  { title: 'Receita Estimada', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
-                  { title: 'Assinantes Premium', value: users.filter(u => u.role === 'premium').length.toString(), change: '+8%', positive: true, icon: Crown },
+                  { title: 'Total Usuários', value: users.length.toLocaleString(), change: '+12%', positive: true, icon: Users },
+                  { title: 'Cartões Ativos', value: totalCards.toLocaleString(), change: '+18%', positive: true, icon: Activity },
+                  { title: 'Receita MRR', value: `R$ ${estimatedRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, change: '+5%', positive: true, icon: CreditCard },
+                  { title: 'Assinantes Premium', value: premiumCount.toLocaleString(), change: '+8%', positive: true, icon: Crown },
                 ].map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
