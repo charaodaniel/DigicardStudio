@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -24,7 +25,9 @@ import {
   Calendar,
   Fingerprint,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  Check,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,6 +81,8 @@ import { ptBR } from 'date-fns/locale';
 import AuthForm from '@/components/auth-form';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 const mockChartData = [
   { name: 'Jan', users: 400, revenue: 2400 },
@@ -102,6 +107,15 @@ const RoleBadge = ({ role }: { role: UserRole }) => {
   }
 };
 
+type Plan = {
+  id: string;
+  name: string;
+  price: string;
+  cardLimit: string;
+  industrialExport: boolean;
+  active: boolean;
+};
+
 export default function AdminDashboard() {
   const router = useRouter();
   const { toast } = useToast();
@@ -110,9 +124,26 @@ export default function AdminDashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Modais
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedViewUser, setSelectedViewUser] = useState<UserProfile | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  
+  // Planos
+  const [plans, setPlans] = useState<Plan[]>([
+    { id: '1', name: 'Free', price: 'R$ 0', cardLimit: '1', industrialExport: false, active: true },
+    { id: '2', name: 'Premium', price: 'R$ 29,90', cardLimit: '10', industrialExport: true, active: true },
+    { id: '3', name: 'Enterprise', price: 'Sob consulta', cardLimit: 'Ilimitado', industrialExport: true, active: true },
+  ]);
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [planForm, setPlanForm] = useState({
+    name: '',
+    price: '',
+    cardLimit: '',
+    industrialExport: false
+  });
 
   const loadData = async () => {
     setIsLoading(true);
@@ -130,7 +161,6 @@ export default function AdminDashboard() {
 
     setProfile(userProfile);
     
-    // Carrega usuários reais do banco
     const allUsers = await supabaseService.getAllProfiles();
     setUsers(allUsers);
     
@@ -180,6 +210,41 @@ export default function AdminDashboard() {
         description: error.message
       });
     }
+  };
+
+  const handleSavePlan = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingPlan) {
+      setPlans(prev => prev.map(p => p.id === editingPlan.id ? { ...p, ...planForm } : p));
+      toast({ title: "Plano Atualizado", description: `O plano ${planForm.name} foi modificado com sucesso.` });
+    } else {
+      const newPlan: Plan = {
+        id: Date.now().toString(),
+        name: planForm.name,
+        price: planForm.price,
+        cardLimit: planForm.cardLimit,
+        industrialExport: planForm.industrialExport,
+        active: true
+      };
+      setPlans(prev => [...prev, newPlan]);
+      toast({ title: "Plano Criado", description: `O plano ${planForm.name} está disponível para novos usuários.` });
+    }
+    
+    setIsPlanModalOpen(false);
+    setEditingPlan(null);
+    setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
+  };
+
+  const openEditPlan = (plan: Plan) => {
+    setEditingPlan(plan);
+    setPlanForm({
+      name: plan.name,
+      price: plan.price,
+      cardLimit: plan.cardLimit,
+      industrialExport: plan.industrialExport
+    });
+    setIsPlanModalOpen(true);
   };
 
   const filteredUsers = users.filter(u => 
@@ -491,19 +556,79 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold">Modelos de Negócio</h3>
                   <p className="text-sm text-slate-500">Configure limites técnicos e preços das assinaturas.</p>
                 </div>
-                <Button className="rounded-xl font-bold gap-2">
-                  <Plus size={18} />
-                  Novo Plano
-                </Button>
+                
+                <Dialog open={isPlanModalOpen} onOpenChange={(open) => {
+                  setIsPlanModalOpen(open);
+                  if (!open) {
+                    setEditingPlan(null);
+                    setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
+                  }
+                }}>
+                  <DialogTrigger asChild>
+                    <Button className="rounded-xl font-bold gap-2">
+                      <Plus size={18} />
+                      Novo Plano
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-black">{editingPlan ? 'Editar Plano' : 'Criar Novo Plano'}</DialogTitle>
+                      <DialogDescription>Defina as regras e precificação para este nível de assinatura.</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSavePlan} className="space-y-4 pt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="planName">Nome do Plano</Label>
+                        <Input 
+                          id="planName" 
+                          placeholder="Ex: Diamond, Pro Plus" 
+                          value={planForm.name} 
+                          onChange={e => setPlanForm({...planForm, name: e.target.value})}
+                          required 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="planPrice">Preço Mensal</Label>
+                        <Input 
+                          id="planPrice" 
+                          placeholder="Ex: R$ 49,90 ou Sob consulta" 
+                          value={planForm.price} 
+                          onChange={e => setPlanForm({...planForm, price: e.target.value})}
+                          required 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="planLimit">Limite de Cartões</Label>
+                        <Input 
+                          id="planLimit" 
+                          placeholder="Ex: 5, 20 ou Ilimitado" 
+                          value={planForm.cardLimit} 
+                          onChange={e => setPlanForm({...planForm, cardLimit: e.target.value})}
+                          required 
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-bold">Exportação Industrial</Label>
+                          <p className="text-[10px] text-slate-500 font-medium">Permite baixar SVG/PNG em alta resolução.</p>
+                        </div>
+                        <Switch 
+                          checked={planForm.industrialExport} 
+                          onCheckedChange={val => setPlanForm({...planForm, industrialExport: val})} 
+                        />
+                      </div>
+                      <DialogFooter className="pt-4">
+                        <Button type="submit" className="w-full h-12 rounded-xl font-bold">
+                          {editingPlan ? 'Salvar Alterações' : 'Publicar Plano'}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { name: 'Free', price: 'R$ 0', users: users.filter(u => u.role === 'free').length, active: true },
-                  { name: 'Premium', price: 'R$ 29,90', users: users.filter(u => u.role === 'premium').length, active: true },
-                  { name: 'Enterprise', price: 'Sob consulta', users: users.filter(u => u.role === 'admin' || u.role === 'super_admin').length, active: true },
-                ].map((plan, i) => (
-                  <Card key={i} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
+                {plans.map((plan, i) => (
+                  <Card key={plan.id} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
                     {plan.active && <div className="absolute top-0 right-0 p-4"><Badge className="bg-emerald-500 text-white uppercase text-[8px] font-black">Ativo</Badge></div>}
                     <CardHeader>
                       <CardTitle className="text-xl flex items-center gap-2">
@@ -515,25 +640,27 @@ export default function AdminDashboard() {
                     <CardContent className="flex-1">
                       <div className="flex items-baseline gap-1 mb-6">
                         <span className="text-3xl font-black">{plan.price}</span>
-                        {plan.price !== 'Sob consulta' && <span className="text-sm text-slate-500 font-bold">/mês</span>}
+                        {plan.price !== 'Sob consulta' && plan.price !== 'R$ 0' && <span className="text-sm text-slate-500 font-bold">/mês</span>}
                       </div>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Usuários ativos</span>
-                          <span className="font-bold">{plan.users}</span>
+                          <span className="font-bold">{users.filter(u => u.role === (plan.name.toLowerCase() as any)).length || 0}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Limite de cartões</span>
-                          <span className="font-bold">{plan.name === 'Free' ? '1' : plan.name === 'Premium' ? '10' : 'Ilimitado'}</span>
+                          <span className="font-bold">{plan.cardLimit}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Exportação Industrial</span>
-                          <span className="font-bold">{plan.name === 'Free' ? 'Não' : 'Sim'}</span>
+                          <span className="font-bold">{plan.industrialExport ? <Check size={16} className="text-emerald-500" /> : <X size={16} className="text-red-500" />}</span>
                         </div>
                       </div>
                     </CardContent>
                     <CardHeader className="pt-0">
-                      <Button variant="outline" className="w-full rounded-xl font-bold">Editar Configurações do Plano</Button>
+                      <Button variant="outline" className="w-full rounded-xl font-bold" onClick={() => openEditPlan(plan)}>
+                        Editar Configurações do Plano
+                      </Button>
                     </CardHeader>
                   </Card>
                 ))}
