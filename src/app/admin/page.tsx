@@ -20,7 +20,11 @@ import {
   Crown,
   ShieldAlert,
   UserCheck,
-  RefreshCcw
+  RefreshCcw,
+  Calendar,
+  Fingerprint,
+  Mail,
+  User as UserIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +58,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter
 } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -71,6 +76,7 @@ import type { UserRole, UserProfile } from '@/lib/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AuthForm from '@/components/auth-form';
+import { Separator } from '@/components/ui/separator';
 
 const mockChartData = [
   { name: 'Jan', users: 400, revenue: 2400 },
@@ -103,6 +109,8 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [selectedViewUser, setSelectedViewUser] = useState<UserProfile | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -392,12 +400,20 @@ export default function AdminDashboard() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-none">
                               <DropdownMenuLabel className="text-xs uppercase tracking-widest text-slate-400">Ações de Gestão</DropdownMenuLabel>
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm">Ver Detalhes do Perfil</DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="gap-2 font-semibold text-sm cursor-pointer"
+                                onClick={() => {
+                                  setSelectedViewUser(u);
+                                  setIsDetailsModalOpen(true);
+                                }}
+                              >
+                                Ver Detalhes do Perfil
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-indigo-500">Alterar para Premium</DropdownMenuItem>
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-orange-500">Tornar Administrador</DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-indigo-500 cursor-pointer">Alterar para Premium</DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-orange-500 cursor-pointer">Tornar Administrador</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-red-500 font-bold">Banir Permanentemente</DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-red-500 font-bold cursor-pointer">Banir Permanentemente</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -432,7 +448,7 @@ export default function AdminDashboard() {
                 {[
                   { name: 'Free', price: 'R$ 0', users: users.filter(u => u.role === 'free').length, active: true },
                   { name: 'Premium', price: 'R$ 29,90', users: users.filter(u => u.role === 'premium').length, active: true },
-                  { name: 'Enterprise', price: 'Sob consulta', users: users.filter(u => u.role === 'admin').length, active: true },
+                  { name: 'Enterprise', price: 'Sob consulta', users: users.filter(u => u.role === 'admin' || u.role === 'super_admin').length, active: true },
                 ].map((plan, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
                     {plan.active && <div className="absolute top-0 right-0 p-4"><Badge className="bg-emerald-500 text-white uppercase text-[8px] font-black">Ativo</Badge></div>}
@@ -473,6 +489,83 @@ export default function AdminDashboard() {
           )}
         </div>
       </main>
+
+      {/* Modal de Detalhes do Perfil */}
+      <Dialog open={isDetailsModalOpen} onOpenChange={setIsDetailsModalOpen}>
+        <DialogContent className="sm:max-w-lg rounded-[2rem] p-0 border-none shadow-2xl overflow-hidden bg-white dark:bg-slate-900">
+          {selectedViewUser && (
+            <div className="flex flex-col">
+              <div className="h-32 bg-slate-100 dark:bg-slate-800 relative">
+                <div className="absolute -bottom-12 left-8 p-1 bg-white dark:bg-slate-900 rounded-full shadow-lg">
+                  <div className="size-24 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex items-center justify-center border-4 border-white dark:border-slate-900">
+                    {selectedViewUser.avatarUrl ? (
+                      <img src={selectedViewUser.avatarUrl} className="w-full h-full object-cover" />
+                    ) : (
+                      <UserIcon size={40} className="text-slate-400" />
+                    )}
+                  </div>
+                </div>
+                <div className="absolute top-4 right-4">
+                  <RoleBadge role={selectedViewUser.role} />
+                </div>
+              </div>
+              
+              <div className="pt-16 px-8 pb-8 space-y-6">
+                <div>
+                  <h3 className="text-2xl font-black tracking-tight">{selectedViewUser.fullName || 'Sem Nome'}</h3>
+                  <p className="text-sm text-slate-500 font-medium flex items-center gap-1.5 mt-1">
+                    <Mail size={14} />
+                    ID de Usuário Ativo
+                  </p>
+                </div>
+
+                <Separator className="bg-slate-100 dark:bg-slate-800" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <Fingerprint size={12} /> Identificador Único
+                    </p>
+                    <p className="text-xs font-mono bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg text-slate-600 dark:text-slate-300 break-all border border-slate-100 dark:border-slate-800">
+                      {selectedViewUser.id}
+                    </p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <Calendar size={12} /> Data de Cadastro
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      {selectedViewUser.createdAt ? format(new Date(selectedViewUser.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Activity size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status da Conta</p>
+                      <p className="text-sm font-black text-primary">ATIVA & SINCRONIZADA</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-emerald-500 text-white font-bold">ONLINE</Badge>
+                </div>
+
+                <DialogFooter className="pt-4 gap-2">
+                  <Button variant="outline" className="rounded-xl font-bold flex-1" onClick={() => setIsDetailsModalOpen(false)}>
+                    Fechar Visualização
+                  </Button>
+                  <Button className="rounded-xl font-bold flex-1 bg-slate-900 dark:bg-white dark:text-slate-900">
+                    Acessar Painel do Usuário
+                  </Button>
+                </DialogFooter>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
