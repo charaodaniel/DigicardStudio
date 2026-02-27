@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -107,6 +108,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -179,6 +181,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    setIsMounted(true);
     loadData();
   }, [router]);
 
@@ -189,6 +192,7 @@ export default function AdminDashboard() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       last7Months.push({ 
+        id: `chart-month-${d.getMonth()}-${d.getFullYear()}`,
         name: months[d.getMonth()], 
         users: 0, 
         revenue: 0,
@@ -288,7 +292,7 @@ export default function AdminDashboard() {
   );
 
   const premiumCount = users.filter(u => u.role === 'premium').length;
-  const estimatedRevenue = chartData[chartData.length - 1].revenue;
+  const estimatedRevenue = chartData.reduce((acc, curr) => acc + curr.revenue, 0) / (chartData.length || 1); // Simplificando para mostrar a média ou o último mês
 
   if (isLoading && profile === null) {
     return (
@@ -399,7 +403,7 @@ export default function AdminDashboard() {
                   { title: 'Total Usuários', value: users.length.toLocaleString(), change: 'Tempo real', positive: true, icon: Users },
                   { title: 'Cartões Ativos', value: totalCards.toLocaleString(), change: 'Registros', positive: true, icon: Activity },
                   { title: 'Receita MRR', value: `R$ ${estimatedRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, change: 'Estimativa', positive: true, icon: CreditCard },
-                  { title: 'Assinantes Premium', value: premiumCount.toLocaleString(), change: `${((premiumCount/users.length)*100).toFixed(1)}% base`, positive: true, icon: Crown },
+                  { title: 'Assinantes Premium', value: premiumCount.toLocaleString(), change: `${((premiumCount/(users.length || 1))*100).toFixed(1)}% base`, positive: true, icon: Crown },
                 ].map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -424,18 +428,20 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
-                            itemStyle={{ color: '#fff' }}
-                          />
-                          <Line type="monotone" dataKey="users" stroke="#5048e5" strokeWidth={3} dot={{ r: 4, fill: '#5048e5' }} />
-                        </LineChart>
-                      </ResponsiveContainer>
+                      {isMounted && (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={chartData} id="growth-chart">
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                            <Tooltip 
+                              contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
+                              itemStyle={{ color: '#fff' }}
+                            />
+                            <Line type="monotone" dataKey="users" stroke="#5048e5" strokeWidth={3} dot={{ r: 4, fill: '#5048e5' }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -447,18 +453,20 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
-                            formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Receita']}
-                          />
-                          <Bar dataKey="revenue" fill="#5048e5" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
+                      {isMounted && (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={chartData} id="revenue-chart">
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
+                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                            <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
+                            <Tooltip 
+                              contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
+                              formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Receita']}
+                            />
+                            <Bar dataKey="revenue" fill="#5048e5" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -506,7 +514,7 @@ export default function AdminDashboard() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden font-bold text-slate-500 text-xs shrink-0">
-                              {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" /> : u.fullName?.[0]}
+                              {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" alt={u.fullName || 'Avatar'} /> : u.fullName?.[0]}
                             </div>
                             <div className="min-w-0">
                               <p className="font-bold text-sm truncate">{u.fullName || 'Sem Nome'}</p>
@@ -804,7 +812,7 @@ export default function AdminDashboard() {
               <div className="h-32 bg-slate-100 dark:bg-slate-800 relative">
                 <div className="absolute -bottom-12 left-8 p-1 bg-white dark:bg-slate-900 rounded-full shadow-lg">
                   <div className="size-24 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex items-center justify-center border-4 border-white dark:border-slate-900">
-                    {selectedViewUser.avatarUrl ? <img src={selectedViewUser.avatarUrl} className="w-full h-full object-cover" /> : <UserIcon size={40} className="text-slate-400" />}
+                    {selectedViewUser.avatarUrl ? <img src={selectedViewUser.avatarUrl} className="w-full h-full object-cover" alt={selectedViewUser.fullName || 'User'} /> : <UserIcon size={40} className="text-slate-400" />}
                   </div>
                 </div>
                 <div className="absolute top-4 right-4"><RoleBadge role={selectedViewUser.role} /></div>
