@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { CardData, UserProfile, UserRole } from './types';
+import type { CardData, UserProfile, UserRole, Plan } from './types';
 import { initialCardData } from './data';
 import { localDb } from './local-database';
 
@@ -109,9 +109,6 @@ export const supabaseService = {
     return profileFromDb(data);
   },
 
-  /**
-   * Busca todos os perfis cadastrados (Apenas para Admins)
-   */
   async getAllProfiles(): Promise<UserProfile[]> {
     if (!isSupabaseConfigured) return [];
     const { data, error } = await supabase
@@ -126,9 +123,6 @@ export const supabaseService = {
     return data.map(profileFromDb);
   },
 
-  /**
-   * Atualiza o papel/role de um perfil (Admin only)
-   */
   async updateProfileRole(userId: string, role: UserRole): Promise<void> {
     if (!isSupabaseConfigured) return;
     const { error } = await supabase
@@ -138,9 +132,6 @@ export const supabaseService = {
     if (error) throw error;
   },
 
-  /**
-   * Remove um perfil do sistema (Admin only)
-   */
   async deleteProfile(userId: string): Promise<void> {
     if (!isSupabaseConfigured) return;
     const { error } = await supabase
@@ -237,5 +228,43 @@ export const supabaseService = {
     }
     
     return newCard;
+  },
+
+  // Novos métodos para Planos
+  async getAllPlans(): Promise<Plan[]> {
+    if (!isSupabaseConfigured) return [];
+    const { data, error } = await supabase
+      .from('plans')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) return [];
+    return data.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      cardLimit: p.card_limit,
+      industrialExport: p.industrial_export,
+      active: p.active
+    }));
+  },
+
+  async savePlan(plan: Partial<Plan>): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    const payload = {
+      name: plan.name,
+      price: plan.price,
+      card_limit: plan.cardLimit,
+      industrial_export: plan.industrialExport,
+      active: plan.active ?? true
+    };
+
+    if (plan.id) {
+      const { error } = await supabase.from('plans').update(payload).eq('id', plan.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from('plans').insert(payload);
+      if (error) throw error;
+    }
   }
 };

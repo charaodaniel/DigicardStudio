@@ -1,4 +1,3 @@
-
 export type UserRole = 'super_admin' | 'admin' | 'premium' | 'free';
 
 export type UserProfile = {
@@ -7,6 +6,15 @@ export type UserProfile = {
   avatarUrl: string | null;
   role: UserRole;
   createdAt: string;
+};
+
+export type Plan = {
+  id: string;
+  name: string;
+  price: string;
+  cardLimit: string;
+  industrialExport: boolean;
+  active: boolean;
 };
 
 export type SocialLink = {

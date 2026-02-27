@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -75,7 +74,7 @@ import {
   LineChart, 
   Line 
 } from 'recharts';
-import type { UserRole, UserProfile } from '@/lib/types';
+import type { UserRole, UserProfile, Plan } from '@/lib/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AuthForm from '@/components/auth-form';
@@ -107,15 +106,6 @@ const RoleBadge = ({ role }: { role: UserRole }) => {
   }
 };
 
-type Plan = {
-  id: string;
-  name: string;
-  price: string;
-  cardLimit: string;
-  industrialExport: boolean;
-  active: boolean;
-};
-
 export default function AdminDashboard() {
   const router = useRouter();
   const { toast } = useToast();
@@ -130,12 +120,8 @@ export default function AdminDashboard() {
   const [selectedViewUser, setSelectedViewUser] = useState<UserProfile | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   
-  // Planos
-  const [plans, setPlans] = useState<Plan[]>([
-    { id: '1', name: 'Free', price: 'R$ 0', cardLimit: '1', industrialExport: false, active: true },
-    { id: '2', name: 'Premium', price: 'R$ 29,90', cardLimit: '10', industrialExport: true, active: true },
-    { id: '3', name: 'Enterprise', price: 'Sob consulta', cardLimit: 'Ilimitado', industrialExport: true, active: true },
-  ]);
+  // Planos (Sincronizados com Banco)
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   const [planForm, setPlanForm] = useState({
@@ -147,24 +133,34 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     setIsLoading(true);
-    const userProfile = await supabaseService.getUserProfile();
-    
-    if (!userProfile) {
-      router.push('/login');
-      return;
-    }
+    try {
+      const userProfile = await supabaseService.getUserProfile();
+      
+      if (!userProfile) {
+        router.push('/login');
+        return;
+      }
 
-    if (userProfile.role !== 'admin' && userProfile.role !== 'super_admin') {
-      router.push('/meus-cartoes');
-      return;
-    }
+      if (userProfile.role !== 'admin' && userProfile.role !== 'super_admin') {
+        router.push('/meus-cartoes');
+        return;
+      }
 
-    setProfile(userProfile);
-    
-    const allUsers = await supabaseService.getAllProfiles();
-    setUsers(allUsers);
-    
-    setIsLoading(false);
+      setProfile(userProfile);
+      
+      // Busca dados reais do banco
+      const [allUsers, allPlans] = await Promise.all([
+        supabaseService.getAllProfiles(),
+        supabaseService.getAllPlans()
+      ]);
+      
+      setUsers(allUsers);
+      setPlans(allPlans);
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Erro ao carregar dados', description: error.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -212,28 +208,27 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleSavePlan = (e: React.FormEvent) => {
+  const handleSavePlan = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (editingPlan) {
-      setPlans(prev => prev.map(p => p.id === editingPlan.id ? { ...p, ...planForm } : p));
-      toast({ title: "Plano Atualizado", description: `O plano ${planForm.name} foi modificado com sucesso.` });
-    } else {
-      const newPlan: Plan = {
-        id: Date.now().toString(),
-        name: planForm.name,
-        price: planForm.price,
-        cardLimit: planForm.cardLimit,
-        industrialExport: planForm.industrialExport,
+    try {
+      await supabaseService.savePlan({
+        id: editingPlan?.id,
+        ...planForm,
         active: true
-      };
-      setPlans(prev => [...prev, newPlan]);
-      toast({ title: "Plano Criado", description: `O plano ${planForm.name} está disponível para novos usuários.` });
+      });
+      
+      toast({ 
+        title: editingPlan ? "Plano Atualizado" : "Plano Criado", 
+        description: `O plano ${planForm.name} foi processado no banco de dados.` 
+      });
+      
+      setIsPlanModalOpen(false);
+      setEditingPlan(null);
+      setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
+      loadData();
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Erro ao salvar plano', description: error.message });
     }
-    
-    setIsPlanModalOpen(false);
-    setEditingPlan(null);
-    setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
   };
 
   const openEditPlan = (plan: Plan) => {
@@ -349,7 +344,7 @@ export default function AdminDashboard() {
                 {[
                   { title: 'Total Usuários', value: users.length.toString(), change: '+12%', positive: true, icon: Users },
                   { title: 'Cartões Ativos', value: '3,492', change: '+18%', positive: true, icon: Activity },
-                  { title: 'Receita Mensal', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
+                  { title: 'Receita Estimada', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
                   { title: 'Assinantes Premium', value: users.filter(u => u.role === 'premium').length.toString(), change: '+8%', positive: true, icon: Crown },
                 ].map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
