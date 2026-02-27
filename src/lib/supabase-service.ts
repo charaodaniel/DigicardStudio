@@ -126,6 +126,30 @@ export const supabaseService = {
     return data.map(profileFromDb);
   },
 
+  /**
+   * Atualiza o papel/role de um perfil (Admin only)
+   */
+  async updateProfileRole(userId: string, role: UserRole): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('id', userId);
+    if (error) throw error;
+  },
+
+  /**
+   * Remove um perfil do sistema (Admin only)
+   */
+  async deleteProfile(userId: string): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    const { error } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', userId);
+    if (error) throw error;
+  },
+
   async getAllCards(): Promise<CardData[]> {
     if (!isSupabaseConfigured) return localDb.getAllCards();
 

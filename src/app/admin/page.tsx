@@ -77,6 +77,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AuthForm from '@/components/auth-form';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 const mockChartData = [
   { name: 'Jan', users: 400, revenue: 2400 },
@@ -103,6 +104,7 @@ const RoleBadge = ({ role }: { role: UserRole }) => {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -142,6 +144,42 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
+  };
+
+  const handleUpdateRole = async (userId: string, role: UserRole) => {
+    try {
+      await supabaseService.updateProfileRole(userId, role);
+      toast({
+        title: "Nível alterado",
+        description: `O usuário agora possui o plano ${role}.`
+      });
+      loadData();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao alterar nível",
+        description: error.message
+      });
+    }
+  };
+
+  const handleBanUser = async (userId: string) => {
+    if (!confirm("Tem certeza que deseja banir este usuário? O perfil será removido permanentemente.")) return;
+    
+    try {
+      await supabaseService.deleteProfile(userId);
+      toast({
+        title: "Usuário banido",
+        description: "O perfil foi removido com sucesso."
+      });
+      loadData();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao banir",
+        description: error.message
+      });
+    }
   };
 
   const filteredUsers = users.filter(u => 
@@ -410,10 +448,25 @@ export default function AdminDashboard() {
                                 Ver Detalhes do Perfil
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-indigo-500 cursor-pointer">Alterar para Premium</DropdownMenuItem>
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-orange-500 cursor-pointer">Tornar Administrador</DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleUpdateRole(u.id, 'premium')}
+                                className="gap-2 font-semibold text-sm text-indigo-500 cursor-pointer"
+                              >
+                                Alterar para Premium
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleUpdateRole(u.id, 'admin')}
+                                className="gap-2 font-semibold text-sm text-orange-500 cursor-pointer"
+                              >
+                                Tornar Administrador
+                              </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="gap-2 font-semibold text-sm text-red-500 font-bold cursor-pointer">Banir Permanentemente</DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleBanUser(u.id)}
+                                className="gap-2 font-semibold text-sm text-red-500 font-bold cursor-pointer"
+                              >
+                                Banir Permanentemente
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
