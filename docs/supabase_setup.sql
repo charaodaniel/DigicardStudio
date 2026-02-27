@@ -1,10 +1,17 @@
 -- 1. Limpeza total (Cuidado: apaga dados existentes para garantir sincronia total)
+-- Removemos o gatilho primeiro
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP FUNCTION IF EXISTS public.handle_new_user();
-DROP FUNCTION IF EXISTS public.is_admin();
+
+-- Removemos as tabelas PRIMEIRO para que as políticas que dependem das funções sejam apagadas
 DROP TABLE IF EXISTS public.cards;
 DROP TABLE IF EXISTS public.plans;
 DROP TABLE IF EXISTS public.profiles;
+
+-- Agora as funções podem ser removidas sem erro de dependência
+DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP FUNCTION IF EXISTS public.is_admin();
+
+-- Finalmente o tipo enumerado
 DROP TYPE IF EXISTS user_role;
 
 -- 2. Criação do Tipo de Role (Hierarquia do SaaS)
@@ -20,6 +27,7 @@ CREATE TABLE public.profiles (
 );
 
 -- 4. Função de Segurança para verificação de Admin (Evita recursão infinita no RLS)
+-- Definida com SECURITY DEFINER para ignorar políticas de RLS durante a checagem
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
 BEGIN
