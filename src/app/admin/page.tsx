@@ -1,5 +1,6 @@
+
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabaseService } from '@/lib/supabase-service';
@@ -86,16 +87,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-
-const mockChartData = [
-  { name: 'Jan', users: 400, revenue: 2400 },
-  { name: 'Fev', users: 300, revenue: 1398 },
-  { name: 'Mar', users: 200, revenue: 9800 },
-  { name: 'Abr', users: 278, revenue: 3908 },
-  { name: 'Mai', users: 189, revenue: 4800 },
-  { name: 'Jun', users: 239, revenue: 3800 },
-  { name: 'Jul', users: 349, revenue: 4300 },
-];
 
 const RoleBadge = ({ role }: { role: UserRole }) => {
   switch (role) {
@@ -185,6 +176,44 @@ export default function AdminDashboard() {
     loadData();
   }, [router]);
 
+  // Cálculo dinâmico de dados para os gráficos baseados nos usuários reais
+  const chartData = useMemo(() => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const now = new Date();
+    
+    // Gerar esqueleto dos últimos 7 meses
+    const last7Months = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      last7Months.push({ 
+        name: months[d.getMonth()], 
+        users: 0, 
+        revenue: 0,
+        monthNum: d.getMonth(),
+        yearNum: d.getFullYear()
+      });
+    }
+
+    // Processar usuários reais
+    users.forEach(u => {
+      if (!u.createdAt) return;
+      const date = new Date(u.createdAt);
+      const m = date.getMonth();
+      const y = date.getFullYear();
+      
+      const target = last7Months.find(item => item.monthNum === m && item.yearNum === y);
+      if (target) {
+        target.users++;
+        if (u.role === 'premium') {
+          // Estimativa baseada no valor padrão de R$ 29,90 se não houver valor no banco
+          target.revenue += 29.90;
+        }
+      }
+    });
+
+    return last7Months;
+  }, [users]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
@@ -196,7 +225,7 @@ export default function AdminDashboard() {
       toast({ title: "Nível alterado", description: `O usuário agora possui o plano ${role}.` });
       loadData();
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erro ao alterar nível", description: error.message });
+      toast({ variant: "destructive", title: "Erro na sincronia", description: "Verifique se a função is_admin() foi criada no SQL Editor." });
     }
   };
 
@@ -259,7 +288,7 @@ export default function AdminDashboard() {
   );
 
   const premiumCount = users.filter(u => u.role === 'premium').length;
-  const estimatedRevenue = premiumCount * 29.90;
+  const estimatedRevenue = chartData[chartData.length - 1].revenue;
 
   if (isLoading && profile === null) {
     return (
@@ -359,10 +388,10 @@ export default function AdminDashboard() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { title: 'Total Usuários', value: users.length.toLocaleString(), change: '+12%', positive: true, icon: Users },
-                  { title: 'Cartões Ativos', value: totalCards.toLocaleString(), change: '+18%', positive: true, icon: Activity },
-                  { title: 'Receita MRR', value: `R$ ${estimatedRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, change: '+5%', positive: true, icon: CreditCard },
-                  { title: 'Assinantes Premium', value: premiumCount.toLocaleString(), change: '+8%', positive: true, icon: Crown },
+                  { title: 'Total Usuários', value: users.length.toLocaleString(), change: 'Tempo real', positive: true, icon: Users },
+                  { title: 'Cartões Ativos', value: totalCards.toLocaleString(), change: 'Registros', positive: true, icon: Activity },
+                  { title: 'Receita MRR', value: `R$ ${estimatedRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, change: 'Estimativa', positive: true, icon: CreditCard },
+                  { title: 'Assinantes Premium', value: premiumCount.toLocaleString(), change: `${((premiumCount/users.length)*100).toFixed(1)}% base`, positive: true, icon: Crown },
                 ].map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -372,8 +401,7 @@ export default function AdminDashboard() {
                     <CardContent>
                       <div className="text-2xl font-black">{stat.value}</div>
                       <p className={`text-[10px] font-bold mt-1 flex items-center gap-1 ${stat.positive ? 'text-emerald-500' : 'text-red-500'}`}>
-                        {stat.positive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                        {stat.change} vs mês anterior
+                        {stat.change}
                       </p>
                     </CardContent>
                   </Card>
@@ -384,12 +412,12 @@ export default function AdminDashboard() {
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
                     <CardTitle>Crescimento da Base</CardTitle>
-                    <CardDescription>Novos usuários cadastrados nos últimos meses.</CardDescription>
+                    <CardDescription>Novos usuários reais detectados por mês.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mockChartData}>
+                        <LineChart data={chartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                           <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
@@ -406,17 +434,20 @@ export default function AdminDashboard() {
 
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
-                    <CardTitle>MRR - Receita Recurrente</CardTitle>
-                    <CardDescription>Fluxo gerado por assinaturas Premium.</CardDescription>
+                    <CardTitle>Receita Mensal Estimada</CardTitle>
+                    <CardDescription>Crescimento do MRR baseado em planos ativos.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={mockChartData}>
+                        <BarChart data={chartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                           <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                          <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '8px', color: '#fff' }}
+                            formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Receita']}
+                          />
                           <Bar dataKey="revenue" fill="#5048e5" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
