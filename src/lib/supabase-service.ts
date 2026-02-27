@@ -1,4 +1,3 @@
-
 import { supabase, isSupabaseConfigured } from './supabase';
 import type { CardData, UserProfile, UserRole } from './types';
 import { initialCardData } from './data';
@@ -108,6 +107,23 @@ export const supabaseService = {
       return null;
     }
     return profileFromDb(data);
+  },
+
+  /**
+   * Busca todos os perfis cadastrados (Apenas para Admins)
+   */
+  async getAllProfiles(): Promise<UserProfile[]> {
+    if (!isSupabaseConfigured) return [];
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao buscar perfis:', error.message);
+      return [];
+    }
+    return data.map(profileFromDb);
   },
 
   async getAllCards(): Promise<CardData[]> {

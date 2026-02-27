@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -59,37 +58,19 @@ import {
   LineChart, 
   Line 
 } from 'recharts';
-import type { UserRole } from '@/lib/types';
+import type { UserRole, UserProfile } from '@/lib/types';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-const mockData = {
-  stats: [
-    { title: 'Total Usuários', value: '1,284', change: '+12%', positive: true, icon: Users },
-    { title: 'Cartões Ativos', value: '3,492', change: '+18%', positive: true, icon: Activity },
-    { title: 'Receita Mensal', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
-    { title: 'Assinantes Premium', value: '312', change: '+8%', positive: true, icon: Crown },
-  ],
-  chartData: [
-    { name: 'Jan', users: 400, revenue: 2400 },
-    { name: 'Fev', users: 300, revenue: 1398 },
-    { name: 'Mar', users: 200, revenue: 9800 },
-    { name: 'Abr', users: 278, revenue: 3908 },
-    { name: 'Mai', users: 189, revenue: 4800 },
-    { name: 'Jun', users: 239, revenue: 3800 },
-    { name: 'Jul', users: 349, revenue: 4300 },
-  ],
-  users: [
-    { id: '1', name: 'João Silva', email: 'joao@exemplo.com', role: 'super_admin' as UserRole, status: 'Ativo', cards: 5, date: '12/05/2024' },
-    { id: '2', name: 'Maria Souza', email: 'maria@exemplo.com', role: 'free' as UserRole, status: 'Inativo', cards: 1, date: '10/05/2024' },
-    { id: '3', name: 'Pedro Santos', email: 'pedro@exemplo.com', role: 'premium' as UserRole, status: 'Ativo', cards: 12, date: '08/05/2024' },
-    { id: '4', name: 'Ana Oliveira', email: 'ana@exemplo.com', role: 'admin' as UserRole, status: 'Ativo', cards: 3, date: '05/05/2024' },
-    { id: '5', name: 'Lucas Lima', email: 'lucas@exemplo.com', role: 'premium' as UserRole, status: 'Ativo', cards: 2, date: '01/05/2024' },
-  ],
-  plans: [
-    { name: 'Free', price: 'R$ 0', users: 842, active: true },
-    { name: 'Premium', price: 'R$ 29,90', users: 312, active: true },
-    { name: 'Enterprise', price: 'Sob consulta', users: 130, active: true },
-  ]
-};
+const mockChartData = [
+  { name: 'Jan', users: 400, revenue: 2400 },
+  { name: 'Fev', users: 300, revenue: 1398 },
+  { name: 'Mar', users: 200, revenue: 9800 },
+  { name: 'Abr', users: 278, revenue: 3908 },
+  { name: 'Mai', users: 189, revenue: 4800 },
+  { name: 'Jun', users: 239, revenue: 3800 },
+  { name: 'Jul', users: 349, revenue: 4300 },
+];
 
 const RoleBadge = ({ role }: { role: UserRole }) => {
   switch (role) {
@@ -108,10 +89,12 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const checkAdmin = async () => {
+    const checkAdminAndLoadData = async () => {
       setIsLoading(true);
       const userProfile = await supabaseService.getUserProfile();
       
@@ -126,15 +109,25 @@ export default function AdminDashboard() {
       }
 
       setProfile(userProfile);
+      
+      // Carrega usuários reais do banco
+      const allUsers = await supabaseService.getAllProfiles();
+      setUsers(allUsers);
+      
       setIsLoading(false);
     };
-    checkAdmin();
+    checkAdminAndLoadData();
   }, [router]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
   };
+
+  const filteredUsers = users.filter(u => 
+    u.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (isLoading) {
     return (
@@ -212,7 +205,12 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-4" />
-              <Input placeholder="Filtrar por nome, email ou nível..." className="pl-9 w-64 bg-slate-50 dark:bg-slate-800 border-none" />
+              <Input 
+                placeholder="Filtrar por nome ou nível..." 
+                className="pl-9 w-64 bg-slate-50 dark:bg-slate-800 border-none" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border-2 border-primary/20">
               {profile?.fullName?.[0] || 'A'}
@@ -224,7 +222,12 @@ export default function AdminDashboard() {
           {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {mockData.stats.map((stat, i) => (
+                {[
+                  { title: 'Total Usuários', value: users.length.toString(), change: '+12%', positive: true, icon: Users },
+                  { title: 'Cartões Ativos', value: '3,492', change: '+18%', positive: true, icon: Activity },
+                  { title: 'Receita Mensal', value: 'R$ 12.450', change: '+5%', positive: true, icon: CreditCard },
+                  { title: 'Assinantes Premium', value: users.filter(u => u.role === 'premium').length.toString(), change: '+8%', positive: true, icon: Crown },
+                ].map((stat, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                       <CardTitle className="text-xs font-bold uppercase tracking-widest text-slate-500">{stat.title}</CardTitle>
@@ -244,13 +247,13 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
-                    <CardTitle>Novos Cadastros</CardTitle>
-                    <CardDescription>Crescimento da base de usuários por nível.</CardDescription>
+                    <CardTitle>Crescimento da Base</CardTitle>
+                    <CardDescription>Novos usuários cadastrados nos últimos meses.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={mockData.chartData}>
+                        <LineChart data={mockChartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                           <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
@@ -268,12 +271,12 @@ export default function AdminDashboard() {
                 <Card className="border-none shadow-sm dark:bg-slate-900">
                   <CardHeader>
                     <CardTitle>MRR - Receita Recurrente</CardTitle>
-                    <CardDescription>Fluxo gerado por assinaturas Premium e Enterprise.</CardDescription>
+                    <CardDescription>Fluxo gerado por assinaturas Premium.</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[300px] w-full mt-4">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={mockData.chartData}>
+                        <BarChart data={mockChartData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" opacity={0.1} />
                           <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                           <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
@@ -293,7 +296,7 @@ export default function AdminDashboard() {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-bold">Membros & Permissões</h3>
-                  <p className="text-sm text-slate-500">Altere níveis de acesso e gerencie usuários Premium.</p>
+                  <p className="text-sm text-slate-500">Gerencie os níveis de acesso e visualize perfis reais.</p>
                 </div>
                 <Button className="rounded-xl font-bold gap-2">
                   <Plus size={18} />
@@ -307,37 +310,37 @@ export default function AdminDashboard() {
                     <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
                       <TableHead className="font-bold text-xs uppercase tracking-widest py-4">Membro</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Nível de Acesso</TableHead>
-                      <TableHead className="font-bold text-xs uppercase tracking-widest">Cartões</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Status</TableHead>
                       <TableHead className="font-bold text-xs uppercase tracking-widest">Cadastro</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockData.users.map((user) => (
-                      <TableRow key={user.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                    {filteredUsers.map((u) => (
+                      <TableRow key={u.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-500 text-xs">
-                              {user.name[0]}
+                            <div className="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden font-bold text-slate-500 text-xs">
+                              {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" /> : u.fullName?.[0]}
                             </div>
                             <div>
-                              <p className="font-bold text-sm">{user.name}</p>
-                              <p className="text-xs text-slate-500">{user.email}</p>
+                              <p className="font-bold text-sm">{u.fullName || 'Sem Nome'}</p>
+                              <p className="text-[10px] text-slate-400 font-mono">{u.id}</p>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <RoleBadge role={user.role} />
+                          <RoleBadge role={u.role} />
                         </TableCell>
-                        <TableCell className="font-medium text-sm">{user.cards}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className={`size-2 rounded-full ${user.status === 'Ativo' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                            <span className="text-sm font-medium">{user.status}</span>
+                            <div className="size-2 rounded-full bg-emerald-500" />
+                            <span className="text-sm font-medium">Ativo</span>
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm text-slate-500 font-medium">{user.date}</TableCell>
+                        <TableCell className="text-sm text-slate-500 font-medium">
+                          {format(new Date(u.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                        </TableCell>
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -378,7 +381,11 @@ export default function AdminDashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {mockData.plans.map((plan, i) => (
+                {[
+                  { name: 'Free', price: 'R$ 0', users: users.filter(u => u.role === 'free').length, active: true },
+                  { name: 'Premium', price: 'R$ 29,90', users: users.filter(u => u.role === 'premium').length, active: true },
+                  { name: 'Enterprise', price: 'Sob consulta', users: users.filter(u => u.role === 'admin').length, active: true },
+                ].map((plan, i) => (
                   <Card key={i} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
                     {plan.active && <div className="absolute top-0 right-0 p-4"><Badge className="bg-emerald-500 text-white uppercase text-[8px] font-black">Ativo</Badge></div>}
                     <CardHeader>
