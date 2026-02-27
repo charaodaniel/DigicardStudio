@@ -159,10 +159,10 @@ export const supabaseService = {
 
     if (error) {
       console.error('Erro detalhado Supabase (Save):', {
-        msg: error.message,
+        code: error.code,
+        message: error.message,
         details: error.details,
-        hint: error.hint,
-        code: error.code
+        hint: error.hint
       });
     }
   },
