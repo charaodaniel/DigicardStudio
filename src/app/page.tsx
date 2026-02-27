@@ -1,14 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { SiInstagram, SiSpotify, SiLinkedin, SiWhatsapp } from "react-icons/si";
 import AuthModal from '@/components/auth-modal';
+import { supabaseService } from '@/lib/supabase-service';
+import type { SystemSettings } from '@/lib/types';
 
 export default function LandingPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [settings, setSettings] = useState<SystemSettings | null>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const data = await supabaseService.getSystemSettings();
+      setSettings(data);
+    };
+    fetchSettings();
+  }, []);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'template-digicard-web');
   const templateEx1 = PlaceHolderImages.find(img => img.id === 'template-executive');
@@ -22,7 +33,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2 text-primary">
             <span className="material-symbols-outlined text-3xl font-bold">style</span>
-            <span className="text-xl font-black tracking-tight text-slate-900">DigiCard Studio</span>
+            <span className="text-xl font-black tracking-tight text-slate-900">
+              {settings?.siteName || 'DigiCard Studio'}
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-bold text-slate-500 hover:text-primary transition-colors">Funcionalidades</a>
@@ -59,10 +72,10 @@ export default function LandingPage() {
                 Revolucione sua Identidade Profissional
               </div>
               <h1 className="text-6xl lg:text-7xl font-black text-slate-900 leading-[0.9] tracking-tighter">
-                Seu Cartão de <span className="text-primary">Visita</span>, Reinventado.
+                {settings?.heroTitle?.split(' ')[0]} <span className="text-primary">{settings?.heroTitle?.split(' ').slice(1).join(' ') || 'Visita, Reinventado.'}</span>
               </h1>
               <p className="text-xl text-slate-500 font-medium max-w-lg leading-relaxed">
-                Crie cartões digitais interativos e gabaritos de impressão profissional em minutos. Onde a elegância digital encontra a precisão física.
+                {settings?.heroSubtitle || 'Crie cartões digitais interativos e gabaritos de impressão profissional em minutos. Onde a elegância digital encontra a precisão física.'}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link href="/editor">
@@ -164,7 +177,7 @@ export default function LandingPage() {
             <div className="relative z-10 space-y-8">
               <h2 className="text-4xl lg:text-6xl font-black tracking-tighter leading-none">Pronto para elevar seu <br/> profissionalismo?</h2>
               <p className="text-xl text-white/80 font-medium max-w-2xl mx-auto">
-                Junte-se a milhares de profissionais que já usam o DigiCard Studio para causar a melhor primeira impressão.
+                Junte-se a milhares de profissionais que já usam o {settings?.siteName || 'DigiCard Studio'} para causar a melhor primeira impressão.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Link href="/editor">
@@ -184,7 +197,7 @@ export default function LandingPage() {
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-primary">
               <span className="material-symbols-outlined text-3xl font-bold">style</span>
-              <span className="text-xl font-black tracking-tight text-slate-900">DigiCard Studio</span>
+              <span className="text-xl font-black tracking-tight text-slate-900">{settings?.siteName || 'DigiCard Studio'}</span>
             </div>
             <p className="text-slate-500 font-medium text-sm leading-relaxed">
               A próxima geração da identidade profissional híbrida. Simples, potente e elegante.
@@ -203,7 +216,7 @@ export default function LandingPage() {
             <ul className="space-y-4 text-sm font-bold text-slate-500">
               <li><a href="#">Sobre nós</a></li>
               <li><a href="#">Termos de Uso</a></li>
-              <li><a href="#">Privacidade</a></li>
+              <li><a href={`mailto:${settings?.supportEmail || 'suporte@digicard.studio'}`}>Suporte</a></li>
             </ul>
           </div>
           <div>
@@ -215,7 +228,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between gap-4">
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">© 2024 DigiCard Studio. Todos os direitos reservados.</p>
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">© 2024 {settings?.siteName || 'DigiCard Studio'}. Todos os direitos reservados.</p>
           <div className="flex gap-6 text-xs text-slate-400 font-bold uppercase tracking-widest">
             <span>Brasil</span>
             <span>English (US)</span>

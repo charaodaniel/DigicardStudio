@@ -26,7 +26,10 @@ import {
   Mail,
   User as UserIcon,
   Check,
-  X
+  X,
+  Globe,
+  Monitor,
+  HardDrive
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,7 +77,7 @@ import {
   LineChart, 
   Line 
 } from 'recharts';
-import type { UserRole, UserProfile, Plan } from '@/lib/types';
+import type { UserRole, UserProfile, Plan, SystemSettings } from '@/lib/types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AuthForm from '@/components/auth-form';
@@ -82,6 +85,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 
 const mockChartData = [
   { name: 'Jan', users: 400, revenue: 2400 },
@@ -121,7 +125,7 @@ export default function AdminDashboard() {
   const [selectedViewUser, setSelectedViewUser] = useState<UserProfile | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   
-  // Planos (Sincronizados com Banco)
+  // Planos
   const [plans, setPlans] = useState<Plan[]>([]);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
@@ -130,6 +134,16 @@ export default function AdminDashboard() {
     price: '',
     cardLimit: '',
     industrialExport: false
+  });
+
+  // Configurações do Sistema
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>({
+    id: 'global',
+    siteName: 'DigiCard Studio',
+    heroTitle: '',
+    heroSubtitle: '',
+    supportEmail: '',
+    maintenanceMode: false
   });
 
   const loadData = async () => {
@@ -149,16 +163,17 @@ export default function AdminDashboard() {
 
       setProfile(userProfile);
       
-      // Busca dados reais do banco
-      const [allUsers, allPlans, cardCount] = await Promise.all([
+      const [allUsers, allPlans, cardCount, settings] = await Promise.all([
         supabaseService.getAllProfiles(),
         supabaseService.getAllPlans(),
-        supabaseService.getTotalCardCount()
+        supabaseService.getTotalCardCount(),
+        supabaseService.getSystemSettings()
       ]);
       
       setUsers(allUsers);
       setPlans(allPlans);
       setTotalCards(cardCount);
+      setSystemSettings(settings);
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Erro ao carregar dados', description: error.message });
     } finally {
@@ -178,36 +193,21 @@ export default function AdminDashboard() {
   const handleUpdateRole = async (userId: string, role: UserRole) => {
     try {
       await supabaseService.updateProfileRole(userId, role);
-      toast({
-        title: "Nível alterado",
-        description: `O usuário agora possui o plano ${role}.`
-      });
+      toast({ title: "Nível alterado", description: `O usuário agora possui o plano ${role}.` });
       loadData();
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao alterar nível",
-        description: error.message
-      });
+      toast({ variant: "destructive", title: "Erro ao alterar nível", description: error.message });
     }
   };
 
   const handleBanUser = async (userId: string) => {
     if (!confirm("Tem certeza que deseja banir este usuário? O perfil será removido permanentemente.")) return;
-    
     try {
       await supabaseService.deleteProfile(userId);
-      toast({
-        title: "Usuário banido",
-        description: "O perfil foi removido com sucesso."
-      });
+      toast({ title: "Usuário banido", description: "O perfil foi removido com sucesso." });
       loadData();
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao banir",
-        description: error.message
-      });
+      toast({ variant: "destructive", title: "Erro ao banir", description: error.message });
     }
   };
 
@@ -219,18 +219,25 @@ export default function AdminDashboard() {
         ...planForm,
         active: true
       });
-      
-      toast({ 
-        title: editingPlan ? "Plano Atualizado" : "Plano Criado", 
-        description: `O plano ${planForm.name} foi processado no banco de dados.` 
-      });
-      
+      toast({ title: editingPlan ? "Plano Atualizado" : "Plano Criado", description: `O plano ${planForm.name} foi processado.` });
       setIsPlanModalOpen(false);
       setEditingPlan(null);
       setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
       loadData();
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Erro ao salvar plano', description: error.message });
+    }
+  };
+
+  const handleSaveSystemSettings = async () => {
+    try {
+      setIsLoading(true);
+      await supabaseService.updateSystemSettings(systemSettings);
+      toast({ title: "Configurações Salvas", description: "As mudanças no sistema foram aplicadas com sucesso." });
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Erro ao salvar configurações', description: error.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -251,9 +258,8 @@ export default function AdminDashboard() {
     u.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Cálculos dinâmicos de estatísticas
   const premiumCount = users.filter(u => u.role === 'premium').length;
-  const estimatedRevenue = premiumCount * 29.90; // Exemplo de cálculo MRR básico
+  const estimatedRevenue = premiumCount * 29.90;
 
   if (isLoading && profile === null) {
     return (
@@ -271,7 +277,7 @@ export default function AdminDashboard() {
             <ShieldCheck size={24} />
           </div>
           <div>
-            <h1 className="text-lg font-bold leading-none tracking-tight">DigiCard</h1>
+            <h1 className="text-lg font-bold leading-none tracking-tight">{systemSettings.siteName || 'DigiCard'}</h1>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Gestão SaaS</p>
           </div>
         </div>
@@ -301,7 +307,10 @@ export default function AdminDashboard() {
           <div className="pt-4 pb-2 px-3">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Configurações</p>
           </div>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === 'settings' ? 'bg-primary/10 text-primary' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+          >
             <Settings size={18} />
             <span className="text-sm font-semibold">Configuração do Sistema</span>
           </button>
@@ -324,7 +333,8 @@ export default function AdminDashboard() {
           <div>
             <h2 className="text-xl font-bold tracking-tight">
               {activeTab === 'overview' ? 'Dashboard Administrativo' : 
-               activeTab === 'users' ? 'Usuários & Permissões' : 'Planos & Assinaturas'}
+               activeTab === 'users' ? 'Usuários & Permissões' : 
+               activeTab === 'plans' ? 'Planos & Assinaturas' : 'Configurações de Marca'}
             </h2>
             <p className="text-xs text-slate-500 font-medium">Controle central de acesso do DigiCard Studio.</p>
           </div>
@@ -426,34 +436,21 @@ export default function AdminDashboard() {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={loadData}
-                    disabled={isLoading}
-                    className="rounded-xl font-bold gap-2 border-slate-200 dark:border-slate-800"
-                  >
+                  <Button variant="outline" onClick={loadData} disabled={isLoading} className="rounded-xl font-bold gap-2 border-slate-200 dark:border-slate-800">
                     <RefreshCcw size={18} className={isLoading ? "animate-spin" : ""} />
                     Sincronizar
                   </Button>
 
                   <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
                     <DialogTrigger asChild>
-                      <Button className="rounded-xl font-bold gap-2">
-                        <Plus size={18} />
-                        Novo Usuário
-                      </Button>
+                      <Button className="rounded-xl font-bold gap-2"><Plus size={18} /> Novo Usuário</Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
                       <DialogHeader>
                         <DialogTitle className="sr-only">Adicionar Novo Usuário</DialogTitle>
-                        <DialogDescription className="sr-only">
-                          Preencha o formulário para criar uma nova conta de usuário.
-                        </DialogDescription>
+                        <DialogDescription className="sr-only">Preencha o formulário para criar uma nova conta.</DialogDescription>
                       </DialogHeader>
-                      <AuthForm onSuccess={() => {
-                        setIsAddUserModalOpen(false);
-                        loadData();
-                      }} />
+                      <AuthForm onSuccess={() => { setIsAddUserModalOpen(false); loadData(); }} />
                     </DialogContent>
                   </Dialog>
                 </div>
@@ -484,9 +481,7 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <RoleBadge role={u.role} />
-                        </TableCell>
+                        <TableCell><RoleBadge role={u.role} /></TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <div className="size-2 rounded-full bg-emerald-500" />
@@ -499,50 +494,25 @@ export default function AdminDashboard() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-                                <MoreHorizontal size={16} />
-                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400"><MoreHorizontal size={16} /></Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-none">
                               <DropdownMenuLabel className="text-xs uppercase tracking-widest text-slate-400">Ações de Gestão</DropdownMenuLabel>
-                              <DropdownMenuItem 
-                                className="gap-2 font-semibold text-sm cursor-pointer"
-                                onClick={() => {
-                                  setSelectedViewUser(u);
-                                  setIsDetailsModalOpen(true);
-                                }}
-                              >
+                              <DropdownMenuItem className="gap-2 font-semibold text-sm cursor-pointer" onClick={() => { setSelectedViewUser(u); setIsDetailsModalOpen(true); }}>
                                 Ver Detalhes do Perfil
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                onClick={() => handleUpdateRole(u.id, 'premium')}
-                                className="gap-2 font-semibold text-sm text-indigo-500 cursor-pointer"
-                              >
-                                Alterar para Premium
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleUpdateRole(u.id, 'admin')}
-                                className="gap-2 font-semibold text-sm text-orange-500 cursor-pointer"
-                              >
-                                Tornar Administrador
-                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleUpdateRole(u.id, 'premium')} className="gap-2 font-semibold text-sm text-indigo-500 cursor-pointer">Alterar para Premium</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleUpdateRole(u.id, 'admin')} className="gap-2 font-semibold text-sm text-orange-500 cursor-pointer">Tornar Administrador</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                onClick={() => handleBanUser(u.id)}
-                                className="gap-2 font-semibold text-sm text-red-500 font-bold cursor-pointer"
-                              >
-                                Banir Permanentemente
-                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleBanUser(u.id)} className="gap-2 font-semibold text-sm text-red-500 font-bold cursor-pointer">Banir Permanentemente</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     )) : (
                       <TableRow>
-                        <TableCell colSpan={5} className="h-24 text-center text-slate-500 font-medium">
-                          Nenhum usuário encontrado.
-                        </TableCell>
+                        <TableCell colSpan={5} className="h-24 text-center text-slate-500 font-medium">Nenhum usuário encontrado.</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -561,67 +531,38 @@ export default function AdminDashboard() {
                 
                 <Dialog open={isPlanModalOpen} onOpenChange={(open) => {
                   setIsPlanModalOpen(open);
-                  if (!open) {
-                    setEditingPlan(null);
-                    setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false });
-                  }
+                  if (!open) { setEditingPlan(null); setPlanForm({ name: '', price: '', cardLimit: '', industrialExport: false }); }
                 }}>
                   <DialogTrigger asChild>
-                    <Button className="rounded-xl font-bold gap-2">
-                      <Plus size={18} />
-                      Novo Plano
-                    </Button>
+                    <Button className="rounded-xl font-bold gap-2"><Plus size={18} /> Novo Plano</Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
                     <DialogHeader>
                       <DialogTitle className="text-2xl font-black">{editingPlan ? 'Editar Plano' : 'Criar Novo Plano'}</DialogTitle>
-                      <DialogDescription>Defina as regras e precificação para este nível de assinatura.</DialogDescription>
+                      <DialogDescription>Defina as regras para este nível de assinatura.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSavePlan} className="space-y-4 pt-4">
                       <div className="space-y-2">
                         <Label htmlFor="planName">Nome do Plano</Label>
-                        <Input 
-                          id="planName" 
-                          placeholder="Ex: Diamond, Pro Plus" 
-                          value={planForm.name} 
-                          onChange={e => setPlanForm({...planForm, name: e.target.value})}
-                          required 
-                        />
+                        <Input id="planName" value={planForm.name} onChange={e => setPlanForm({...planForm, name: e.target.value})} required />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="planPrice">Preço Mensal</Label>
-                        <Input 
-                          id="planPrice" 
-                          placeholder="Ex: R$ 49,90 ou Sob consulta" 
-                          value={planForm.price} 
-                          onChange={e => setPlanForm({...planForm, price: e.target.value})}
-                          required 
-                        />
+                        <Input id="planPrice" value={planForm.price} onChange={e => setPlanForm({...planForm, price: e.target.value})} required />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="planLimit">Limite de Cartões</Label>
-                        <Input 
-                          id="planLimit" 
-                          placeholder="Ex: 5, 20 ou Ilimitado" 
-                          value={planForm.cardLimit} 
-                          onChange={e => setPlanForm({...planForm, cardLimit: e.target.value})}
-                          required 
-                        />
+                        <Input id="planLimit" value={planForm.cardLimit} onChange={e => setPlanForm({...planForm, cardLimit: e.target.value})} required />
                       </div>
                       <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                         <div className="space-y-0.5">
                           <Label className="text-sm font-bold">Exportação Industrial</Label>
                           <p className="text-[10px] text-slate-500 font-medium">Permite baixar SVG/PNG em alta resolução.</p>
                         </div>
-                        <Switch 
-                          checked={planForm.industrialExport} 
-                          onCheckedChange={val => setPlanForm({...planForm, industrialExport: val})} 
-                        />
+                        <Switch checked={planForm.industrialExport} onCheckedChange={val => setPlanForm({...planForm, industrialExport: val})} />
                       </div>
                       <DialogFooter className="pt-4">
-                        <Button type="submit" className="w-full h-12 rounded-xl font-bold">
-                          {editingPlan ? 'Salvar Alterações' : 'Publicar Plano'}
-                        </Button>
+                        <Button type="submit" className="w-full h-12 rounded-xl font-bold">{editingPlan ? 'Salvar Alterações' : 'Publicar Plano'}</Button>
                       </DialogFooter>
                     </form>
                   </DialogContent>
@@ -629,15 +570,12 @@ export default function AdminDashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {plans.map((plan, i) => (
+                {plans.map((plan) => (
                   <Card key={plan.id} className="border-none shadow-sm dark:bg-slate-900 flex flex-col relative overflow-hidden">
                     {plan.active && <div className="absolute top-0 right-0 p-4"><Badge className="bg-emerald-500 text-white uppercase text-[8px] font-black">Ativo</Badge></div>}
                     <CardHeader>
-                      <CardTitle className="text-xl flex items-center gap-2">
-                        {plan.name === 'Premium' && <Crown size={18} className="text-indigo-500" />}
-                        {plan.name}
-                      </CardTitle>
-                      <CardDescription>Limites e precificação para {plan.name}.</CardDescription>
+                      <CardTitle className="text-xl flex items-center gap-2">{plan.name === 'Premium' && <Crown size={18} className="text-indigo-500" />}{plan.name}</CardTitle>
+                      <CardDescription>Limites para {plan.name}.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1">
                       <div className="flex items-baseline gap-1 mb-6">
@@ -645,10 +583,6 @@ export default function AdminDashboard() {
                         {plan.price !== 'Sob consulta' && plan.price !== 'R$ 0' && <span className="text-sm text-slate-500 font-bold">/mês</span>}
                       </div>
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500 font-medium">Usuários ativos</span>
-                          <span className="font-bold">{users.filter(u => u.role === (plan.name.toLowerCase() as any)).length || 0}</span>
-                        </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500 font-medium">Limite de cartões</span>
                           <span className="font-bold">{plan.cardLimit}</span>
@@ -660,12 +594,119 @@ export default function AdminDashboard() {
                       </div>
                     </CardContent>
                     <CardHeader className="pt-0">
-                      <Button variant="outline" className="w-full rounded-xl font-bold" onClick={() => openEditPlan(plan)}>
-                        Editar Configurações do Plano
-                      </Button>
+                      <Button variant="outline" className="w-full rounded-xl font-bold" onClick={() => openEditPlan(plan)}>Editar Configurações</Button>
                     </CardHeader>
                   </Card>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'settings' && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h3 className="text-lg font-bold">Configurações Globais</h3>
+                  <p className="text-sm text-slate-500">Personalize a identidade e o comportamento da plataforma.</p>
+                </div>
+                <Button onClick={handleSaveSystemSettings} className="rounded-xl font-bold gap-2 h-12 px-8">
+                  <Check size={18} />
+                  Salvar Alterações
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
+                  <Card className="border-none shadow-sm dark:bg-slate-900">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Globe className="size-4 text-primary" /> Identidade Visual & Branding
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Nome do Sistema</Label>
+                          <Input 
+                            value={systemSettings.siteName} 
+                            onChange={e => setSystemSettings({...systemSettings, siteName: e.target.value})} 
+                            placeholder="Ex: DigiCard Studio"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>E-mail de Suporte</Label>
+                          <Input 
+                            value={systemSettings.supportEmail} 
+                            onChange={e => setSystemSettings({...systemSettings, supportEmail: e.target.value})} 
+                            placeholder="suporte@exemplo.com"
+                          />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-none shadow-sm dark:bg-slate-900">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Monitor className="size-4 text-primary" /> Conteúdo da Landing Page
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Título Principal (Hero)</Label>
+                        <Input 
+                          value={systemSettings.heroTitle} 
+                          onChange={e => setSystemSettings({...systemSettings, heroTitle: e.target.value})} 
+                          placeholder="Ex: Seu Cartão, Reinventado."
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Subtítulo (Hero)</Label>
+                        <Textarea 
+                          value={systemSettings.heroSubtitle} 
+                          onChange={e => setSystemSettings({...systemSettings, heroSubtitle: e.target.value})} 
+                          placeholder="Breve descrição sobre o produto..."
+                          className="min-h-[100px]"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-6">
+                  <Card className="border-none shadow-sm dark:bg-slate-900 border-l-4 border-l-orange-500">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <ShieldAlert className="size-4 text-orange-500" /> Controle de Estado
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="flex items-center justify-between p-4 bg-orange-50 dark:bg-orange-950/20 rounded-xl border border-orange-100 dark:border-orange-900/30">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm font-bold text-orange-700 dark:text-orange-400">Modo de Manutenção</Label>
+                          <p className="text-[10px] text-orange-600 dark:text-orange-500 font-medium">Bloqueia o acesso de usuários.</p>
+                        </div>
+                        <Switch 
+                          checked={systemSettings.maintenanceMode} 
+                          onCheckedChange={val => setSystemSettings({...systemSettings, maintenanceMode: val})} 
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold text-slate-500 uppercase">Capacidade de Infra</Label>
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-3">
+                          <div className="flex justify-between text-[10px] font-bold">
+                            <span className="flex items-center gap-1"><HardDrive size={10} /> Storage em uso</span>
+                            <span className="text-primary">12.4 GB / 50 GB</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary w-[25%] rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           )}
@@ -680,53 +721,30 @@ export default function AdminDashboard() {
               <div className="h-32 bg-slate-100 dark:bg-slate-800 relative">
                 <div className="absolute -bottom-12 left-8 p-1 bg-white dark:bg-slate-900 rounded-full shadow-lg">
                   <div className="size-24 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden flex items-center justify-center border-4 border-white dark:border-slate-900">
-                    {selectedViewUser.avatarUrl ? (
-                      <img src={selectedViewUser.avatarUrl} className="w-full h-full object-cover" />
-                    ) : (
-                      <UserIcon size={40} className="text-slate-400" />
-                    )}
+                    {selectedViewUser.avatarUrl ? <img src={selectedViewUser.avatarUrl} className="w-full h-full object-cover" /> : <UserIcon size={40} className="text-slate-400" />}
                   </div>
                 </div>
-                <div className="absolute top-4 right-4">
-                  <RoleBadge role={selectedViewUser.role} />
-                </div>
+                <div className="absolute top-4 right-4"><RoleBadge role={selectedViewUser.role} /></div>
               </div>
-              
               <div className="pt-16 px-8 pb-8 space-y-6">
                 <div>
                   <h3 className="text-2xl font-black tracking-tight">{selectedViewUser.fullName || 'Sem Nome'}</h3>
-                  <p className="text-sm text-slate-500 font-medium flex items-center gap-1.5 mt-1">
-                    <Mail size={14} />
-                    ID de Usuário Ativo
-                  </p>
+                  <p className="text-sm text-slate-500 font-medium flex items-center gap-1.5 mt-1"><Mail size={14} /> ID de Usuário Ativo</p>
                 </div>
-
                 <Separator className="bg-slate-100 dark:bg-slate-800" />
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <Fingerprint size={12} /> Identificador Único
-                    </p>
-                    <p className="text-xs font-mono bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg text-slate-600 dark:text-slate-300 break-all border border-slate-100 dark:border-slate-800">
-                      {selectedViewUser.id}
-                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Fingerprint size={12} /> Identificador Único</p>
+                    <p className="text-xs font-mono bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg text-slate-600 dark:text-slate-300 break-all border border-slate-100 dark:border-slate-800">{selectedViewUser.id}</p>
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <Calendar size={12} /> Data de Cadastro
-                    </p>
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      {selectedViewUser.createdAt ? format(new Date(selectedViewUser.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'N/A'}
-                    </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5"><Calendar size={12} /> Data de Cadastro</p>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedViewUser.createdAt ? format(new Date(selectedViewUser.createdAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : 'N/A'}</p>
                   </div>
                 </div>
-
                 <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                      <Activity size={20} />
-                    </div>
+                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><Activity size={20} /></div>
                     <div>
                       <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Status da Conta</p>
                       <p className="text-sm font-black text-primary">ATIVA & SINCRONIZADA</p>
@@ -734,14 +752,9 @@ export default function AdminDashboard() {
                   </div>
                   <Badge className="bg-emerald-500 text-white font-bold">ONLINE</Badge>
                 </div>
-
                 <DialogFooter className="pt-4 gap-2">
-                  <Button variant="outline" className="rounded-xl font-bold flex-1" onClick={() => setIsDetailsModalOpen(false)}>
-                    Fechar Visualização
-                  </Button>
-                  <Button className="rounded-xl font-bold flex-1 bg-slate-900 dark:bg-white dark:text-slate-900">
-                    Acessar Painel do Usuário
-                  </Button>
+                  <Button variant="outline" className="rounded-xl font-bold flex-1" onClick={() => setIsDetailsModalOpen(false)}>Fechar Visualização</Button>
+                  <Button className="rounded-xl font-bold flex-1 bg-slate-900 dark:bg-white dark:text-slate-900">Acessar Painel do Usuário</Button>
                 </DialogFooter>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import type { CardData, UserProfile, UserRole, Plan } from './types';
+import type { CardData, UserProfile, UserRole, Plan, SystemSettings } from './types';
 import { initialCardData } from './data';
 import { localDb } from './local-database';
 
@@ -240,7 +240,6 @@ export const supabaseService = {
     return newCard;
   },
 
-  // Novos métodos para Planos
   async getAllPlans(): Promise<Plan[]> {
     if (!isSupabaseConfigured) return [];
     const { data, error } = await supabase
@@ -276,5 +275,55 @@ export const supabaseService = {
       const { error } = await supabase.from('plans').insert(payload);
       if (error) throw error;
     }
+  },
+
+  async getSystemSettings(): Promise<SystemSettings> {
+    const defaultSettings: SystemSettings = {
+      id: 'global',
+      siteName: 'DigiCard Studio',
+      heroTitle: 'Seu Cartão de Visita, Reinventado.',
+      heroSubtitle: 'Crie cartões digitais interativos e gabaritos de impressão profissional em minutos. Onde a elegância digital encontra a precisão física.',
+      supportEmail: 'suporte@digicard.studio',
+      maintenanceMode: false
+    };
+
+    if (!isSupabaseConfigured) return defaultSettings;
+
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('*')
+      .eq('id', 'global')
+      .single();
+
+    if (error) return defaultSettings;
+
+    return {
+      id: data.id,
+      siteName: data.site_name,
+      heroTitle: data.hero_title,
+      heroSubtitle: data.hero_subtitle,
+      supportEmail: data.support_email,
+      maintenanceMode: data.maintenance_mode
+    };
+  },
+
+  async updateSystemSettings(settings: Partial<SystemSettings>): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    
+    const payload = {
+      id: 'global',
+      site_name: settings.siteName,
+      hero_title: settings.heroTitle,
+      hero_subtitle: settings.heroSubtitle,
+      support_email: settings.supportEmail,
+      maintenance_mode: settings.maintenanceMode,
+      last_updated: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('system_settings')
+      .upsert(payload);
+
+    if (error) throw error;
   }
 };

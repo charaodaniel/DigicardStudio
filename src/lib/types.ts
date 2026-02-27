@@ -17,6 +17,15 @@ export type Plan = {
   active: boolean;
 };
 
+export type SystemSettings = {
+  id: string;
+  siteName: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  supportEmail: string;
+  maintenanceMode: boolean;
+};
+
 export type SocialLink = {
   id: string;
   type: 'phone' | 'email' | 'linkedin' | 'instagram' | 'website' | 'github' | 'whatsapp' | 'youtube' | 'tiktok' | 'spotify' | 'facebook' | 'discord';
