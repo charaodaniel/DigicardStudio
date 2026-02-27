@@ -19,7 +19,8 @@ import {
   Plus,
   Crown,
   ShieldAlert,
-  UserCheck
+  UserCheck,
+  RefreshCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -141,7 +142,7 @@ export default function AdminDashboard() {
     u.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isLoading) {
+  if (isLoading && profile === null) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-950">
         <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
@@ -311,26 +312,38 @@ export default function AdminDashboard() {
                   <p className="text-sm text-slate-500">Gerencie os níveis de acesso e visualize perfis reais.</p>
                 </div>
                 
-                <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="rounded-xl font-bold gap-2">
-                      <Plus size={18} />
-                      Novo Usuário
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
-                    <DialogHeader>
-                      <DialogTitle className="sr-only">Adicionar Novo Usuário</DialogTitle>
-                      <DialogDescription className="sr-only">
-                        Preencha o formulário para criar uma nova conta de usuário.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <AuthForm onSuccess={() => {
-                      setIsAddUserModalOpen(false);
-                      loadData();
-                    }} />
-                  </DialogContent>
-                </Dialog>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={loadData}
+                    disabled={isLoading}
+                    className="rounded-xl font-bold gap-2 border-slate-200 dark:border-slate-800"
+                  >
+                    <RefreshCcw size={18} className={isLoading ? "animate-spin" : ""} />
+                    Sincronizar
+                  </Button>
+
+                  <Dialog open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="rounded-xl font-bold gap-2">
+                        <Plus size={18} />
+                        Novo Usuário
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md rounded-[2rem] p-8 border-none shadow-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="sr-only">Adicionar Novo Usuário</DialogTitle>
+                        <DialogDescription className="sr-only">
+                          Preencha o formulário para criar uma nova conta de usuário.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <AuthForm onSuccess={() => {
+                        setIsAddUserModalOpen(false);
+                        loadData();
+                      }} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
 
               <Card className="border-none shadow-sm dark:bg-slate-900 overflow-hidden">
