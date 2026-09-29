@@ -136,7 +136,7 @@ function renderInstagram(c) {
         </div>
         <div class="mt-4 text-center">
           <div class="flex items-center justify-center gap-1">
-            <h1 class="text-xl font-bold tracking-tight hover:text-primary transition-colors ${c.fullNameLink ? 'cursor-pointer' : ''} ${c.fullNameLink ? '' : ''}">@${username}</h1>
+            <h1 class="text-xl font-bold tracking-tight hover:text-primary transition-colors">@${username}</h1>
             ${c.isVerified ? `<span class="material-symbols-outlined text-primary text-xl" style="${FILL}">verified</span>` : ''}
           </div>
           <p class="text-white/80 text-sm mt-1 max-w-[280px]">${esc(c.bio)}</p>

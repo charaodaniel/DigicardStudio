@@ -103,7 +103,8 @@ function triggerDownload(blob, filename) {
 async function imageToHighQualityBase64(url) {
   if (!url) return '';
   try {
-    const response = await fetch(url);
+    // Timeout curto: rede lenta não pode pendurar a exportação
+    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
     const blob = await response.blob();
 
     return new Promise((resolve) => {

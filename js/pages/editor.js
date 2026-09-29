@@ -21,7 +21,12 @@ let saveTimer = null;
 /* ---------------- Helpers ---------------- */
 const $ = (sel) => document.querySelector(sel);
 
-function updateCardData(updater) {
+/**
+ * @param {object} opts
+ * @param {boolean} opts.full - re-render completo (painel + canvas). Padrão: só o canvas,
+ *        para não destruir o input em foco enquanto o usuário digita.
+ */
+function updateCardData(updater, opts = {}) {
   const next = typeof updater === 'function' ? updater(cardData) : { ...cardData, ...updater };
   if (JSON.stringify(next) !== JSON.stringify(cardData)) {
     past.push(cardData);
@@ -30,7 +35,11 @@ function updateCardData(updater) {
   }
   cardData = next;
   scheduleSave();
-  render();
+  if (opts.full) {
+    render();
+  } else {
+    renderCanvas();
+  }
 }
 
 function scheduleSave() {
@@ -69,6 +78,13 @@ function render() {
   renderPropsPanel();
 }
 
+/** Aplica fontFamily/baseFontSize do cartão ao container (o CSS usa em e m/relativos). */
+function applyCardTypography(rootEl) {
+  if (!rootEl) return;
+  rootEl.style.fontFamily = `'${cardData.fontFamily}', sans-serif`;
+  rootEl.style.fontSize = `${cardData.baseFontSize}px`;
+}
+
 function renderModeToggle() {
   document.querySelectorAll('.mode-btn').forEach((btn) => {
     const active = btn.dataset.mode === mode;
@@ -91,6 +107,10 @@ function renderUndoRedo() {
 /* ---------------- Canvas (digital ou físico) ---------------- */
 function renderCanvas() {
   const area = $('#canvas-area');
+  // Preserva a posição de scroll dos containers roláveis do cartão
+  const scrollStates = mode === 'digital'
+    ? [...area.querySelectorAll('.overflow-y-auto')].map((el) => el.scrollTop)
+    : [];
 
   if (mode === 'digital') {
     area.className = 'flex flex-col items-center w-full justify-center min-h-full';
@@ -107,14 +127,21 @@ function renderCanvas() {
         <div id="phone-screen" class="flex-1 relative overflow-hidden"></div>
         <div class="h-1.5 w-32 bg-slate-300 rounded-full mx-auto mb-4 shrink-0 z-20"></div>
         <div id="edit-zones" class="absolute inset-0 z-50 pointer-events-none flex flex-col"></div>
-        <div class="absolute inset-0 z-[60] pointer-events-none" id="upload-overlay"></div>
     </div>`;
-    document.getElementById('phone-screen').innerHTML = renderCard(cardData);
+    const screen = document.getElementById('phone-screen');
+    // O template usa flex-1/min-h-0: precisa do wrapper h-full flex flex-col (igual ao React original)
+    screen.innerHTML = `<div class="h-full w-full flex flex-col">${renderCard(cardData)}</div>`;
+    applyCardTypography(screen);
+    // Restaura o scroll dos containers roláveis (mesma ordem do DOM)
+    [...screen.querySelectorAll('.overflow-y-auto')].forEach((el, i) => {
+      if (scrollStates[i]) el.scrollTop = scrollStates[i];
+    });
     renderEditZones();
   } else {
     area.className = 'flex flex-col items-center w-full justify-start pt-12 pb-32';
     area.innerHTML = physicalMockup();
     bindPhysicalClicks(area);
+    applyCardTypography(area);
   }
   area.style.transform = '';
   area.style.transform = `scale(${zoom / 100})`;
@@ -288,15 +315,25 @@ function physicalMockup() {
 
   const dims = isVertical ? 'w-[340px] h-[580px]' : 'w-[580px] h-[340px]';
 
+  // 5 pares (frente+verso) = 10 cartões por folha A4
+  const printPairs = Array.from({ length: 5 })
+    .map(
+      () => `
+      <div class="print-card-item"><div class="print-card-content flex">${front()}</div></div>
+      <div class="print-card-item"><div class="print-card-content flex">${back()}</div></div>`
+    )
+    .join('');
+
+  // IMPORTANTE: a grade de impressão fica FORA do wrapper print:hidden (irmã, como no app original)
   return `
-  <div class="flex flex-col items-center gap-12 print:hidden">
+  <div class="physical-preview flex flex-col items-center gap-12 print:hidden">
     <div class="bg-primary/5 border border-primary/20 p-6 rounded-2xl max-w-[800px] text-center shadow-sm">
       <h4 class="text-base font-bold text-primary flex items-center justify-center gap-2 mb-2">
         <span class="material-symbols-outlined text-2xl">print</span>
         Gabarito Técnico "Aberto" (A4)
       </h4>
       <p class="text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest font-medium">
-        O PDF será gerado com frentes e versos organizados com espaçamento para facilitar o corte. Use a ferramenta "Impressão" na lateral para personalizar.
+        O PDF sai com 5 pares (frente + verso) lado a lado = 10 cartões por folha, com espaçamento para corte. Personalize na ferramenta "Impressão".
       </p>
     </div>
 
@@ -314,19 +351,11 @@ function physicalMockup() {
         <p class="text-center mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Verso (Reverso)</p>
       </div>
     </div>
+  </div>
 
-    <!-- Grade A4 para impressão -->
-    <div class="hidden print:block">
-      <div class="print-layout-a4">
-        ${Array.from({ length: 5 })
-          .map(
-            () => `
-        <div class="print-card-item"><div class="w-full h-full flex" style="width:85mm;height:55mm">${front()}</div></div>
-        <div class="print-card-item"><div class="w-full h-full flex" style="width:85mm;height:55mm">${back()}</div></div>`
-          )
-          .join('')}
-      </div>
-    </div>
+  <!-- Grade A4: visível apenas na impressão -->
+  <div class="print-root hidden print:block">
+    <div class="print-layout-a4">${printPairs}</div>
   </div>`;
 }
 
@@ -752,9 +781,9 @@ function bindPropsEvents(panel) {
     });
   }
 
-  // Fonte
+  // Fonte (atualiza painel para mover o destaque)
   panel.querySelectorAll('[data-font]').forEach((btn) =>
-    btn.addEventListener('click', () => updateCardData((prev) => ({ ...prev, fontFamily: btn.dataset.font })))
+    btn.addEventListener('click', () => updateCardData((prev) => ({ ...prev, fontFamily: btn.dataset.font }), { full: true }))
   );
 
   // Slider de fonte
@@ -776,12 +805,12 @@ function bindPropsEvents(panel) {
 
   // Stats
   const addStat = panel.querySelector('#add-stat');
-  if (addStat) addStat.addEventListener('click', () => updateCardData((prev) => ({ ...prev, stats: [...prev.stats, { label: 'Nova Métrica', value: '0', url: '' }] })));
+  if (addStat) addStat.addEventListener('click', () => updateCardData((prev) => ({ ...prev, stats: [...prev.stats, { label: 'Nova Métrica', value: '0', url: '' }] }), { full: true }));
 
   panel.querySelectorAll('[data-remove-stat]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const index = parseInt(btn.dataset.removeStat, 10);
-      updateCardData((prev) => ({ ...prev, stats: prev.stats.filter((_, i) => i !== index) }));
+      updateCardData((prev) => ({ ...prev, stats: prev.stats.filter((_, i) => i !== index) }), { full: true });
     })
   );
 
@@ -828,25 +857,25 @@ function bindPropsEvents(panel) {
     });
   });
 
-  // Ícones
+  // Ícones (atualiza o header do accordion)
   panel.querySelectorAll('[data-link-icon]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const id = btn.dataset.linkIcon;
       updateCardData((prev) => ({
         ...prev,
         links: prev.links.map((l) => (l.id === id ? { ...l, icon: btn.dataset.icon } : l)),
-      }));
+      }), { full: true });
     })
   );
 
-  // Cores de link
+  // Cores de link (atualiza o header do accordion)
   panel.querySelectorAll('[data-link-color]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const id = btn.dataset.linkFor;
       updateCardData((prev) => ({
         ...prev,
         links: prev.links.map((l) => (l.id === id ? { ...l, color: btn.dataset.linkColor } : l)),
-      }));
+      }), { full: true });
     })
   );
 
@@ -854,21 +883,21 @@ function bindPropsEvents(panel) {
   panel.querySelectorAll('[data-remove-link]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const id = btn.dataset.removeLink;
-      updateCardData((prev) => ({ ...prev, links: prev.links.filter((l) => l.id !== id) }));
+      updateCardData((prev) => ({ ...prev, links: prev.links.filter((l) => l.id !== id) }), { full: true });
       if (selectedLinkId === id) selectedLinkId = null;
     })
   );
 
-  // Novo link
+  // Novo link (re-render abre o accordion do novo link)
   const addLink = panel.querySelector('#add-link');
   if (addLink) {
     addLink.addEventListener('click', () => {
       const newId = `link-${Date.now()}`;
+      selectedLinkId = newId;
       updateCardData((prev) => ({
         ...prev,
         links: [...prev.links, { id: newId, type: 'website', label: 'Novo Link', value: '', icon: 'link', color: prev.themeColor }],
-      }));
-      selectedLinkId = newId;
+      }), { full: true });
     });
   }
 
@@ -898,12 +927,12 @@ function bindPropsEvents(panel) {
     });
   });
 
-  // Switches do modo físico
+  // Switches do modo físico (re-render para animar o knob)
   panel.querySelectorAll('[data-switch]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const field = btn.dataset.switch;
       const current = cardData[field] !== false;
-      updateCardData((prev) => ({ ...prev, [field]: !current }));
+      updateCardData((prev) => ({ ...prev, [field]: !current }), { full: true });
     })
   );
 }
@@ -972,7 +1001,16 @@ function handleExport(kind) {
     downloadPhysicalPNG(cardData);
     toastLocal('PNG Gerado (350 DPI)', 'Imagem de alta resolução exportada com sucesso.');
   } else if (kind === 'print') {
+    // O CSS @media print já neutraliza o zoom via transform:none; isso evita
+    // qualquer flash do layout escalado antes da caixa de impressão abrir.
+    const area = $('#canvas-area');
+    area.style.transform = 'none';
+    if (mode !== 'physical') {
+      toastLocal('Mude para o modo Físico', 'O PDF usa o gabarito de impressão do modo Físico.');
+      return;
+    }
     window.print();
+    area.style.transform = `scale(${zoom / 100})`;
   }
   $('#export-menu').classList.add('hidden');
 }

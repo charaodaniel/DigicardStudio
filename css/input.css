@@ -17,41 +17,74 @@ html {
     margin: 0;
   }
 
+  html,
   body {
     background: white !important;
     color: black !important;
     padding: 0 !important;
     margin: 0 !important;
     width: 210mm;
-    height: 297mm;
+    min-height: 297mm;
+    overflow: visible !important;
   }
 
-  /* Ocultar tudo que não for o gabarito de impressão */
-  .print-hidden,
-  header,
-  footer,
-  aside,
-  nav,
-  button,
-  .fixed,
-  .absolute:not(.print-element),
-  .no-print {
+  /* Reset do app: chrome do editor sai; a grade de impressão é o único conteúdo.
+     print-root vive em main > section > #canvas-area, então main permanece visível. */
+  body > header,
+  body > footer,
+  body > main > aside {
     display: none !important;
   }
 
-  /* Container da Grade A4 - Layout "Aberto" (Frente + Verso lado a lado) */
+  body > main {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body > main > section {
+    display: block !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Cancela o zoom do editor — o gabarito sempre sai em escala real (mm) */
+  #canvas-area,
+  #canvas-area * {
+    transform: none !important;
+  }
+
+  #canvas-area {
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .physical-preview,
+  .print-hidden,
+  .no-print,
+  .fixed {
+    display: none !important;
+  }
+
+  /* A raiz da grade é o único conteúdo visível */
+  .print-root {
+    display: block !important;
+  }
+
+  /* Container da Grade A4 — 5 pares (frente+verso) = 10 cartões por folha
+     Cálculo: 2×85 + 5 gap = 175mm largura (sobram 2×17.5mm de margem)
+              5×55 + 4×2 gap = 283mm altura (cabe em 297mm com respiro) */
   .print-layout-a4 {
     display: grid !important;
     grid-template-columns: 85mm 85mm !important;
     grid-auto-rows: 55mm !important;
     column-gap: 5mm !important;
-    row-gap: 3mm !important;
-    padding: 10mm 15mm !important;
+    row-gap: 2mm !important;
+    padding: 7mm 0 0 17.5mm !important;
     width: 210mm !important;
-    height: 297mm !important;
     background: white !important;
-    page-break-after: always;
-    justify-content: center !important;
+    justify-content: start !important;
     align-content: start !important;
   }
 
@@ -63,8 +96,21 @@ html {
     position: relative !important;
     overflow: hidden !important;
     background: white !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
+  }
+
+  /* Conteúdo do cartão: dimensão fixa em mm */
+  .print-card-content {
+    width: 85mm !important;
+    height: 55mm !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* Dentro do cartão impresso nada é escondido (rodapés, badges etc.) */
+  .print-card-content .absolute,
+  .print-card-content button,
+  .print-card-content a {
+    display: revert !important;
   }
 
   /* Forçar cores de fundo na impressão */

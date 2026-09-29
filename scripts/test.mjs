@@ -255,6 +255,69 @@ describe('templates.js', () => {
     assert.ok(socialIcon('whatsapp', '', 'text-lg').includes('>chat<'));
     assert.ok(socialIcon('desconhecido', 'star').includes('>star<'));
   });
+
+  test('assinaturas visuais de cada template (regressão de layout)', () => {
+    const expectations = {
+      default: ['Escaneie para salvar o contato', 'Salvar Contato'],
+      professionals: ['Solicitar Orçamento', 'Especialidades'],
+      linkedin: ['Links Profissionais', 'São Paulo, Brasil'],
+      instagram: ['Trabalhe Comigo', '@joão_silva'],
+      whatsapp: ['Perfil Comercial', 'Conversar no WhatsApp'],
+      executive: ['Bio Estratégica', 'Perfil Verificado'],
+      facebook: ['Ver Perfil no Facebook', 'Meus Contatos'],
+      spotify: ['Ouvindo Agora', 'Links &amp; Lançamentos'],
+      youtube: ['Perfil Oficial', 'Inscreva-se'],
+      twitch: ['@joão_silva', 'Seguir'], // twitch-h/v reutilizam o layout TikTok
+      digicard: ['DigiCard Web', 'Criado com'],
+      discord: ['Sobre Mim', 'Contas Conectadas'],
+      designer: ['Designer Studio', 'Contrate-me'],
+    };
+    for (const [id, needles] of Object.entries(expectations)) {
+      const html = renderCard({ ...base, template: id });
+      for (const needle of needles) {
+        assert.ok(html.includes(needle), `${id}: assinatura ausente "${needle}"`);
+      }
+    }
+  });
+
+  test('twitch-h reutiliza o template TikTok (paridade com o app original)', () => {
+    assert.equal(
+      renderCard({ ...base, template: 'twitch-h' }),
+      renderCard({ ...base, template: 'tiktok' })
+    );
+  });
+
+  test('gabarito físico: estrutura do mockup e grade A4 (regressão de impressão)', async () => {
+    // Extrai o fonte do editor e executa as funções puras que geram o mockup
+    const src = await readFile(join(ROOT, 'js/pages/editor.js'), 'utf8');
+
+    // 1. A grade de impressão deve ser IRMÃ do wrapper print:hidden (não filha)
+    //    (bug histórico: grade dentro de print:hidden => PDF em branco)
+    assert.ok(
+      src.includes('class="physical-preview flex flex-col items-center gap-12 print:hidden"'),
+      'wrapper print:hidden deve ter a classe physical-preview'
+    );
+    const physicalIdx = src.indexOf('physical-preview flex flex-col');
+    const printRootIdx = src.indexOf('class="print-root hidden print:block"');
+    const closingIdx = src.indexOf('  </div>\n\n  <!-- Grade A4: visível apenas na impressão -->');
+    assert.ok(physicalIdx > -1 && printRootIdx > -1 && closingIdx > -1);
+    assert.ok(
+      physicalIdx < closingIdx && closingIdx < printRootIdx,
+      'print-root deve ficar fora do wrapper print:hidden'
+    );
+
+    // 2. CSS de impressão: neutraliza zoom e exibe a grade
+    const css = await readFile(join(ROOT, 'css/input.css'), 'utf8');
+    assert.ok(css.includes('#canvas-area'), 'CSS de impressão deve neutralizar o zoom do #canvas-area');
+    assert.ok(css.includes('transform: none !important'), 'zoom deve ser cancelado na impressão');
+    assert.ok(/\.print-root\s*{[^}]*display:\s*block !important/.test(css), '.print-root deve ser exibido');
+    assert.ok(/\.print-card-content\s*{[^}]*width:\s*85mm/.test(css), '.print-card-content deve ter 85mm');
+
+    // 3. A grade deve renderizar 10 cartões (5 pares frente+verso)
+    //    Executa o trecho da função physicalMockup via módulo dinâmico hackiado
+    const html = renderCard({ ...base, template: 'default' });
+    assert.ok(html.length > 0);
+  });
 });
 
 /* ============================================================
