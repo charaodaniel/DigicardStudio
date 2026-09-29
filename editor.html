@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editor — DigiCard Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300..700&family=Roboto:wght@300;400;500;700;900&family=Lora:ital,wght@0,400..700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/app.css" />
+  <script src="./vendor/htmx.min.js" defer></script>
+  <script type="module" src="./js/pages/editor.js"></script>
+</head>
+<body class="antialiased">
+
+  <!-- Cabeçalho do editor -->
+  <header id="editor-header" class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-6 z-30 shrink-0 print:hidden">
+    <div class="flex items-center gap-6">
+      <a href="/" class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-3xl font-bold">style</span>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">DigiCard Studio</h1>
+      </a>
+      <div class="h-6 w-[1px] bg-slate-200"></div>
+
+      <a href="/meus-cartoes.html" class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-semibold text-sm">
+        <span class="material-symbols-outlined text-lg">dashboard</span>
+        <span class="hidden sm:inline">Meus Cartões</span>
+      </a>
+
+      <div class="h-6 w-[1px] bg-slate-200"></div>
+
+      <div class="flex bg-slate-100 p-1 rounded-lg" id="mode-toggle">
+        <button data-mode="digital" class="mode-btn px-4 py-1.5 text-sm font-semibold rounded transition-all bg-white shadow-sm text-primary">Digital</button>
+        <button data-mode="physical" class="mode-btn px-4 py-1.5 text-sm font-semibold rounded transition-all text-slate-500 hover:text-slate-700">Físico</button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1 mr-2">
+        <button id="btn-undo" disabled class="p-1.5 rounded transition-colors text-slate-300 cursor-not-allowed" title="Desfazer (Ctrl+Z)">
+          <span class="material-symbols-outlined text-xl">undo</span>
+        </button>
+        <button id="btn-redo" disabled class="p-1.5 rounded transition-colors text-slate-300 cursor-not-allowed" title="Refazer (Ctrl+Y)">
+          <span class="material-symbols-outlined text-xl">redo</span>
+        </button>
+      </div>
+
+      <button id="btn-preview" class="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg font-semibold text-sm hover:bg-slate-50 transition-colors">
+        <span class="material-symbols-outlined text-lg">visibility</span>
+        Preview
+      </button>
+
+      <div id="export-wrap" class="relative hidden">
+        <button id="btn-export" class="flex items-center gap-2 px-4 py-2 border-2 border-primary/20 text-primary rounded-lg font-bold text-sm hover:bg-primary/5 transition-all">
+          <span class="material-symbols-outlined text-lg">download</span>
+          Exportar Gabarito
+        </button>
+        <div id="export-menu" class="absolute right-0 top-12 w-56 rounded-xl shadow-2xl border border-slate-100 p-2 bg-white hidden z-50">
+          <button data-export="svg" class="w-full flex gap-3 py-3 px-4 rounded-lg cursor-pointer hover:bg-slate-50 text-left">
+            <span class="material-symbols-outlined text-primary">vector_library</span>
+            <span><b class="block text-sm">Salvar SVG</b><small class="text-[10px] text-slate-400">Para plotters e recorte</small></span>
+          </button>
+          <button data-export="png" class="w-full flex gap-3 py-3 px-4 rounded-lg cursor-pointer hover:bg-slate-50 text-left">
+            <span class="material-symbols-outlined text-primary">image</span>
+            <span><b class="block text-sm">PNG (350 DPI)</b><small class="text-[10px] text-slate-400">Alta resolução</small></span>
+          </button>
+          <hr class="my-1" />
+          <button data-export="print" class="w-full flex gap-3 py-3 px-4 rounded-lg cursor-pointer bg-primary text-white hover:bg-primary/90 text-left">
+            <span class="material-symbols-outlined">print</span>
+            <span><b class="block text-sm">Gerar PDF (A4)</b><small class="text-[10px] text-white/70">10 cartões por folha</small></span>
+          </button>
+        </div>
+      </div>
+
+      <button id="btn-publish" class="bg-slate-900 text-white px-6 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-all">Publicar</button>
+
+      <div class="h-6 w-[1px] bg-slate-200 mx-2"></div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex flex-col items-end">
+          <span class="text-xs font-bold text-emerald-500 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            AO VIVO
+          </span>
+          <span class="text-[10px] text-slate-400">v2.0.0</span>
+        </div>
+        <img src="https://images.unsplash.com/photo-1715615751025-e7ebe7f47eea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200" class="w-10 h-10 rounded-full border-2 border-primary/20" alt="Avatar" />
+      </div>
+    </div>
+  </header>
+
+  <!-- Corpo: ferramentas | canvas | propriedades -->
+  <main class="flex overflow-hidden" style="height: calc(100vh - 4rem - 2.5rem)">
+    <!-- Sidebar de ferramentas -->
+    <aside class="w-20 lg:w-64 border-r border-slate-200 bg-white flex flex-col shrink-0">
+      <div class="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-2">
+        <p class="hidden lg:block text-[10px] font-bold text-slate-400 tracking-widest uppercase mb-2 px-3">Ferramentas</p>
+        <div id="tools-list" class="flex flex-col gap-2"></div>
+        <div class="h-[1px] bg-slate-100 my-4"></div>
+        <div class="hidden lg:block px-3 py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+          <p class="text-xs font-semibold text-slate-500 mb-2">Dica Pro</p>
+          <p class="text-[11px] leading-relaxed text-slate-400">Personalize a tipografia global para dar uma personalidade única ao seu cartão.</p>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-200">
+        <button class="flex items-center justify-center lg:justify-start gap-3 w-full px-3 py-2 text-slate-500 hover:text-slate-900 transition-colors">
+          <span class="material-symbols-outlined">settings</span>
+          <span class="hidden lg:block text-sm font-medium">Configurações</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Canvas -->
+    <section class="flex-1 bg-slate-50 relative flex justify-center overflow-auto no-scrollbar p-4 lg:p-8">
+      <div class="fixed top-20 left-24 lg:left-72 flex items-center gap-4 bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 z-50">
+        <button id="zoom-out" class="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors">remove</button>
+        <span id="zoom-label" class="text-xs font-bold w-12 text-center">85%</span>
+        <button id="zoom-in" class="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-colors">add</button>
+      </div>
+      <div id="canvas-area" class="flex flex-col items-center w-full justify-center min-h-full"></div>
+    </section>
+
+    <!-- Painel de propriedades / modelos -->
+    <aside class="w-80 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden">
+      <div id="props-panel" class="flex flex-col h-full overflow-hidden"></div>
+    </aside>
+  </main>
+
+  <footer class="h-10 bg-slate-900 text-slate-400 flex items-center justify-between px-6 text-[10px] font-medium shrink-0">
+    <div class="flex items-center gap-6">
+      <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300">CTRL + Z</kbd> Desfazer</span>
+      <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300">V</kbd> Selecionar</span>
+      <span class="flex items-center gap-1.5"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300">T</kbd> Texto</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="save-status" class="text-emerald-500">Alterações salvas automaticamente</span>
+      <div class="h-3 w-[1px] bg-slate-700"></div>
+      <span class="hover:text-white cursor-pointer transition-colors">Precisa de ajuda?</span>
+    </div>
+  </footer>
+
+</body>
+</html>

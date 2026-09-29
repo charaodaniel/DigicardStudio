@@ -1,69 +1,110 @@
-# DigiCard Studio 📇✨
+# DigiCard Studio
 
-O **DigiCard Studio** é uma plataforma SaaS (Software as a Service) de arquitetura híbrida projetada para a gestão de identidades profissionais. O sistema permite a transição fluida entre perfis digitais interativos e gabaritos técnicos de alta fidelidade para produção física em larga escala.
+Cartões digitais interativos + gabaritos de impressão, construído **sem framework**: HTML estático, HTMX, Tailwind CSS e JavaScript vanilla (ES Modules). Sem TypeScript, sem React, sem Supabase.
 
----
+## Stack
 
-## 🏗️ Arquitetura do Sistema
+- **HTML** — páginas estáticas
+- **HTMX** (vendor local em `vendor/htmx.min.js`) — carregamento do fragmento da grade em `meus-cartoes.html`
+- **Tailwind CSS** — buildado para `css/app.css`
+- **JavaScript vanilla** (ES Modules, sem build) — estado, editor, templates de cartão, localStorage
 
-A plataforma é construída sobre uma pilha tecnológica moderna focada em performance, segurança e escalabilidade:
+## Estrutura
 
-### Core & Framework
-- **Next.js 15 (App Router)**: Utilização de Server Components para otimização de SEO nas páginas públicas e Client Components para o editor em tempo real.
-- **TypeScript**: Tipagem rigorosa em toda a aplicação para garantir a integridade dos dados de design.
-- **Tailwind CSS**: Sistema de design baseado em utilitários para interface responsiva e modo escuro nativo.
+```
+├── index.html            Landing page
+├── editor.html           Editor de cartões (digital + físico)
+├── meus-cartoes.html     Dashboard de cartões (grade via HTMX)
+├── preview.html          Preview standalone do editor
+├── c/card.html           Template da página pública do cartão
+├── partials/             Fragmentos HTMX
+├── css/
+│   ├── input.css         Fonte do Tailwind
+│   └── app.css           CSS buildado (não editar)
+├── js/
+│   ├── db.js             "Banco" local (localStorage, chave digicard_db_json)
+│   ├── data.js           Dados iniciais do cartão
+│   ├── templates.js      Os 13 templates de cartão (HTML strings)
+│   ├── card.js           Preview digital + modal de compartilhar
+│   ├── utils.js          vCard, SVG/PNG, analytics
+│   ├── shared.js         Toast + biblioteca de modelos
+│   └── pages/            Lógica por página
+└── vendor/htmx.min.js    HTMX 2.0.4 local
+```
 
-### Backend & Segurança (BaaS)
-- **Supabase (PostgreSQL)**: Persistência de dados relacionais para cartões e perfis.
-- **RBAC (Role-Based Access Control)**: Sistema de permissões hierárquico implementado via Row Level Security (RLS), suportando:
-  - `super_admin`: Acesso total ao sistema e banco de dados.
-  - `admin`: Gestão de usuários e moderação de conteúdo.
-  - `premium`: Acesso a templates exclusivos e exportação industrial.
-  - `free`: Nível de entrada com limites de criação de cartões.
+## Rodando
 
-### Inteligência Artificial
-- **Genkit 1.x & Google Gemini**: Fluxos de IA para sugestões inteligentes de design baseadas em processamento de linguagem natural (NLP).
+```bash
+npm install          # instala só o tailwindcss (dev)
+npm run build:css    # gera css/app.css
+npm run dev          # serve em http://localhost:9002
+```
 
----
+> Importante: usar `npm run dev` (ou qualquer servidor HTTP). Abrir os arquivos direto via `file://` não funciona por causa dos ES Modules.
 
-## 🛠️ Motores de Renderização e Exportação
+## Testes
 
-O diferencial técnico do DigiCard Studio reside em sua capacidade de processar ativos gráficos para diferentes mídias:
+```bash
+npm test             # suíte completa (node:test, zero dependências)
+```
 
-### 1. Renderização Digital (Web-First)
-- **Flexbox Scroll Engine**: Arquitetura CSS `flex-1 min-h-0` para garantir rolagem independente de conteúdo em mockups de dispositivos móveis.
-- **QR Code Inteligente**: Geração dinâmica de códigos de resposta rápida (API-driven) integrados ao final do fluxo de leitura do usuário.
+44 testes cobrindo:
+- **SQLite store** (`node:sqlite` nativo): CRUD, upsert, import/export, reset
+- **db.js** (localStorage): mesma API, fallback e recuperação de JSON corrompido
+- **utils.js**: links sociais, vCard, SVG de impressão (escape XML, dimensões A4)
+- **templates.js**: os 13 templates renderizam sem "undefined"/"[object Object]" e escapam XSS
+- **gerador** `c/<id>.html`: dados embutidos, XSS neutralizado, erros claros
+- **integridade**: páginas, `node --check` em todos os JS, CSS buildado
 
-### 2. Exportação Industrial (Print-Ready)
-- **Motor de 350 DPI**: Processamento de planos vetoriais via HTML5 Canvas API com interpolação de alta qualidade para saída em PNG de alta resolução.
-- **SVG Vetorial Autocontido**: Geração de arquivos XML/SVG 1.1 com conversão de imagens remotas para **Base64 (Data URI)**, garantindo compatibilidade total com softwares de Plotters (Cricut, Silhouette, Roland).
-- **Layout A4 "Aberto"**: Algoritmo de posicionamento milimétrico para impressão em grade (10 cartões por folha), com marcas de sangria e compensação de corte.
+## SQLite (banco de dados p/ testes)
 
----
+O `node:sqlite` nativo substitui o localStorage em contexto Node. Mesma API do `db.js`:
 
-## 📋 Requisitos e Instalação
+```bash
+npm run db -- list                    # lista cartões
+npm run db -- add spotify "Maria"      # cria cartão
+npm run db -- get <id>                # JSON completo
+npm run db -- delete <id>             # remove
+npm run db -- import cards.json       # importa do "Exportar JSON" da UI
+npm run db -- export                  # exporta para cards.json
+npm run db -- reset                   # limpa tudo
+```
 
-1. **Dependências**:
-   ```bash
-   npm install
-   ```
+O banco fica em `.data/digicard.db` (criado sob demanda). Para usar outro caminho:
+`DIGICARD_DB=/tmp/test.db npm run db -- list`
 
-2. **Variáveis de Ambiente (.env)**:
-   - `NEXT_PUBLIC_SUPABASE_URL`: Endpoint do projeto Supabase.
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Chave pública de anonimato.
-   - `GOOGLE_GENAI_API_KEY`: Chave para o motor Genkit/Gemini.
+### Fluxo manual de teste
 
-3. **Banco de Dados**:
-   - Execute o script `supabase_setup.sql` localizado na pasta `/docs` para provisionar as tabelas, tipos ENUM e políticas RLS.
+```bash
+npm test                          # 1. valida tudo
+npm run db -- add spotify "Teste" # 2. popula o banco
+npm run db -- export              # 3. gera cards.json
+npm run generate:cards            # 4. cria páginas públicas
+npm run dev                       # 5. serve e testa no navegador
+```
 
----
+## Página pública do cartão (links /c/<id>.html)
 
-## 🚀 Roadmap Técnico
-- [x] Implementação de Hierarquia de Usuários (RBAC).
-- [x] Motor de exportação SVG para Plotters.
-- [x] Filtros contextuais na biblioteca de modelos (Digital vs Físico).
-- [x] Painel Administrativo Geral com métricas MRR.
-- [ ] Integração com Gateway de Pagamento (Stripe).
-- [ ] Suporte a domínios personalizados via CNAME.
+Os dados ficam no seu navegador, então as páginas públicas são **geradas**:
 
-*Desenvolvido com rigor técnico no DigiCard Studio.*
+1. Em **Meus Cartões**, clique em **Exportar JSON** → baixa `cards.json`
+2. Coloque o `cards.json` na raiz do projeto
+3. Rode:
+
+```bash
+npm run generate:cards
+```
+
+Isso cria `c/<id>.html` para cada cartão, com os dados embutidos na própria página (self-contained) — o link funciona para qualquer visitante, independente de localStorage. Rodar de novo recria as páginas do zero.
+
+Em ambiente dev (sem gerar), `c/card.html` ainda funciona lendo do localStorage pelo id na URL: `/c/card.html?id=<id>`.
+
+> Segurança: os dados são embutidos com `</` escapado, evitando quebra do `<script>` de dados (testado com payloads XSS).
+
+## Dados
+
+Tudo fica no **localStorage** do navegador (chave `digicard_db_json`). O cartão inicial (João Silva) é criado automaticamente. Para resetar: DevTools → Application → Local Storage → limpar.
+
+## Dados
+
+Tudo fica no **localStorage** do navegador (chave `digicard_db_json`). O cartão inicial (João Silva) é criado automaticamente. Para resetar: DevTools → Application → Local Storage → limpar.

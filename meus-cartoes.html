@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meus Cartões — DigiCard Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/app.css" />
+  <script src="./vendor/htmx.min.js" defer></script>
+  <script type="module" src="./js/pages/meus-cartoes.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 border-r border-slate-200 bg-white flex flex-col fixed h-full z-10">
+      <a href="/" class="p-6 flex items-center gap-3">
+        <div class="bg-primary size-10 rounded-lg flex items-center justify-center text-white">
+          <span class="material-symbols-outlined">style</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold leading-none tracking-tight">DigiCard</h1>
+          <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Professional</p>
+        </div>
+      </a>
+      <nav class="flex-1 px-4 space-y-1">
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="/meus-cartoes.html">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="text-sm font-medium">Dashboard</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors" href="/meus-cartoes.html">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">credit_card</span>
+          <span class="text-sm font-medium">Meus Cartões</span>
+        </a>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors" href="/editor.html">
+          <span class="material-symbols-outlined">edit_note</span>
+          <span class="text-sm font-medium">Abrir Editor</span>
+        </a>
+        <div class="pt-4 pb-2">
+          <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sistema</p>
+        </div>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors" href="/">
+          <span class="material-symbols-outlined">settings</span>
+          <span class="text-sm font-medium">Início</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-slate-200">
+        <div class="flex items-center gap-3 p-2">
+          <div class="size-9 rounded-full bg-slate-100 flex items-center justify-center border-2 border-primary/20">
+            <span class="material-symbols-outlined text-slate-400" style="font-size:18px">person</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold truncate">Usuário Local</p>
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Plano Free</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="flex-1 ml-64 p-8">
+      <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h2 class="text-3xl font-black text-slate-900 tracking-tight">Meus Cartões</h2>
+          <p class="text-slate-500 font-medium mt-1">Gerencie sua identidade digital profissional.</p>
+        </div>
+        <div class="flex items-center gap-3">
+        <button id="btn-new" class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20">
+          <span class="material-symbols-outlined">add_circle</span>
+          Criar Novo Cartão
+        </button>
+        <button id="btn-export" class="border border-slate-200 hover:bg-slate-100 text-slate-700 px-4 py-3 rounded-xl font-bold flex items-center gap-2 transition-all" title="Baixa cards.json para gerar as páginas públicas com npm run generate:cards">
+          <span class="material-symbols-outlined">download</span>
+          Exportar JSON
+        </button>
+        </div>
+      </header>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
+        <div class="relative flex-1 min-w-[300px]">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input id="search" class="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm" placeholder="Pesquisar por nome ou cargo..." type="text" />
+        </div>
+      </div>
+
+      <!-- Grade HTMX: recebe os cartões de partials/cards-grid.html -->
+      <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+           hx-get="./partials/cards-grid.html" hx-trigger="load" hx-swap="innerHTML">
+        <div class="col-span-full flex items-center justify-center py-24">
+          <span class="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Scrollbars ocultos (equivalente ao .no-scrollbar do app original) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Configurações de Impressão Profissional (A4) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 210mm;
+    height: 297mm;
+  }
+
+  /* Ocultar tudo que não for o gabarito de impressão */
+  .print-hidden,
+  header,
+  footer,
+  aside,
+  nav,
+  button,
+  .fixed,
+  .absolute:not(.print-element),
+  .no-print {
+    display: none !important;
+  }
+
+  /* Container da Grade A4 - Layout "Aberto" (Frente + Verso lado a lado) */
+  .print-layout-a4 {
+    display: grid !important;
+    grid-template-columns: 85mm 85mm !important;
+    grid-auto-rows: 55mm !important;
+    column-gap: 5mm !important;
+    row-gap: 3mm !important;
+    padding: 10mm 15mm !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    background: white !important;
+    page-break-after: always;
+    justify-content: center !important;
+    align-content: start !important;
+  }
+
+  /* Item de Cartão Real */
+  .print-card-item {
+    width: 85mm !important;
+    height: 55mm !important;
+    border: 0.05mm solid #eee !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Forçar cores de fundo na impressão */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
