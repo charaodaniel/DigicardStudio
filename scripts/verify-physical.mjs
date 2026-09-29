@@ -111,4 +111,17 @@ check('marcas de corte (class="cut")', svg.includes('class="cut"'));
 check('nome escapado no SVG', svg.includes('João Silva'.toUpperCase()));
 check('verso com fallback textual (sem QR)', svg.includes('SCAN TO SAVE CONTACT') === false || true);
 
+console.log('\n=== Marcação de corte tracejada (opcional) ===');
+// Desligada por padrão
+const svgOff = await generatePhysicalCardSVG({ ...initialCardData, avatarUrl: '', qrCodeUrl: '' });
+check('desligada por padrão (sem cut-guide)', !svgOff.includes('cut-guide') && !svgOff.includes('dasharray: 3 1.5'));
+// Ligada via switch
+const svgOn = await generatePhysicalCardSVG({ ...initialCardData, avatarUrl: '', qrCodeUrl: '', physicalShowCutMarks: true });
+check('ligada: guia tracejada nos dois lados', (svgOn.match(/<rect class="cut-guide"/g) || []).length === 2);
+check('ligada: traço do corte vira tracejado', svgOn.includes('stroke-dasharray: 3 1.5'));
+check('CSS .cut-marks definido', css.includes('.cut-marks'));
+check('switch physicalShowCutMarks no painel', src.includes("switchRow('physicalShowCutMarks'"));
+check('grade de impressão aplica cut-marks', src.includes('cut-marks'));
+check('dado inicial physicalShowCutMarks existe', src.includes('physicalShowCutMarks') && JSON.stringify(initialCardData).includes('physicalShowCutMarks'));
+
 console.log('\n' + (process.exitCode ? '❌ Falhas encontradas' : '✅ Modo físico íntegro'));

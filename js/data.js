@@ -40,6 +40,7 @@ export const initialCardData = {
   physicalShowLinks: true,
   physicalShowQR: true,
   physicalShowFooter: true,
+  physicalShowCutMarks: false,
   physicalBackgroundColor: '#ffffff',
   lastUpdated: Date.now(),
 };

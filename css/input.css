@@ -10,6 +10,31 @@ html {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* Marcação de corte tracejada (opcional, gabarito impresso)
+   Desenhada com gradiente repetido para funcionar no print (border-style:
+   dashed é impreciso/dependente do driver em alta resolução). */
+.cut-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+.cut-marks::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* Traços de 2mm com 1.2mm de espaçamento, 0.2mm de espessura */
+  background-image:
+    repeating-linear-gradient(90deg, #e11d48 0 2mm, transparent 2mm 3.2mm),
+    repeating-linear-gradient(90deg, #e11d48 0 2mm, transparent 2mm 3.2mm),
+    repeating-linear-gradient(0deg, #e11d48 0 2mm, transparent 2mm 3.2mm),
+    repeating-linear-gradient(0deg, #e11d48 0 2mm, transparent 2mm 3.2mm);
+  background-size: 100% 0.2mm, 100% 0.2mm, 0.2mm 100%, 0.2mm 100%;
+  background-position: top left, bottom left, top left, top right;
+  background-repeat: no-repeat;
+}
+
 /* Configurações de Impressão Profissional (A4) */
 @media print {
   @page {

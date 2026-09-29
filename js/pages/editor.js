@@ -315,12 +315,15 @@ function physicalMockup() {
 
   const dims = isVertical ? 'w-[340px] h-[580px]' : 'w-[580px] h-[340px]';
 
+  // Marcação de corte tracejada (opcional)
+  const cutMarks = c.physicalShowCutMarks === true ? '<div class="cut-marks"></div>' : '';
+
   // 5 pares (frente+verso) = 10 cartões por folha A4
   const printPairs = Array.from({ length: 5 })
     .map(
       () => `
-      <div class="print-card-item"><div class="print-card-content flex">${front()}</div></div>
-      <div class="print-card-item"><div class="print-card-content flex">${back()}</div></div>`
+      <div class="print-card-item">${cutMarks}<div class="print-card-content flex">${front()}</div></div>
+      <div class="print-card-item">${cutMarks}<div class="print-card-content flex">${back()}</div></div>`
     )
     .join('');
 
@@ -341,12 +344,14 @@ function physicalMockup() {
       <div class="relative group/face">
         <div class="relative bg-white shadow-2xl overflow-hidden rounded-sm ${dims}">
           <div class="absolute inset-0 flex overflow-hidden">${front()}</div>
+          ${cutMarks}
         </div>
         <p class="text-center mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Frente (Anverso)</p>
       </div>
       <div class="relative group/face">
         <div class="relative bg-white shadow-2xl overflow-hidden rounded-sm ${dims}">
           <div class="absolute inset-0 flex overflow-hidden">${back()}</div>
+          ${cutMarks}
         </div>
         <p class="text-center mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Verso (Reverso)</p>
       </div>
@@ -724,6 +729,15 @@ function toolFisico(c) {
         ${switchRow('physicalShowLinks', 'Exibir Links (Top 3)', c.physicalShowLinks !== false)}
         ${switchRow('physicalShowQR', 'Exibir QR Code (Verso)', c.physicalShowQR !== false)}
         ${switchRow('physicalShowFooter', 'Exibir Rodapé Técnico', c.physicalShowFooter !== false)}
+      </div>
+    </div>
+    <div class="space-y-4 pt-6 border-t">
+      <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Marcas de Corte</label>
+      <div class="space-y-3">
+        ${switchRow('physicalShowCutMarks', 'Marcação tracejada no gabarito', c.physicalShowCutMarks === true)}
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Desenha um contorno tracejado na borda de cada cartão impresso, para conferência e corte manual. Não afeta o SVG da plotter (que já traz marcas de corte próprias).
+        </p>
       </div>
     </div>
     <div class="space-y-4 pt-6 border-t">

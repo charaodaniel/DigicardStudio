@@ -155,6 +155,7 @@ export async function generatePhysicalCardSVG(cardData) {
   const w = 85;
   const h = 55;
   const gap = 5;
+  const cutMarks = cardData.physicalShowCutMarks === true;
 
   const avatarBase64 = cardData.physicalShowAvatar ? await imageToHighQualityBase64(cardData.avatarUrl) : '';
   const qrBase64 = cardData.physicalShowQR ? await imageToHighQualityBase64(cardData.qrCodeUrl || '') : '';
@@ -175,7 +176,8 @@ export async function generatePhysicalCardSVG(cardData) {
     </clipPath>
   </defs>
   <style>
-    .cut { fill: none; stroke: #FF0000; stroke-width: 0.1; }
+    .cut { fill: none; stroke: #FF0000; stroke-width: 0.1; ${cutMarks ? 'stroke-dasharray: 3 1.5;' : ''} }
+    ${cutMarks ? '.cut-guide { fill: none; stroke: #e11d48; stroke-width: 0.15; stroke-dasharray: 2 1.2; }' : ''}
     .text { fill: ${textColor}; font-family: '${fontName}', Arial, sans-serif; }
     .label { fill: ${cardData.themeColor}; font-weight: bold; }
     .small-label { fill: ${textColor}; opacity: 0.5; font-size: 1.8px; font-weight: bold; }
@@ -184,6 +186,7 @@ export async function generatePhysicalCardSVG(cardData) {
   <g id="front">
     <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
+    ${cutMarks ? `<rect class="cut-guide" x="1" y="1" width="${w - 2}" height="${h - 2}" rx="1.5" />` : ''}
 
     ${cardData.physicalShowAvatar && avatarBase64 ? `
     <image xlink:href="${avatarBase64}" x="53" y="8" width="24" height="24" clip-path="url(#avatar-clip)" preserveAspectRatio="xMidYMid slice" />
@@ -211,6 +214,7 @@ export async function generatePhysicalCardSVG(cardData) {
   <g id="back" transform="translate(${w + gap}, 0)">
     <rect x="0" y="0" width="${w}" height="${h}" fill="${cardData.physicalBackgroundColor || '#ffffff'}" />
     <rect class="cut" x="0" y="0" width="${w}" height="${h}" rx="2" />
+    ${cutMarks ? `<rect class="cut-guide" x="1" y="1" width="${w - 2}" height="${h - 2}" rx="1.5" />` : ''}
 
     ${cardData.physicalShowQR && qrBase64 ? `
     <g transform="translate(${w / 2 - 15}, ${h / 2 - 18})">
